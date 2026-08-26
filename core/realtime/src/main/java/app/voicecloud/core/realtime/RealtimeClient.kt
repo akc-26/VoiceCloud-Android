@@ -20,6 +20,7 @@ sealed interface RealtimeConnectionState {
 interface RealtimeClient {
     val state: StateFlow<RealtimeConnectionState>
     fun connect(): Boolean
+    fun refreshAuthentication()
     fun disconnect()
     fun emit(event: String, payload: JSONObject = JSONObject())
     fun on(event: String, listener: (Array<out Any>) -> Unit)
@@ -82,6 +83,18 @@ private class SocketIoRealtimeClient(
         }
         active.connect()
         return true
+    }
+
+    override fun refreshAuthentication() {
+        val wasActive = socket?.connected() == true ||
+            connectionState.value is RealtimeConnectionState.Authenticated ||
+            connectionState.value is RealtimeConnectionState.TransportConnected
+        if (!wasActive) return
+        socket?.off()
+        socket?.disconnect()
+        socket = null
+        connectionState.value = RealtimeConnectionState.Disconnected
+        connect()
     }
 
     override fun disconnect() {

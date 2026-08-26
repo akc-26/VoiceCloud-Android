@@ -33,6 +33,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,14 +44,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 
 @Composable
-fun BootstrapRoute(viewModel: BootstrapViewModel = hiltViewModel()) {
+fun BootstrapRoute(viewModel: BootstrapViewModel = hiltViewModel(), onReady: (app.voicecloud.core.model.MobileConfig) -> Unit = {}) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     AnimatedContent(
         targetState = state,
@@ -74,12 +75,15 @@ fun BootstrapRoute(viewModel: BootstrapViewModel = hiltViewModel()) {
                 action = if (current.canRetry) "Try again" else null,
                 onAction = viewModel::refresh,
             )
-            is BootstrapState.Ready -> FoundationReadyScreen(
-                loginMethods = current.config.supportedLoginMethods,
-                liveKitAvailable = current.config.availableRtcProviders.any {
-                    it.providerType?.contains("livekit", ignoreCase = true) == true
-                },
-            )
+            is BootstrapState.Ready -> {
+                LaunchedEffect(current.config) { onReady(current.config) }
+                FoundationReadyScreen(
+                    loginMethods = current.config.supportedLoginMethods,
+                    liveKitAvailable = current.config.availableRtcProviders.any {
+                        it.providerType?.contains("livekit", ignoreCase = true) == true
+                    },
+                )
+            }
         }
     }
 }
@@ -195,7 +199,7 @@ private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: 
                     StatusRow("Live audio", if (liveKitAvailable) "Available" else "Backend controlled")
                     HorizontalDivider()
                     Text(
-                        "User and Creator authentication begin in PH02. This PH01 screen intentionally contains no account/business workflow.",
+                        "Secure account access is loading. PH02 adds User and Creator authentication without exposing later product modules.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

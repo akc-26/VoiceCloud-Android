@@ -13,8 +13,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:security"))
-    implementation(libs.kotlinx.coroutines.android)
+    api(project(":core:security"))
+    api(libs.kotlinx.coroutines.android)
     implementation(libs.socketio.client) {
         exclude(group = "org.json", module = "json")
     }

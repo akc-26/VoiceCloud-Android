@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -14,7 +16,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph01"
+        versionName = "1.0.0-ph02"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -26,12 +28,17 @@ android {
 
     fun property(name: String): String = providers.gradleProperty(name).orNull.orEmpty().trim()
     fun quoted(value: String): String = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+    fun webHost(url: String): String = URI(url).host ?: error("VoiceCloud Web endpoint must contain a valid host: $url")
 
     // PH01-R08+: endpoint values are centralized in the project root gradle.properties.
     // %USERPROFILE%\.gradle\gradle.properties may override them per workstation.
     fun requiredEndpoint(name: String): String = property(name).ifBlank {
         error("Missing required VoiceCloud endpoint Gradle property: $name")
     }
+    val googleWebClientId = property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID")
+    val firebaseApiKey = property("VOICECLOUD_FIREBASE_API_KEY")
+    val firebaseApplicationId = property("VOICECLOUD_FIREBASE_APPLICATION_ID")
+    val firebaseProjectId = property("VOICECLOUD_FIREBASE_PROJECT_ID")
     val debugApiUrl = requiredEndpoint("VOICECLOUD_DEBUG_API_BASE_URL")
     val debugSocketUrl = requiredEndpoint("VOICECLOUD_DEBUG_SOCKET_BASE_URL")
     val debugWebUrl = requiredEndpoint("VOICECLOUD_DEBUG_WEB_BASE_URL")
@@ -42,6 +49,8 @@ android {
     val releaseSocketUrl = property("VOICECLOUD_RELEASE_SOCKET_BASE_URL").ifBlank { debugSocketUrl }
     val releaseWebUrl = property("VOICECLOUD_RELEASE_WEB_BASE_URL").ifBlank { debugWebUrl }
 
+    defaultConfig.manifestPlaceholders["voicecloudWebHost"] = webHost(debugWebUrl)
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -51,6 +60,11 @@ android {
             buildConfigField("String", "SOCKET_BASE_URL", quoted(debugSocketUrl))
             buildConfigField("String", "WEB_BASE_URL", quoted(debugWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"debug\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientId))
+            buildConfigField("String", "FIREBASE_API_KEY", quoted(firebaseApiKey))
+            buildConfigField("String", "FIREBASE_APPLICATION_ID", quoted(firebaseApplicationId))
+            buildConfigField("String", "FIREBASE_PROJECT_ID", quoted(firebaseProjectId))
+            manifestPlaceholders["voicecloudWebHost"] = webHost(debugWebUrl)
         }
         create("staging") {
             initWith(getByName("debug"))
@@ -61,6 +75,11 @@ android {
             buildConfigField("String", "SOCKET_BASE_URL", quoted(stagingSocketUrl))
             buildConfigField("String", "WEB_BASE_URL", quoted(stagingWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"staging\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientId))
+            buildConfigField("String", "FIREBASE_API_KEY", quoted(firebaseApiKey))
+            buildConfigField("String", "FIREBASE_APPLICATION_ID", quoted(firebaseApplicationId))
+            buildConfigField("String", "FIREBASE_PROJECT_ID", quoted(firebaseProjectId))
+            manifestPlaceholders["voicecloudWebHost"] = webHost(stagingWebUrl)
         }
         release {
             isMinifyEnabled = true
@@ -69,6 +88,11 @@ android {
             buildConfigField("String", "SOCKET_BASE_URL", quoted(releaseSocketUrl))
             buildConfigField("String", "WEB_BASE_URL", quoted(releaseWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"release\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientId))
+            buildConfigField("String", "FIREBASE_API_KEY", quoted(firebaseApiKey))
+            buildConfigField("String", "FIREBASE_APPLICATION_ID", quoted(firebaseApplicationId))
+            buildConfigField("String", "FIREBASE_PROJECT_ID", quoted(firebaseProjectId))
+            manifestPlaceholders["voicecloudWebHost"] = webHost(releaseWebUrl)
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -92,11 +116,14 @@ dependencies {
     implementation(project(":core:logging"))
     implementation(project(":core:realtime"))
     implementation(project(":feature:bootstrap"))
+    implementation(project(":feature:auth"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
     implementation(libs.moshi.kotlin)
     ksp(libs.hilt.compiler)

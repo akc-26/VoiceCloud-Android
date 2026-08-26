@@ -26,3 +26,5 @@ include(":feature:bootstrap")
 include(":core:preferences")
 include(":core:logging")
 include(":core:realtime")
+
+include(":feature:auth")

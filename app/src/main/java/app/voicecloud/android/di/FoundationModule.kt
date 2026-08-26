@@ -24,6 +24,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import javax.inject.Named
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -37,6 +38,9 @@ object FoundationModule {
         configuredWebBaseUrl = BuildConfig.WEB_BASE_URL,
         debug = BuildConfig.DEBUG,
     )
+
+    @Provides @Singleton @Named("voicecloudApiBaseUrl")
+    fun apiBaseUrl(endpoints: app.voicecloud.android.network.VoiceCloudEndpoints): String = endpoints.apiBaseUrl
 
     @Provides @Singleton
     fun tokenVault(@ApplicationContext context: Context): TokenVault = AndroidKeyStoreTokenVault(context)
