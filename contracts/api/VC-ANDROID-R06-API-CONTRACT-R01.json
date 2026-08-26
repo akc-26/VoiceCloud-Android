@@ -1,0 +1,4771 @@
+{
+  "authority": {
+    "repository": "akc-26/VoiceCloud-Backend",
+    "branch": "VoiceCloud-Backend-VC-PLATFORM-CLOSURE-R06",
+    "commit": "7bee8d463786d21a7200b5663a499408bb229115",
+    "androidReadinessRevision": "VC-ANDROID-A0-R01"
+  },
+  "generatedAt": "2026-08-26T01:34:39.285Z",
+  "backendControllerFiles": 55,
+  "backendOperations": 700,
+  "existingFrontendApiCalls": 251,
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/admin/audit-logs",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/auth/history",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/:param/download",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/:param/verify",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/backups/:param",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/:param",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/disaster-recovery/status",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/restore/history",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/restore/preview/:param",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/restore",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/retention/purge",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/backups/schedules/:param",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/backups/schedules/:param",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/schedules/list",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/schedules",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/upload",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups",
+      "controllerFile": "src/modules/backup/backup.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/badges/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/badges/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/badges",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/badges",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/cms/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/cms/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/cms/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/cms",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/cms",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/contact-submissions/:param/reply",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/contact-submissions/:param/status",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/contact-submissions/:param",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/contact-submissions",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications/:param/assets/:param/content",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications/:param/assets",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/creator-access-applications/:param/review",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications/:param",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/dashboard/stats",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/feature-flags/:param/toggle",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/feature-flags/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/feature-flags",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/feature-flags",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/analytics",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/attachments",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/conversations/:param/messages",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/conversations/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/conversations",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/messaging/reports/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/reports",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/providers/:param/activate",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers/:param/history",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/reveal",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/rollback/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/rotate",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/test",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/providers/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/providers/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers/health-summary",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/rankings/cache-status",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/rankings/refresh-cache",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/rankings/snapshots",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/analytics",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/approve",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/referrals/blacklist/:param",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/blacklist",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/blacklist",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/referrals/campaigns/:param",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/referrals/campaigns/:param",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/campaigns",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/campaigns",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/fraud-logs",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/fraud/action",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/grant-reward",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/search",
+      "controllerFile": "src/modules/referral/controllers/admin-referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/rooms/:param/terminate",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/rooms/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/rooms",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/settings/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings/group/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings/host-business",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/settings/host-business",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings/operational",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/settings/operational",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings/streaming-infrastructure",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/settings/streaming-infrastructure",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/settings",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/store/analytics",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/store/grant",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/store/inventory/:param",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/store/items/:param",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/store/items/:param",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/store/items",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/store/items",
+      "controllerFile": "src/modules/store/controllers/admin-store.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/tasks-achievements/achievements/:param",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tasks-achievements/achievements/:param",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/achievements",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/achievements",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/analytics",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/manual-grant-reward",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/manual-reset",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/rewards/audit-logs",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/seasons/:param/rollover",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tasks-achievements/seasons/:param",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/seasons",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/seasons",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/tasks-achievements/tasks/:param",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tasks-achievements/tasks/:param",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/tasks",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/tasks",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/user-progress/:param",
+      "controllerFile": "src/modules/tasks-achievements/controllers/admin-tasks-achievements.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/users/:param/badges/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:param/badges",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:param/identity",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:param/level",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:param/reset-password",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:param/settings",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/users/:param/settings",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/users/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/users/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/visitors/logs",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/visitors/stats",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/versions/:param",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/versions",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/versions",
+      "controllerFile": "src/modules/admin/admin.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/payouts/:param/approve",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/payouts/:param/process",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/payouts/:param/reject",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/creator/payouts/:param",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/creator/payouts",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/settle",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/overview",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/wallet/packages/:param",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/wallet/packages/:param",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/packages",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/packages",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/payment-logs",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/wallet/payment-providers/:param",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/payment-providers",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/refunds",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/transactions/:param",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/transactions/credit",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/transactions/debit",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/transactions",
+      "controllerFile": "src/modules/wallet/admin-wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/audience-growth",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/gifting-heatmap",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/hourly-engagement",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/listener-retention",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/realtime",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/session-summary",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/:param/speaker-activity",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/rooms/compare",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics",
+      "controllerFile": "src/modules/analytics/analytics.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/android/billing/creator-plans/:param/google-play",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/android/billing/creator-plans",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/android/billing/creator/:param/catalog",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/android/billing/creator/history",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/android/billing/creator/verify",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/android/billing/google-play/rtdn",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/android/billing/subscriptions/:param/cancel",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/android/billing/vip/catalog",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/android/billing/vip/verify",
+      "controllerFile": "src/modules/android-billing/android-billing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/announcements/:param/attachment",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/announcements/:param/banner",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/announcements/:param/thumbnail",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/announcements/:param",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/announcements/:param",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/announcements/:param",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/announcements/admin",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/announcements",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/announcements",
+      "controllerFile": "src/modules/announcements/announcements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/info",
+      "controllerFile": "src/app.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api",
+      "controllerFile": "src/app.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/auth/devices/:param",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/devices/:param",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/devices",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/forgot-password",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/google/login",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/guest/login",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/guest/upgrade",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/history",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout-all",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/phone/login",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/phone/send-otp",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/phone/verify-otp",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/referral/validate/:param",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/refresh",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/register",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/reset-password",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/auth/sessions/:param",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/sessions/:param",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/sessions",
+      "controllerFile": "src/modules/auth/auth.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/blocks/:param",
+      "controllerFile": "src/modules/moderation/blocks.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/blocks/:param",
+      "controllerFile": "src/modules/moderation/blocks.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/blocks/check/:param",
+      "controllerFile": "src/modules/moderation/blocks.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/blocks",
+      "controllerFile": "src/modules/moderation/blocks.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/blocks",
+      "controllerFile": "src/modules/moderation/blocks.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/attachments",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/leave",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/chat/conversations/:param/members/:param/role",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/chat/conversations/:param/members/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/members",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations/:param/messages",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/messages",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/read",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/transfer-ownership",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/typing",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/chat/conversations/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/chat/conversations/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/forward",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/pin",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/chat/messages/:param/reactions/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/reactions",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/reply",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/report-spam",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/report",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/messages/:param/unpin",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/chat/messages/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/chat/messages/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/presence/:param",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/presence",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/rooms/:param/announcement",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/rooms/:param/pinned",
+      "controllerFile": "src/modules/chat/chat.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:param/invite-code",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:param/join",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/clubs/:param/leave",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/clubs/:param/members/:param",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/clubs/:param/members/:param",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:param/members",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:param/membership/me",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:param/scheduled-rooms",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/clubs/:param",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/clubs/:param",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/clubs/:param",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/clubs",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/clubs",
+      "controllerFile": "src/modules/clubs/clubs.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/cms/creator/pages/:param",
+      "controllerFile": "src/modules/admin/public-cms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/cms/creator/pages",
+      "controllerFile": "src/modules/admin/public-cms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/cms/pages/:param",
+      "controllerFile": "src/modules/admin/public-cms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/cms/pages",
+      "controllerFile": "src/modules/admin/public-cms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/features",
+      "controllerFile": "src/modules/admin/public-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/maintenance",
+      "controllerFile": "src/modules/admin/public-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/mobile",
+      "controllerFile": "src/modules/admin/public-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/providers",
+      "controllerFile": "src/modules/admin/public-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/public/remote-config",
+      "controllerFile": "src/modules/config/remote-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/public/version-check",
+      "controllerFile": "src/modules/config/remote-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/public",
+      "controllerFile": "src/modules/admin/public-config.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/version",
+      "controllerFile": "src/modules/admin/public-config.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/contact",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator-access/applications/verified",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator-access/applications",
+      "controllerFile": "src/modules/admin/public-engagement.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/dashboard",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/earnings",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/my-subscriptions",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/payout-request",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/payout-requests/:param",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/payout-requests",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/creator/plans/:param",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/plans/:param",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/creator/plans/:param",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/plans",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/plans",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/stream-credentials/regenerate",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/stream-credentials",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/subscribe/:param",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/subscribers",
+      "controllerFile": "src/modules/creator/creator.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/hosts/recently-active",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/hosts/top",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/hosts/trending",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/hosts/verified",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/rooms/following",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/rooms/live",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/rooms/popular",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/rooms/recent",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/rooms/trending",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/users/new",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/users/online",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/users/popular",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/users/recently-active",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/users/suggested",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/discovery/users/trending",
+      "controllerFile": "src/modules/discovery/discovery.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/:param/animation",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/:param/icon",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/:param/preview",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/admin/:param/archive",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/gifts/admin/:param/disable",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/gifts/admin/:param/enable",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/admin/:param/restore",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/gifts/admin/:param",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/gifts/admin/:param",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/admin/catalog",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/gifts/admin/categories/:param",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/gifts/admin/categories/:param",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/admin/categories",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/admin/categories",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/gifts/admin/reorder",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/admin",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/analytics/revenue",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/analytics/top-gifts",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/analytics/top-receivers",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/analytics/top-senders",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/analytics/trends",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/catalog",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/categories",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/featured",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/history",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/lucky-box/open",
+      "controllerFile": "src/modules/gifts/gifts-phase18.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/multi-send",
+      "controllerFile": "src/modules/gifts/gifts-phase18.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/queue/:param",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/queue/cancel/:param",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/search",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/send-combo",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/send-multi",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/gifts/send",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/trending",
+      "controllerFile": "src/modules/gifts/gifts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/health/metrics",
+      "controllerFile": "src/modules/health/health.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "controllerFile": "src/modules/health/health.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/applications/:param/verification-assets",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/applications",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/approve/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/audit-history/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/audit-note/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/earnings",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/grant-reward/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/reactivate/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/reject/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/settlement/complete/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/suspend/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/apply",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/earnings/settlement/request",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/earnings",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/eligibility",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/moderation/action",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/moderation/incidents/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/performance",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/profile/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/profile",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/hosts/profile",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/progression",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/rewards/claim",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/rewards",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/rooms/analytics/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/rooms/cancel/:param",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/rooms/history",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/rooms",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/search",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/top-hosts",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/verification/assets/:param/content",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/hosts/verification/assets/:param/replacement",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/verification/assets",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/verification/documents",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/verification/government-id",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/verification/profile-photo",
+      "controllerFile": "src/modules/hosts/hosts.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/:param/:param",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/:param",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/clubs",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/comparison",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/creators",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/gift-receivers",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/gift-senders",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/hosts",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/rooms",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/snapshots",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/users",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards/vip",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/leaderboards",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/audit-logs",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/auto-moderation/analyze",
+      "controllerFile": "src/modules/moderation/phase18-security.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/device-security/ban",
+      "controllerFile": "src/modules/moderation/phase18-security.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/device-security/check/:param",
+      "controllerFile": "src/modules/moderation/phase18-security.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/device-security/register",
+      "controllerFile": "src/modules/moderation/phase18-security.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/notes/:param",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/notes",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/moderation/reports/:param/approve",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/moderation/reports/:param/dismiss",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/reports/:param",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/reports/search",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/reports",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/users/:param/ban",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/users/:param/mute",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/users/:param/status",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/users/:param/suspend",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/users/:param/warnings",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/moderation/users/:param/warn",
+      "controllerFile": "src/modules/moderation/moderation.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/notifications/:param/read",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications/:param",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/:param",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/admin/delivery-log",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/admin",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/notifications/read-all",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/register-device",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications",
+      "controllerFile": "src/modules/notifications/notifications.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/payment/webhooks/:param",
+      "controllerFile": "src/modules/payment-webhooks/payment-webhooks.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/polls/:param/start",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/polls/:param/stop",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/polls/:param/vote",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/polls/:param",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/polls/:param",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/polls/rooms/:param",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/polls",
+      "controllerFile": "src/modules/polls/polls.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/presence/:param/last-seen",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/presence/:param",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/presence/devices/register",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/presence/devices",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/presence/online",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/presence/sessions/:param",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/presence/sessions",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/presence/sessions",
+      "controllerFile": "src/modules/users/presence.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/quizzes/:param/leaderboard",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/quizzes/:param/next-round",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/quizzes/:param/start",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/quizzes/:param/stop",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/quizzes/:param/submit",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/quizzes/:param",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/quizzes/rooms/:param/active",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/quizzes",
+      "controllerFile": "src/modules/quizzes/quizzes.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rankings/admin/cache-refresh",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/admin/cache-status",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rankings/admin/cache/refresh",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/admin/cache/status",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rankings/admin/snapshot",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/admin/snapshots",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rankings/admin/snapshots",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/history/comparison/:param/:param",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/:param/:param",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/:param",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/clubs",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/creators",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/gift-receivers",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/gift-senders",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/hosts",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/rooms",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/users",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/vip",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending/clubs",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending/hosts",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending/keywords",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending/rooms",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending/users",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/recommendations/hosts",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/recommendations/rooms",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/recommendations/users",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/recommendations",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/referrals/apply-code",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/referrals/campaigns",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/referrals/generate-code",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/referrals/history",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/referrals/leaderboard",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/referrals/milestones",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/referrals/rewards",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/referrals/summary",
+      "controllerFile": "src/modules/referral/controllers/referral.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/regional-pricing/convert",
+      "controllerFile": "src/modules/regional-pricing/regional-pricing.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/regional-pricing/countries/:param",
+      "controllerFile": "src/modules/regional-pricing/regional-pricing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/regional-pricing/countries/:param",
+      "controllerFile": "src/modules/regional-pricing/regional-pricing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/regional-pricing/countries",
+      "controllerFile": "src/modules/regional-pricing/regional-pricing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/regional-pricing/countries",
+      "controllerFile": "src/modules/regional-pricing/regional-pricing.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/regional-pricing/creator-earnings/calculate",
+      "controllerFile": "src/modules/regional-pricing/regional-pricing.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/replays/:param",
+      "controllerFile": "src/modules/replays/replays.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/replays",
+      "controllerFile": "src/modules/replays/replays.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/reports/my-reports",
+      "controllerFile": "src/modules/moderation/reports.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/reports/targets/:param/:param",
+      "controllerFile": "src/modules/moderation/reports.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/reports/targets/search",
+      "controllerFile": "src/modules/moderation/reports.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/reports",
+      "controllerFile": "src/modules/moderation/reports.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/room-activity/:param/join",
+      "controllerFile": "src/modules/rooms/room-activity.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/room-activity/:param/leave",
+      "controllerFile": "src/modules/rooms/room-activity.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/room-activity/me",
+      "controllerFile": "src/modules/rooms/room-activity.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/:param/audio-state",
+      "controllerFile": "src/modules/rooms/soundboard.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/background",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/rooms/:param/bgm",
+      "controllerFile": "src/modules/rooms/soundboard.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/cover",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/end",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/pause",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/:param/replay",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/resume",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/soundboard/trigger",
+      "controllerFile": "src/modules/rooms/soundboard.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/start",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/thumbnail",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/rooms/:param",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/:param",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/rooms/:param",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/mine",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/saved/:param/status",
+      "controllerFile": "src/modules/rooms/saved-rooms.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/rooms/saved/:param",
+      "controllerFile": "src/modules/rooms/saved-rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/saved/:param",
+      "controllerFile": "src/modules/rooms/saved-rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/saved",
+      "controllerFile": "src/modules/rooms/saved-rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/soundboard/presets",
+      "controllerFile": "src/modules/rooms/soundboard.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms",
+      "controllerFile": "src/modules/rooms/rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/admin/monitoring",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/analytics/room/:param",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/config",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/rtc/config",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/metrics/report",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/recordings/:param/stop",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/recordings/pause",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/recordings/resume",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/recordings/start",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/recordings",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/approve-speaker",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/rtc/rooms/:param/audio-profile",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/cancel-raise-hand",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/invite-speaker",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/lock-seat",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/mute-user",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/rooms/:param/participants/:param/quality",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/rooms/:param/participants",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/rooms/:param/quality-metrics",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/raise-hand",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/reject-speaker",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/remove-speaker",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/rooms/:param/stage",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/force-disconnect",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/join",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/leave",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/rejoin",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/sessions/:param",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/sessions/active",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/sessions/start",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/sessions/stop",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/speaking-state",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/token/refresh",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/token",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/webhooks/:param",
+      "controllerFile": "src/modules/rtc/rtc.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/scheduled-rooms/:param/buy-ticket",
+      "controllerFile": "src/modules/rooms/room-tickets.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/scheduled-rooms/:param/lobby",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/scheduled-rooms/:param/reminder",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/scheduled-rooms/:param",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/scheduled-rooms/:param",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/scheduled-rooms/:param",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/scheduled-rooms/my-tickets",
+      "controllerFile": "src/modules/rooms/room-tickets.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/scheduled-rooms",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/scheduled-rooms",
+      "controllerFile": "src/modules/rooms/scheduled-rooms.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/announcements",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/gifts",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/search/history",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/history",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/search/history",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/hosts",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/rooms",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/suggestions",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search/users",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/search",
+      "controllerFile": "src/modules/search/search.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/storage/:param",
+      "controllerFile": "src/modules/storage/storage.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/storage/:param",
+      "controllerFile": "src/modules/storage/storage.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/storage/:param",
+      "controllerFile": "src/modules/storage/storage.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/storage/upload",
+      "controllerFile": "src/modules/storage/storage.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/storage",
+      "controllerFile": "src/modules/storage/storage.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/store/catalog",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/store/equip",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/store/gift",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/store/inventory/equipped",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/store/inventory",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/store/items/:param",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/store/purchase",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/store/unequip",
+      "controllerFile": "src/modules/store/controllers/store.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/achievements",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks-achievements/check-in/claim",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/check-in",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/rewards/history",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/seasons/active",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/seasons/leaderboard",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks-achievements/streaks/:param/freeze",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks-achievements/streaks/:param/recover",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/streaks",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks-achievements/tasks/:param/claim",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks-achievements/tasks/event",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/tasks",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks-achievements/xp/add",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks-achievements/xp/progress",
+      "controllerFile": "src/modules/tasks-achievements/controllers/tasks-achievements.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/trending/clubs",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/trending/hosts",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/trending/keywords",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/trending/rooms",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/trending/users",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/trending",
+      "controllerFile": "src/modules/rankings/rankings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/follow-stats",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/:param/follow",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/followers",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/following",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/:param/follow",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/last-seen",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/mutual-followers",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/presence",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/profile",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/stats",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/avatar/metadata",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/avatar",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/avatar",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/avatar",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/badges/:param",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/badges",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/cover",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/cover",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/cover",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/devices",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/exp",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/follow-stats",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/followers",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/following",
+      "controllerFile": "src/modules/users/social.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/friends/:param/category",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/friends/:param",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/friends/mutual/:param",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/friends/nearby",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/friends/request/:param/accept",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/friends/request/:param/cancel",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/friends/request/:param/reject",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/friends/request",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/friends/requests/pending",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/friends/suggested",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/friends",
+      "controllerFile": "src/modules/users/friends.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/presence/online",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/privacy",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/privacy",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/profile/me",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/profile",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/public/:param",
+      "controllerFile": "src/modules/users/social-identity.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/qr",
+      "controllerFile": "src/modules/users/social-identity.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/referrals/claim",
+      "controllerFile": "src/modules/users/social-identity.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/referrals",
+      "controllerFile": "src/modules/users/social-identity.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/search",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/sessions/active",
+      "controllerFile": "src/modules/users/users.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/settings",
+      "controllerFile": "src/modules/users/user-settings.controller.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/settings",
+      "controllerFile": "src/modules/users/user-settings.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/share",
+      "controllerFile": "src/modules/users/social-identity.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/visitors/:param",
+      "controllerFile": "src/modules/users/visitors.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/visitors/:param",
+      "controllerFile": "src/modules/users/visitors.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/visitors/stats",
+      "controllerFile": "src/modules/users/visitors.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/visitors",
+      "controllerFile": "src/modules/users/visitors.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/benefits/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/benefits",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/benefits",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/dashboard",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/memberships",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/vip/admin/plans/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/plans/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/plans",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/plans",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/renewals",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/revenue",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/rewards/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/rewards",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/rewards",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/vip/admin/tiers/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/tiers/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/tiers",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/tiers",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/badges",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/benefits",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/cancel",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/checkout/web/cancel",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/checkout/web/complete",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/checkout/web/initiate",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/downgrade",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/gifts",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/history",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/membership",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/plans",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/purchase",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/renew",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/rewards/claim",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/rewards/history",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/rewards/missed",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/rewards",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/room-privileges",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/subscribe",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/tiers/:param",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/tiers",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/upgrade",
+      "controllerFile": "src/modules/vip/vip.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/balance",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/conversion-preview",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/convert-diamonds",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/creator/earnings",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/creator/settlement-history",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/history",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/packages",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/purchase-preview",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/purchase/initiate",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/purchase/validate",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/purchase/web/cancel",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/purchase/web/complete",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/purchase/web/initiate",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/purchases/history",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/summary",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/transactions/:param",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/transactions",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/wallet/transfer",
+      "controllerFile": "src/modules/wallet/wallet.controller.ts"
+    }
+  ],
+  "frontendCalls": [
+    {
+      "method": "GET",
+      "path": "/admin/auth/history",
+      "file": "admin/src/pages/AuthManagementPage.tsx"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/settings/:param",
+      "file": "admin/src/pages/AuthManagementPage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/conversations/:param",
+      "file": "admin/src/pages/MessagingConversationPage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/conversations/:param/messages",
+      "file": "admin/src/pages/MessagingConversationPage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/analytics",
+      "file": "admin/src/pages/MessagingPage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/conversations",
+      "file": "admin/src/pages/MessagingPage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/reports",
+      "file": "admin/src/pages/MessagingPage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/messaging/attachments",
+      "file": "admin/src/pages/MessagingPage.tsx"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/messaging/reports/:param",
+      "file": "admin/src/pages/MessagingPage.tsx"
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/profile",
+      "file": "admin/src/pages/ProfilePage.tsx"
+    },
+    {
+      "method": "POST",
+      "path": "/users/avatar",
+      "file": "admin/src/pages/ProfilePage.tsx"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/dashboard/stats",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/audit-logs",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/feature-flags",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/feature-flags/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/settings/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers/health-summary",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/providers/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/providers/:param/activate",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/test",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/reveal",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/rotate",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/providers/:param/history",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/providers/:param/rollback/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/providers/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/versions",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/versions",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/versions/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/cms",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/cms",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/cms/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/cms/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/contact-submissions",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/contact-submissions/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/contact-submissions/:param/reply",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/contact-submissions/:param/status",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/creator-access-applications/:param/review",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications/:param/assets",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/creator-access-applications/:param/assets/:param/content",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/campaigns",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/campaigns",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/referrals/campaigns/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/referrals/campaigns/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/fraud-logs",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/fraud/action",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/blacklist",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/blacklist",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/referrals/blacklist/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/referrals/grant-reward",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/referrals/analytics",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/announcements/admin",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/announcements",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/announcements/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/announcements/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/reports",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/moderation/reports/:param/approve",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/moderation/reports/:param/dismiss",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/audit-logs",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/:param/verify",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/backups/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/:param/download",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/restore/preview/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/restore",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/restore/history",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/schedules/list",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/schedules",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/backups/schedules/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/backups/schedules/:param",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/backups/retention/purge",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/backups/disaster-recovery/status",
+      "file": "admin/src/services/admin.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "file": "admin/src/services/auth.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "file": "admin/src/services/auth.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/refresh",
+      "file": "admin/src/services/auth.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/transactions",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/transactions/:param",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/creator/payouts",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/creator/payouts/:param",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/payouts/:param/approve",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/payouts/:param/reject",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/creator/payouts/:param/process",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/wallet/packages",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/packages",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/wallet/packages/:param",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/wallet/packages/:param",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/wallet/refunds",
+      "file": "admin/src/services/economy.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/applications",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/applications/:param/verification-assets",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/verification/assets/:param/content",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/approve/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/reject/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/suspend/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/reactivate/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/audit-history/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/audit-note/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/admin/earnings",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/settlement/complete/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/admin/grant-reward/:param",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/top-hosts",
+      "file": "admin/src/services/hosts.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/admin/delivery-log",
+      "file": "admin/src/services/notifications-admin.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/leaderboard/:param",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/trending",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rankings/admin/cache/refresh",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/admin/cache/status",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rankings/admin/snapshot",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/admin/snapshots",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rankings/history/comparison/:param/:param",
+      "file": "admin/src/services/rankings.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/rooms",
+      "file": "admin/src/services/rooms.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/rooms/:param",
+      "file": "admin/src/services/rooms.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/rooms/:param/terminate",
+      "file": "admin/src/services/rooms.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/store/items",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/store/items",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/store/items/:param",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/store/items/:param",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/store/grant",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/store/inventory/:param",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/store/analytics",
+      "file": "admin/src/services/store.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/tasks",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/tasks",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tasks-achievements/tasks/:param",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/tasks-achievements/tasks/:param",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/achievements",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/achievements",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tasks-achievements/achievements/:param",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/tasks-achievements/achievements/:param",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/seasons",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/seasons",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/tasks-achievements/seasons/:param",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/seasons/:param/rollover",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/manual-grant-reward",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/tasks-achievements/manual-reset",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/user-progress/:param",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/rewards/audit-logs",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/tasks-achievements/analytics",
+      "file": "admin/src/services/tasks-achievements.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:param/reset-password",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:param/identity",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:param",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/users/:param",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/users/:param",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:param/level",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/badges",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/badges",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/badges/:param",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/badges/:param",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/:param/badges",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/users/:param/badges/:param",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/visitors/logs",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/visitors/stats",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/:param/settings",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/users/:param/settings",
+      "file": "admin/src/services/users.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/dashboard",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/tiers",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/tiers",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/tiers/:param",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/vip/admin/tiers/:param",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/memberships",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/benefits",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/benefits",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/benefits/:param",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/rewards",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/vip/admin/rewards",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/vip/admin/rewards/:param",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/revenue",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/vip/admin/renewals",
+      "file": "admin/src/services/vip.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/dashboard",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/profile/me",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/balance",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/summary",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/wallet/transactions",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/earnings",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/gifts/history",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/plans",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/plans",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/creator/plans/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/creator/plans/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/subscribers",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/creator/payout-requests",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/payout-request",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/mine",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/sessions/start",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/sessions/active",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/sessions/stop",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/token",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/join",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/leave",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/rooms/:param/participants",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/speaking-state",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rtc/rooms/:param/stage",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:param/profile",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations/:param/messages",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/messages",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/read",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/chat/conversations/:param/messages",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/chat/conversations/:param/messages",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/rooms/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/rooms/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/start",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/pause",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/resume",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms/:param/end",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/invite-speaker",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/approve-speaker",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/reject-speaker",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/remove-speaker",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/mute-user",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/rtc/rooms/:param/lock-seat",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/scheduled-rooms",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/scheduled-rooms",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/scheduled-rooms/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/scheduled-rooms/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/followers",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/following",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/follow-stats",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/users/:param/follow",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/:param/follow",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/notifications/:param/read",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/notifications/read-all",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/profile",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator/stream-credentials/regenerate",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users/settings",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/users/settings",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/profile",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/hosts/apply",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/progression",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/eligibility",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/hosts/verification/assets",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/hosts/verification/assets/:param/replacement",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/maintenance",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/contact",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator-access/applications",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/creator-access/applications/verified",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/cms/creator/pages",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/cms/creator/pages/:param",
+      "file": "creator/src/services/creator-api.service.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/config/public",
+      "file": "creator/src/services/creator-api.service.ts"
+    }
+  ]
+}

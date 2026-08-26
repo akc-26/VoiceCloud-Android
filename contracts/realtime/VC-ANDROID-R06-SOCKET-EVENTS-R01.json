@@ -1,0 +1,658 @@
+{
+  "authority": {
+    "backend": "VC-ANDROID-A0-R01",
+    "parentR06Commit": "7bee8d463786d21a7200b5663a499408bb229115"
+  },
+  "inboundSubscribeMessages": [
+    {
+      "event": "accept_speaker_invitation",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "ban_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "chat:typing",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "demote_speaker",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "emoji_reaction",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "get_participant_count",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "get_speaker_queue",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "gift:send",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "heartbeat",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "heartbeat",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "invite_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "invite_speaker",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "join_room",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "join_room",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "join_speaker_queue",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "kick_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "leave_room",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "leave_room",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "leave_speaker_queue",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "mute_speaker",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "ping",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "ping",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "presence:count",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "presence:join",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "presence:leave",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "presence:ping",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "presence:reconnect",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "promote_listener",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "queue:join",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "queue:leave",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "queue:reorder",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "queue:view",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "reaction:send",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "reject_speaker_invitation",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "remove_speaker",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "reorder_speaker_queue",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:ban_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:invite_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:kick_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:revoke_invitation",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:unban_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:update_category",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:update_description",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:update_title",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room:update_topic",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "send_emoji_reaction",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "send_gift",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "stage:accept_invitation",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:demote",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:invite",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:mute",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:promote",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:reject_invitation",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:remove",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage:unmute",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "unban_participant",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "unmute_speaker",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "update_room_topic",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "user_reconnect",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "user_typing",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    }
+  ],
+  "outboundEmitLiterals": [
+    {
+      "event": "achievement_unlocked",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "achievement_unlocked",
+      "source": "src/modules/tasks-achievements/services/achievement.service.ts"
+    },
+    {
+      "event": "active_speaker_changed",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "announcement_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "auth_error",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "auth_error",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "avatar_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "combo_finished",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "combo_started",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "combo_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "connection_established",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "connection_established",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "emoji_reaction_received",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "entrance_effect_triggered",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "feature_flag_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "follow_added",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "follow_removed",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "followers_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "following_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "fullscreen_gift",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "gift.animation",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "gift.received",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "gift.received",
+      "source": "src/socket/creator.gateway.ts"
+    },
+    {
+      "event": "gift.sent",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "gift_media_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "gift_sent",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "hand_approved",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "hand_raised",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "hand_rejected",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "leaderboard_update",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "level_up",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "level_up",
+      "source": "src/modules/tasks-achievements/services/xp-engine.service.ts"
+    },
+    {
+      "event": "live_room_ranking_change",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "maintenance_mode_toggled",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "network_quality_changed",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "participant_banned",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "participant_force_disconnected",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "participant_invited",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "participant_joined",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "participant_kicked",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "participant_left",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "participant_reconnected",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "participant_unbanned",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "presence_updated",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "presence_updated",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "profile_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "reaction:broadcast",
+      "source": "src/common/events/gateways/reactions.gateway.ts"
+    },
+    {
+      "event": "recording_finished",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "recording_paused",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "recording_resumed",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "recording_started",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "reward_claimed",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "reward_claimed",
+      "source": "src/modules/tasks-achievements/services/reward-engine.service.ts"
+    },
+    {
+      "event": "room_banned",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room_bgm_updated",
+      "source": "src/modules/rooms/soundboard.service.ts"
+    },
+    {
+      "event": "room_gift_animation",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "room_image_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "room_invitation_received",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room_invitation_revoked",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room_jackpot_announcement",
+      "source": "src/modules/gifts/lucky-box.service.ts"
+    },
+    {
+      "event": "room_kicked",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "room_multi_gift_blast",
+      "source": "src/modules/gifts/multi-gifting.service.ts"
+    },
+    {
+      "event": "room_soundboard_triggered",
+      "source": "src/modules/rooms/soundboard.service.ts"
+    },
+    {
+      "event": "room_topic_updated",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "rtc_provider_changed",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "rtc_session_ended",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "rtc_session_started",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "rtc_token_generated",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "rtc_token_refreshed",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "rtc_webhook_event",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "season_ended",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "season_ended",
+      "source": "src/modules/tasks-achievements/services/seasonal-event.service.ts"
+    },
+    {
+      "event": "season_started",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "season_started",
+      "source": "src/modules/tasks-achievements/services/seasonal-event.service.ts"
+    },
+    {
+      "event": "session_created",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "session_expired",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "speaker_demoted",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_invitation_rejected",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_invitation_sent",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_joined",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "speaker_left",
+      "source": "src/modules/rtc/rtc.service.ts"
+    },
+    {
+      "event": "speaker_muted",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_promoted",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_queue_updated",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_removed",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "speaker_unmuted",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "stage_updated",
+      "source": "src/common/events/gateways/room.gateway.ts"
+    },
+    {
+      "event": "store_item_equipped",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "store_item_gifted",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "store_item_purchased",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "streak_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "streak_updated",
+      "source": "src/modules/tasks-achievements/services/streak.service.ts"
+    },
+    {
+      "event": "task_completed",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "task_completed",
+      "source": "src/modules/tasks-achievements/services/daily-tasks.service.ts"
+    },
+    {
+      "event": "user_joined",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "user_left",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "user_offline",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "user_online",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "user_presence_updated",
+      "source": "src/common/events/events.gateway.ts"
+    },
+    {
+      "event": "user_reconnected",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "user_typing",
+      "source": "src/common/events/gateways/presence.gateway.ts"
+    },
+    {
+      "event": "wallet.updated",
+      "source": "src/socket/creator.gateway.ts"
+    }
+  ]
+}

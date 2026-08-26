@@ -1,0 +1,25 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+checks=[]
+def read(p): return (ROOT/p).read_text(errors='ignore')
+def ok(name, cond):
+    if not cond: raise SystemExit(f'[FAIL] {name}')
+    checks.append(name); print(f'[PASS] {name}')
+ps=read('scripts/BOOTSTRAP-GRADLE-WRAPPER.ps1')
+props=read('gradle/wrapper/gradle-wrapper.properties')
+acc=read('scripts/VC-ANDROID-PH01-R09-ACCEPTANCE.cmd')
+live=read('scripts/VC-ANDROID-LIVE-CONNECTIVITY-CHECK.ps1')
+ok('wrapper generation validates cached local Gradle ZIP instead of public URL', '--gradle-distribution-url $localDistributionUri' in ps)
+ok('Windows wrapper converts Resolve-Path PathInfo to filesystem path before Uri construction', '(Resolve-Path -LiteralPath $zip).ProviderPath' in ps and '[System.Uri]::new($resolvedZipPath)' in ps)
+ok('bootstrap verifies official Gradle distribution checksum before use', 'Get-FileHash $zip -Algorithm SHA256' in ps and '553c78f50dafcd54d65b9a444649057857469edf836431389695608536d6b746' in ps)
+ok('bootstrap verifies official wrapper JAR checksum after generation', '497c8c2a7e5031f6aa847f88104aa80a93532ec32ee17bdb8d1d2f67a194a9c7' in ps and "Get-FileHash 'gradle\\wrapper\\gradle-wrapper.jar'" in ps)
+ok('wrapper is rewritten to official Gradle 9.5.0 HTTPS distribution', 'gradle-9.5.0-bin.zip' in props and 'services.gradle.org' in props)
+ok('Gradle 9.5.0 binary distribution SHA-256 pinned', '553c78f50dafcd54d65b9a444649057857469edf836431389695608536d6b746' in props)
+ok('wrapper network timeout raised to 60 seconds', 'networkTimeout=60000' in props)
+ok('acceptance invokes R09 source checker', 'VC-ANDROID-PH01-R09-SOURCE-CHECK.ps1' in acc)
+ok('acceptance invokes R09 wrapper regression', 'ph01_r09_wrapper_regression.py' in acc)
+ok('acceptance retains debug compile gate', ':app:compileDebugKotlin' in acc)
+ok('acceptance retains staging compile gate', ':app:compileStagingKotlin' in acc)
+ok('acceptance retains release compile gate', ':app:compileReleaseKotlin' in acc)
+ok('live REST/Socket/Web probe has three-attempt retry authority', '[int]$attempts = 3' in live and 'Start-Sleep -Seconds 3' in live)
+print(f'VC-ANDROID-PH01-R09 wrapper/connectivity regression: {len(checks)}/{len(checks)} PASS')

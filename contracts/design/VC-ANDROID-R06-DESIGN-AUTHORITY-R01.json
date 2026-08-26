@@ -1,0 +1,22 @@
+{
+  "authority": {
+    "repository": "akc-26/VoiceCloud-Backend",
+    "branch": "VoiceCloud-Backend-VC-PLATFORM-CLOSURE-R06",
+    "commit": "7bee8d463786d21a7200b5663a499408bb229115"
+  },
+  "sources": {
+    "sharedBranding": {
+      "path": "shared/branding/index.ts",
+      "sha256": "56b5722f4edc8e0840be2e78b63cb20d96dfcced81ee0f3f7829a20826618a60"
+    },
+    "websiteBranding": {
+      "path": "website/src/branding/index.ts",
+      "sha256": "caa370e8e617db32835e40e7b1dfcb001281f8a6c3f2fde6df1fe1de55519bf5"
+    },
+    "creatorTheme": {
+      "path": "creator/src/theme/theme.ts",
+      "sha256": "5320e1dd7ed224a92f1df3478e9b6d6984355b5990357dc4ecf8e3ca49a406f2"
+    }
+  },
+  "androidRule": "User Portal derives from current finalized Website presentation; Creator Portal derives from current Creator Studio; design and feature ship together per phase; no generic redesign."
+}

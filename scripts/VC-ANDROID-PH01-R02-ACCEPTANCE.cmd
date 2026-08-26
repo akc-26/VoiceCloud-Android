@@ -1,0 +1,40 @@
+@echo off
+setlocal
+cd /d "%~dp0.."
+echo =============================================================
+echo VoiceCloud Android PH01 R02 - Full Acceptance
+echo =============================================================
+where powershell >nul 2>nul || (echo [FAIL] PowerShell is required for source-contract verification.& exit /b 1)
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\VC-ANDROID-PH01-R02-SOURCE-CHECK.ps1 || exit /b 1
+where python >nul 2>nul && (python scripts\ph01_source_check.py || exit /b 1)
+where python >nul 2>nul && (python scripts\ph01_r02_windows_acceptance_regression.py || exit /b 1)
+
+if not exist gradle\wrapper\gradle-wrapper.jar (
+  echo [INFO] Standard Gradle Wrapper is not generated yet. Bootstrapping Gradle 9.5.0...
+  call scripts\BOOTSTRAP-GRADLE-WRAPPER.cmd || exit /b 1
+)
+if not exist gradlew.bat (echo [FAIL] Standard gradlew.bat was not generated.& exit /b 1)
+
+echo [GATE 1] compileDebugKotlin
+call gradlew.bat :app:compileDebugKotlin --stacktrace || exit /b 1
+echo [GATE 2] compileStagingKotlin
+call gradlew.bat :app:compileStagingKotlin --stacktrace || exit /b 1
+echo [GATE 3] compileReleaseKotlin
+call gradlew.bat :app:compileReleaseKotlin --stacktrace || exit /b 1
+
+echo [GATE 4] Unit tests
+call gradlew.bat test --stacktrace || exit /b 1
+echo [GATE 5] Android lint
+call gradlew.bat lintDebug lintStaging lintRelease --stacktrace || exit /b 1
+echo [GATE 6] Assemblies
+call gradlew.bat :app:assembleDebug :app:assembleStaging :app:assembleRelease --stacktrace || exit /b 1
+
+echo [INFO] Device instrumentation is the final PH01 device gate.
+where adb >nul 2>nul && for /f "skip=1 tokens=1" %%D in ('adb devices') do if not "%%D"=="" (
+  echo [GATE 7] connectedDebugAndroidTest
+  call gradlew.bat :app:connectedDebugAndroidTest --stacktrace || exit /b 1
+  goto device_done
+)
+echo [WARN] No adb device/emulator detected. Run :app:connectedDebugAndroidTest before PH01 manual approval.
+:device_done
+echo [PASS] VC-ANDROID-PH01-R02 acceptance commands completed successfully.
