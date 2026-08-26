@@ -1,3 +1,22 @@
+# VC-ANDROID-PH03-R02
+
+- Fixed fatal Home scroll crash caused by the same user UUID being used as a Compose `LazyColumn` key in both People and Creators sections.
+- Replaced raw UUID-only PH03 lazy-list keys with section-qualified collision-safe keys.
+- Added render-boundary deduplication for Home, Explore, Rooms, Search, Social and Friends lists.
+- Added repository-level deduplication for room/search/friend/request/suggestion payloads.
+- Added unit coverage for duplicate consumer identities and a durable `ph03_r02_lazy_list_key_regression.py` gate reproducing the reported UUID collision scenario.
+- Preserved PH02 authentication/bootstrap implementation unchanged.
+
+## VC-ANDROID-PH03-R01
+
+- Starts from PH02-R05 exact parent `ae84dc7ea408c5d0948f2064e0955e088cbad957`.
+- Adds isolated `:feature:discovery` module for Home, Explore, live-room discovery, People/Creators, Search, profiles, follows and friends.
+- Adds centralized consumer identity filtering: USER/CREATOR only, guest/privileged exclusion and defensive self-exclusion.
+- Resolves role-less relationship DTOs through authoritative profile lookup before rendering.
+- Adds human-readable `profile/{username}` navigation and keeps raw IDs internal to backend operations.
+- Preserves PH02 auth/bootstrap implementation and sends the PH02 UserReady handoff to PH03 Home.
+- Adds PH03 source, dependency, Windows acceptance, implementation report and manual QA gates while retaining all prior regressions.
+
 ## VC-ANDROID-PH02-R05
 
 - Rebased corrective delivery on PH02-R03, rejecting the unnecessary R04 refactor.

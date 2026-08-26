@@ -28,3 +28,5 @@ include(":core:logging")
 include(":core:realtime")
 
 include(":feature:auth")
+
+include(":feature:discovery")

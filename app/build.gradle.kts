@@ -16,7 +16,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph02"
+        versionName = "1.0.0-ph03"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -117,6 +117,7 @@ dependencies {
     implementation(project(":core:realtime"))
     implementation(project(":feature:bootstrap"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:discovery"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

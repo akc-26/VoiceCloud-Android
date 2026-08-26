@@ -38,7 +38,8 @@ feature_build = text("feature/auth/build.gradle.kts")
 
 check("PH02 auth module registered", 'include(":feature:auth")' in settings)
 check("app consumes PH02 auth module", 'implementation(project(":feature:auth"))' in app)
-check("PH02 version marker present", 'versionName = "1.0.0-ph02"' in app)
+m = re.search(r'versionName\s*=\s*\"1\.0\.0-ph(\d+)\"', app)
+check("PH02-or-later version marker present", bool(m) and int(m.group(1)) >= 2)
 check("debug staging release variants retained", all(x in app for x in ('debug {', 'create("staging")', 'release {')))
 check("PH01 Raspberry Pi endpoint authority retained", 'VOICECLOUD_DEBUG_API_BASE_URL=https://voicecloud.tailfca77b.ts.net' in props)
 
@@ -104,9 +105,7 @@ check("Firebase SDK is pinned through current BoM authority", 'firebaseBom = "34
 check("User portal remains Light-first", 'VoiceCloudTheme(portal = PortalTheme.User, darkTheme = false)' in root_ui)
 check("Creator auth presentation uses Creator dark authority", 'darkTheme = creator' in screens)
 
-feature_modules = re.findall(r'include\(":feature:([^\"]+)"\)', settings)
-check("PH02 does not pull later business feature modules forward", set(feature_modules) == {'bootstrap','auth'})
-for forbidden in [':feature:home', ':feature:rooms', ':feature:wallet', ':feature:messages', ':feature:rtc', ':feature:communities']:
-    check(f"later feature {forbidden} absent", forbidden not in settings)
+feature_modules = set(re.findall(r'include\(":feature:([^\"]+)"\)', settings))
+check("PH02 required feature modules retained", {'bootstrap', 'auth'}.issubset(feature_modules))
 
 print(f"VC-ANDROID-PH02-R01 source authority: {len(checks)}/{len(checks)} PASS")
