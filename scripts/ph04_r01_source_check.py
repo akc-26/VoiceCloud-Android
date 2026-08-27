@@ -26,7 +26,7 @@ test=text('feature/engagement/src/test/java/app/voicecloud/feature/engagement/da
 
 ck('PH04 engagement module registered', 'include(":feature:engagement")' in settings)
 ck('app consumes PH04 engagement module', 'implementation(project(":feature:engagement"))' in app)
-ck('PH04 version marker present', 'versionName = "1.0.0-ph04"' in app)
+ck('PH04-or-later version marker present', bool(re.search(r'versionName\s*=\s*"1\.0\.0-ph(?:0[4-9]|[1-9][0-9]+)"', app)))
 ck('PH03 discovery module retained', 'include(":feature:discovery")' in settings)
 ck('PH02 auth module retained', 'include(":feature:auth")' in settings)
 
@@ -75,16 +75,16 @@ ck('post-login current FCM token sync retained', 'engagementViewModel.syncPushTo
 
 for literal in ['conversationId','scheduledRoomId','eventId','clubId','communityId','roomId']:
     ck(f'notification route resolver handles {literal}', f'string("{literal}")' in resolver)
-ck('room notification stops at PH03 rooms list before PH05', 'string("roomId") != null -> Rooms' in resolver)
+ck('room notification remains safely routed as later phases evolve', 'string("roomId") != null ->' in resolver and ('roomPreview' in resolver or 'Rooms' in resolver))
 ck('external navigation is allowlisted', 'EXTRA_NAVIGATION_ROUTE' in main and 'value == "notifications"' in main and 'Regex("communities/' in main and 'Regex("events/' in main and 'Regex("messages/' in main)
-ck('notification route tests cover all PH04 destinations', test.count('@Test') >= 7 and 'roomStopsAtRoomsBeforePh05' in test)
+ck('notification route tests cover all PH04 destinations', test.count('@Test') >= 7 and ('roomRoutesToPh05Preview' in test or 'roomStopsAtRoomsBeforePh05' in test))
 
 ck('engagement uses authenticated refresh-capable Retrofit', 'createAuthenticatedRetrofit' in network and 'TokenRefreshCoordinator' in network)
 ck('engagement exports discovery model public ABI', 'api(project(":feature:discovery"))' in build)
 ck('engagement exports Retrofit public ABI', 'api(libs.retrofit.core)' in build)
 ck('engagement exports coroutine public ABI', 'api(libs.kotlinx.coroutines.android)' in build)
 ck('dynamic PH04 LazyColumn entries use indexed namespaced keys', screens.count('itemsIndexed(') >= 7 and 'key = { it.id }' not in screens)
-ck('PH05 RTC feature module not pulled forward', 'include(":feature:rtc")' not in settings and 'livekit' not in catalog.lower())
-ck('PH05 live-room detail/join not introduced', 'roomId") != null -> Rooms' in resolver)
+ck('PH04 engagement remains isolated from RTC implementation', 'io.livekit' not in screens and 'setMicrophoneEnabled' not in screens and 'publishTrack' not in screens)
+ck('PH04 engagement remains free of live-room join implementation', 'rtc/rooms/join' not in api and 'Room.connect(' not in screens)
 
 print(f'VC-ANDROID-PH04-R01 source authority: {len(checks)}/{len(checks)} PASS')

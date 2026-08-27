@@ -1,5 +1,7 @@
 package app.voicecloud.android.notifications
 
+import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -32,8 +34,8 @@ class VoiceCloudFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         val route = EngagementRouteResolver.fromStringData(message.data)
-        val title = message.notification?.title ?: message.data["title"] ?: "VoiceCloud"
-        val body = message.notification?.body ?: message.data["message"] ?: message.data["body"] ?: "You have a new VoiceCloud notification."
+        val title = message.notification?.title ?: message.data["title"] ?: VoiceCloudBrand.name
+        val body = message.notification?.body ?: message.data["message"] ?: message.data["body"] ?: "You have a new ${VoiceCloudBrand.name} notification."
         showNotification(title, body, route, message.messageId)
     }
 
@@ -41,7 +43,7 @@ class VoiceCloudFirebaseMessagingService : FirebaseMessagingService() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "VoiceCloud notifications", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                NotificationChannel(channelId, "${VoiceCloudBrand.name} notifications", NotificationManager.IMPORTANCE_DEFAULT).apply {
                     description = "Messages, community updates, reminders and account notifications"
                 },
             )
@@ -56,7 +58,7 @@ class VoiceCloudFirebaseMessagingService : FirebaseMessagingService() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
@@ -72,5 +74,5 @@ class VoiceCloudFirebaseMessagingService : FirebaseMessagingService() {
         super.onDestroy()
     }
 
-    private companion object { const val CHANNEL_ID = "voicecloud_general" }
+    private val channelId: String get() = "${VoiceCloudBrand.slug}_general"
 }

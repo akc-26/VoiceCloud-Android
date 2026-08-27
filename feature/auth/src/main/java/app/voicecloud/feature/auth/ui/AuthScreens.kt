@@ -1,5 +1,7 @@
 package app.voicecloud.feature.auth.ui
 
+import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
+
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -134,7 +136,7 @@ fun AuthGateScreen() {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
             VoiceCloudBrandMark(64.dp)
             CircularProgressIndicator()
-            Text("Restoring your secure VoiceCloud session…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Restoring your secure ${VoiceCloudBrand.name} session…", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -146,12 +148,12 @@ fun PortalSelectorScreen(
     onCreator: () -> Unit,
 ) {
     AuthPage(
-        title = "Welcome to VoiceCloud",
+        title = "Welcome to ${VoiceCloudBrand.name}",
         subtitle = "Choose how you want to enter. User and Creator access share one secure account authority but remain separate experiences.",
         state = state,
     ) {
         PortalChoice(
-            title = "VoiceCloud",
+            title = VoiceCloudBrand.name,
             body = "Listen, discover, connect and participate with your User account.",
             accent = MaterialTheme.colorScheme.primary,
             onClick = onUser,
@@ -163,7 +165,7 @@ fun PortalSelectorScreen(
             onClick = onCreator,
         )
         Text(
-            "VoiceCloud never infers Creator access from the selected button.",
+            "${VoiceCloudBrand.name} never infers Creator access from the selected button.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -210,7 +212,7 @@ fun UserSignInScreen(
     }
     fun enabled(vararg aliases: String) = aliases.any { alias -> methods.any { it.contains(alias) } }
 
-    AuthPage("Sign in to VoiceCloud", "Continue with the account method enabled by VoiceCloud.", state) {
+    AuthPage("Sign in to ${VoiceCloudBrand.name}", "Continue with the account method enabled by ${VoiceCloudBrand.name}.", state) {
         if (enabled("email", "password", "username")) {
             Field(identifier, { identifier = it }, "Email or username", keyboardType = KeyboardType.Email)
             Field(password, { password = it }, "Password", password = true)
@@ -226,7 +228,7 @@ fun UserSignInScreen(
         )
         if (enabled("guest")) SecondaryButton("Continue as guest", !state.busy, onGuest)
         HorizontalDivider()
-        TextAction("Create a VoiceCloud account", onRegister)
+        TextAction("Create a ${VoiceCloudBrand.name} account", onRegister)
         TextAction("Choose another portal", onBack)
     }
 }
@@ -237,7 +239,7 @@ fun RegisterScreen(state: AuthUiState, onSubmit: (String, String, String, String
     var displayName by rememberSaveableCompat("")
     var email by rememberSaveableCompat("")
     var password by rememberSaveableCompat("")
-    AuthPage("Create your account", "Your email and username become part of your VoiceCloud account identity.", state) {
+    AuthPage("Create your account", "Your email and username become part of your ${VoiceCloudBrand.name} account identity.", state) {
         Field(displayName, { displayName = it }, "Display name")
         Field(username, { username = it }, "Username")
         Field(email, { email = it }, "Email", keyboardType = KeyboardType.Email)
@@ -251,7 +253,7 @@ fun RegisterScreen(state: AuthUiState, onSubmit: (String, String, String, String
 fun PhoneSignInScreen(state: AuthUiState, onSend: (String, String) -> Unit, onBack: () -> Unit) {
     var phone by rememberSaveableCompat("")
     var referral by rememberSaveableCompat("")
-    AuthPage("Sign in with phone", "Use international E.164 format. VoiceCloud will send a six-digit verification code.", state) {
+    AuthPage("Sign in with phone", "Use international E.164 format. ${VoiceCloudBrand.name} will send a six-digit verification code.", state) {
         Field(phone, { phone = it }, "Phone number, e.g. +919876543210", keyboardType = KeyboardType.Phone)
         Field(referral, { referral = it }, "Referral code (optional)")
         BusyButton("Send Verification Code", state.busy) { onSend(phone, referral) }
@@ -323,7 +325,7 @@ fun OnboardingScreen(state: AuthUiState, onFinish: (String, String, List<String>
     var country by rememberSaveableCompat(state.user?.country.orEmpty())
     var interests by remember { mutableStateOf(state.user?.interests.orEmpty()) }
     var reminders by remember { mutableStateOf(true) }
-    AuthPage("Make VoiceCloud feel like yours", "First-time setup adds optional profile and discovery preferences.", state) {
+    AuthPage("Make ${VoiceCloudBrand.name} feel like yours", "First-time setup adds optional profile and discovery preferences.", state) {
         LinearProgressIndicator(progress = { step / 3f }, modifier = Modifier.fillMaxWidth())
         Text("Step $step of 3", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
         when (step) {
@@ -398,7 +400,7 @@ fun GuestUpgradeScreen(
     var password by rememberSaveableCompat("")
     var phone by rememberSaveableCompat("")
     var otpCode by rememberSaveableCompat("")
-    AuthPage("Keep your VoiceCloud account", "Upgrade this active Guest account without losing the server-side account identity.", state) {
+    AuthPage("Keep your ${VoiceCloudBrand.name} account", "Upgrade this active Guest account without losing the server-side account identity.", state) {
         Field(displayName, { displayName = it }, "Display name")
         Text("Upgrade with email", style = MaterialTheme.typography.titleMedium)
         Field(email, { email = it }, "Email", keyboardType = KeyboardType.Email)
@@ -428,7 +430,7 @@ fun CreatorSignInScreen(
     var password by rememberSaveableCompat("")
     AuthPage(
         "Creator Studio",
-        "Sign in with your Creator email. Your CREATOR role is verified by VoiceCloud before entry.",
+        "Sign in with your Creator email. Your Creator access is verified by ${VoiceCloudBrand.name} before entry.",
         state,
         creator = true,
     ) {
@@ -436,7 +438,7 @@ fun CreatorSignInScreen(
         Field(password, { password = it }, "Password", password = true)
         BusyButton("Enter Creator Studio", state.busy) { onLogin(identifier, password) }
         HorizontalDivider()
-        Text("Need Creator access? Applications are reviewed by VoiceCloud before the role is granted.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Need Creator access? Applications are reviewed by ${VoiceCloudBrand.name} before the role is granted.", color = MaterialTheme.colorScheme.onSurfaceVariant)
         SecondaryButton("Apply for Creator Access", !state.busy, onApply)
         TextAction("Choose another portal", onBack)
     }
@@ -454,7 +456,7 @@ fun CreatorAccessScreen(state: AuthUiState, onSubmit: (CreatorAccessApplicationR
     var experience by rememberSaveableCompat("")
     var motivation by rememberSaveableCompat("")
     var portfolio by rememberSaveableCompat("")
-    AuthPage("Apply for Creator access", "Submit your Creator background for VoiceCloud review.", state, creator = true) {
+    AuthPage("Apply for Creator access", "Submit your Creator background for ${VoiceCloudBrand.name} review.", state, creator = true) {
         Field(fullName, { fullName = it }, "Full name")
         Field(email, { email = it }, "Email", keyboardType = KeyboardType.Email)
         Field(phone, { phone = it }, "Phone number", keyboardType = KeyboardType.Phone)
@@ -485,7 +487,7 @@ fun CreatorAccessScreen(state: AuthUiState, onSubmit: (CreatorAccessApplicationR
 
 @Composable
 fun CreatorReadyScreen(state: AuthUiState, onLogout: () -> Unit, onLogoutAll: () -> Unit) {
-    AuthPage("Creator access verified", "Your CREATOR role was validated by VoiceCloud. Creator dashboard/product modules begin in the locked later phase.", state, creator = true) {
+    AuthPage("Creator access verified", "Your Creator access was validated by ${VoiceCloudBrand.name}.", state, creator = true) {
         IdentityCard(state.user)
         AlertBox("PH02 intentionally stops at the authenticated Creator handoff. It does not expose room, dashboard, RTC or earnings controls early.", false)
         SecondaryButton("Sign Out", !state.busy, onLogout)
@@ -524,7 +526,7 @@ fun SessionExpiredScreen(state: AuthUiState, onSignIn: () -> Unit, onPortal: () 
 
 @Composable
 fun MaintenanceScreen(state: AuthUiState, onPortal: () -> Unit) {
-    AuthPage("VoiceCloud is under maintenance", state.maintenanceMessage ?: "VoiceCloud is temporarily unavailable.", state.copy(error = null)) {
+    AuthPage("${VoiceCloudBrand.name} is under maintenance", state.maintenanceMessage ?: "${VoiceCloudBrand.name} is temporarily unavailable.", state.copy(error = null)) {
         AlertBox("Maintenance access is controlled by the backend. Creator/User authentication will not bypass it.", false)
         SecondaryButton("Back", onClick = onPortal)
     }

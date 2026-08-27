@@ -14,6 +14,7 @@ import app.voicecloud.feature.auth.ui.*
 import app.voicecloud.feature.bootstrap.BootstrapRoute
 import app.voicecloud.feature.discovery.ui.*
 import app.voicecloud.feature.engagement.ui.*
+import app.voicecloud.feature.live.ui.*
 
 object VoiceCloudRoutes {
     const val Bootstrap = "bootstrap"
@@ -63,6 +64,13 @@ object VoiceCloudRoutes {
     const val Messages = "messages"
     const val Conversation = "messages/{conversationId}"
     const val Notifications = "notifications"
+
+    // PH05 listener live-room graph. Host/publisher controls remain outside this phase.
+    const val RoomPreview = "rooms/{roomId}/preview"
+    const val RoomExperience = "rooms/{roomId}/live"
+
+    fun roomPreview(id: String): String = "rooms/${Uri.encode(id.trim())}/preview"
+    fun roomExperience(id: String): String = "rooms/${Uri.encode(id.trim())}/live"
 
     fun profile(username: String): String = "profile/${Uri.encode(username.trim())}"
     fun community(id: String): String = "communities/${Uri.encode(id.trim())}"
@@ -257,6 +265,7 @@ fun VoiceCloudNavHost(
                 isGuest = viewer?.isGuest == true,
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadHome() },
                 onRooms = { open(VoiceCloudRoutes.Rooms) },
+                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
                 onPeople = { open(VoiceCloudRoutes.People) },
                 onCreators = { open(VoiceCloudRoutes.Creators) },
                 onProfile = ::openProfile,
@@ -279,6 +288,7 @@ fun VoiceCloudNavHost(
                 state = state,
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadExplore() },
                 onRooms = { open(VoiceCloudRoutes.Rooms) },
+                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
                 onPeople = { open(VoiceCloudRoutes.People) },
                 onCreators = { open(VoiceCloudRoutes.Creators) },
                 onProfile = ::openProfile,
@@ -292,7 +302,48 @@ fun VoiceCloudNavHost(
         composable(VoiceCloudRoutes.Rooms) {
             val vm: DiscoveryViewModel = hiltViewModel()
             val state by vm.state.collectAsStateWithLifecycle()
-            RoomsScreen(state, { vm.loadRooms() }, { navController.popBackStack() })
+            RoomsScreen(state, { vm.loadRooms() }, { open(VoiceCloudRoutes.roomPreview(it)) }, { navController.popBackStack() })
+        }
+        composable(VoiceCloudRoutes.RoomPreview) { entry ->
+            val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+            val vm: LiveRoomViewModel = hiltViewModel()
+            val state by vm.state.collectAsStateWithLifecycle()
+            val viewer = authState.user
+            LaunchedEffect(viewer?.id, viewer?.username) { vm.setViewer(viewer?.id, viewer?.username) }
+            RoomPreviewScreen(
+                state = state,
+                roomId = roomId,
+                onLoad = { vm.loadPreview(roomId) },
+                onJoin = { open(VoiceCloudRoutes.roomExperience(roomId)) },
+                onToggleSave = vm::toggleSave,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.RoomExperience) { entry ->
+            val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+            val vm: LiveRoomViewModel = hiltViewModel()
+            val state by vm.state.collectAsStateWithLifecycle()
+            val viewer = authState.user
+            LaunchedEffect(viewer?.id, viewer?.username) { vm.setViewer(viewer?.id, viewer?.username) }
+            LiveRoomScreen(
+                state = state,
+                roomId = roomId,
+                viewerId = viewer?.id,
+                onEnter = { vm.enter(roomId) },
+                onLeave = vm::leave,
+                onRetryAudio = vm::retryAudio,
+                onToggleSave = vm::toggleSave,
+                onToggleHand = vm::toggleHand,
+                onSendMessage = vm::sendMessage,
+                onMessageReaction = vm::reactToMessage,
+                onReaction = vm::sendReaction,
+                onGift = vm::sendGift,
+                onAcceptInvitation = vm::acceptSpeakerInvitation,
+                onRejectInvitation = vm::rejectSpeakerInvitation,
+                onBackground = vm::onBackground,
+                onForeground = vm::onForeground,
+                onBack = { navController.popBackStack() },
+            )
         }
         composable(VoiceCloudRoutes.People) {
             val vm: DiscoveryViewModel = hiltViewModel()
@@ -314,6 +365,7 @@ fun VoiceCloudNavHost(
                 state = state,
                 onSubmit = { query -> vm.setViewer(viewer?.id, viewer?.username); vm.search(query) },
                 onProfile = ::openProfile,
+                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },

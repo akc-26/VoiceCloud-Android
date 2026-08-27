@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import app.voicecloud.android.ui.VoiceCloudRoot
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URI
@@ -16,6 +17,7 @@ class MainActivity : ComponentActivity() {
     private val navigationRoute = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         resetToken.value = extractResetToken(intent)
         navigationRoute.value = extractNavigationRoute(intent)
@@ -36,7 +38,8 @@ class MainActivity : ComponentActivity() {
             value == "notifications" || value == "communities" || value == "events" || value == "messages" || value == "rooms" ||
                 value.matches(Regex("communities/[A-Za-z0-9._~-]+")) ||
                 value.matches(Regex("events/[A-Za-z0-9._~-]+")) ||
-                value.matches(Regex("messages/[A-Za-z0-9._~-]+"))
+                value.matches(Regex("messages/[A-Za-z0-9._~-]+")) ||
+                value.matches(Regex("rooms/[A-Za-z0-9._~-]+/preview"))
         }
     }
 

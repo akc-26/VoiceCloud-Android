@@ -1,5 +1,7 @@
 package app.voicecloud.feature.engagement.ui
 
+import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -156,7 +158,7 @@ fun CommunitiesScreen(
             ElevatedCard(Modifier.fillMaxWidth().clickable { onOpen(community.handle.ifBlank { community.id }) }, shape = RoundedCornerShape(20.dp)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(community.name.ifBlank { "VoiceCloud community" }, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                        Text(community.name.ifBlank { "${VoiceCloudBrand.name} community" }, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
                         if (community.isVerified) Text("✓", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
                     }
                     Text("@${community.handle} · ${community.visibility.uppercase()}", color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -324,7 +326,7 @@ fun CommunityMembersScreen(
             val user = member.user
             val memberName = user?.displayName?.takeIf { it.isNotBlank() }
                 ?: user?.username?.takeIf { it.isNotBlank() }
-                ?: "VoiceCloud member"
+                ?: "${VoiceCloudBrand.name} member"
             ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(memberName, fontWeight = FontWeight.Bold)
@@ -352,7 +354,7 @@ private fun EventCard(event: ScheduledEvent, onClick: () -> Unit) {
     ElevatedCard(Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(event.status, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
-            Text(event.title.ifBlank { "VoiceCloud session" }, style = MaterialTheme.typography.titleLarge)
+            Text(event.title.ifBlank { "${VoiceCloudBrand.name} session" }, style = MaterialTheme.typography.titleLarge)
             Text(event.scheduledStartTime.replace('T', ' ').take(16) + " · ${event.timeZone}", color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (!event.description.isNullOrBlank()) Text(event.description, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text("${event.rsvpCount} reminders · ${event.durationMinutes} min · ${event.category}", style = MaterialTheme.typography.bodyMedium)
@@ -366,7 +368,7 @@ fun EventsScreen(state: EngagementUiState, onLoad: (String) -> Unit, onOpen: (St
     LaunchedEffect(Unit) { onLoad("") }
     SecondaryPageLayout(
         title = "Upcoming Events",
-        subtitle = "Scheduled VoiceCloud sessions and reminders.",
+        subtitle = "Scheduled ${VoiceCloudBrand.name} sessions and reminders.",
         onBack = onBack,
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -405,7 +407,7 @@ fun MessagesScreen(state: EngagementUiState, onLoad: (String) -> Unit, onOpen: (
     LaunchedEffect(Unit) { onLoad("") }
     SecondaryPageLayout(
         title = "Messages",
-        subtitle = "Your VoiceCloud conversations, all in one place.",
+        subtitle = "Your ${VoiceCloudBrand.name} conversations, all in one place.",
         onBack = onBack,
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -508,19 +510,19 @@ fun NotificationsScreen(
         if (!pushPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) item {
             Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
                 Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { Text("Enable push alerts", fontWeight = FontWeight.Bold); Text("Allow Android to show VoiceCloud messages, reminders and community notifications.", style = MaterialTheme.typography.bodyMedium) }
+                    Column(Modifier.weight(1f)) { Text("Enable push alerts", fontWeight = FontWeight.Bold); Text("Allow Android to show ${VoiceCloudBrand.name} messages, reminders and community notifications.", style = MaterialTheme.typography.bodyMedium) }
                     TextButton(onClick = { permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text("Enable") }
                 }
             }
         }
-        if (state.notifications.isEmpty() && !state.loading) item { Empty("You're all caught up", "New VoiceCloud notifications will appear here.") }
+        if (state.notifications.isEmpty() && !state.loading) item { Empty("You're all caught up", "New ${VoiceCloudBrand.name} notifications will appear here.") }
         itemsIndexed(state.notifications.distinctBy { it.id }, key = { i, n -> "notification:${n.id}:$i" }) { _, item ->
             ElevatedCard(Modifier.fillMaxWidth(), colors = CardDefaults.elevatedCardColors(containerColor = if (item.isRead) MaterialTheme.colorScheme.surface else ConsumerColors.SapphireSoft), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.fillMaxWidth().clickable {
                     if (!item.isRead) onRead(item.id)
                     onOpen(EngagementRouteResolver.fromNotification(item))
                 }.padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Text(item.title.ifBlank { "VoiceCloud notification" }, fontWeight = FontWeight.Bold)
+                    Text(item.title.ifBlank { "${VoiceCloudBrand.name} notification" }, fontWeight = FontWeight.Bold)
                     Text(item.message)
                     Text(item.type.replace('_', ' ') + " · " + item.createdAt.replace('T', ' ').take(16), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {

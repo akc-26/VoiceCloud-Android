@@ -1,5 +1,7 @@
 package app.voicecloud.feature.discovery.ui
 
+import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,13 +15,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
+import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.feature.discovery.model.*
 
@@ -38,12 +43,12 @@ private fun ConsumerScaffold(
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 listOf(
-                    Triple("home", "●", "Home"),
-                    Triple("explore", "◇", "Explore"),
-                    Triple("search", "⌕", "Search"),
-                    Triple("friends", "◎", "Friends"),
-                    Triple("profile", "◉", "Profile"),
-                ).forEach { (key, glyph, label) ->
+                    Triple("home", R.drawable.vc_nav_home, "Home"),
+                    Triple("explore", R.drawable.vc_nav_explore, "Explore"),
+                    Triple("search", R.drawable.vc_nav_search, "Search"),
+                    Triple("friends", R.drawable.vc_nav_friends, "Friends"),
+                    Triple("profile", R.drawable.vc_nav_profile, "Profile"),
+                ).forEach { (key, iconRes, label) ->
                     val action = when (key) {
                         "home" -> onHome
                         "explore" -> onExplore
@@ -54,7 +59,7 @@ private fun ConsumerScaffold(
                     NavigationBarItem(
                         selected = selected == key,
                         onClick = action,
-                        icon = { Text(glyph, fontSize = 18.sp) },
+                        icon = { Icon(painterResource(iconRes), contentDescription = label) },
                         label = { Text(label) },
                     )
                 }
@@ -167,9 +172,9 @@ private fun UserCard(
                     user.role?.uppercase() == "CREATOR" -> "Creator"
                     user.isOnline -> "Online now"
                     !user.bio.isNullOrBlank() -> user.bio
-                    else -> "VoiceCloud member"
+                    else -> "${VoiceCloudBrand.name} member"
                 }
-                Text(descriptor ?: "VoiceCloud member", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                Text(descriptor ?: "${VoiceCloudBrand.name} member", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
             }
             if (actionLabel != null && onAction != null) {
                 OutlinedButton(enabled = actionEnabled, onClick = onAction) { Text(actionLabel) }
@@ -179,17 +184,17 @@ private fun UserCard(
 }
 
 @Composable
-private fun RoomCard(room: VoiceCloudRoom) {
-    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
+private fun RoomCard(room: VoiceCloudRoom, onOpen: () -> Unit) {
+    ElevatedCard(Modifier.fillMaxWidth().clickable(onClick = onOpen), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(9.dp).clip(CircleShape).background(if (room.isLive) Color(0xFFEF4444) else MaterialTheme.colorScheme.outline))
+                Box(Modifier.size(9.dp).clip(CircleShape).background(if (room.isLive) CommonColors.Error else MaterialTheme.colorScheme.outline))
                 Spacer(Modifier.width(8.dp))
                 Text(if (room.isLive) "LIVE NOW" else room.status.ifBlank { "ROOM" }, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.weight(1f))
                 if (room.isLocked) Text("Locked", style = MaterialTheme.typography.labelLarge)
             }
-            Text(room.title.ifBlank { "VoiceCloud Room" }, style = MaterialTheme.typography.titleLarge)
+            Text(room.title.ifBlank { "${VoiceCloudBrand.name} Room" }, style = MaterialTheme.typography.titleLarge)
             if (!room.description.isNullOrBlank()) Text(room.description, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("${room.listenerCount} listening", style = MaterialTheme.typography.bodyMedium)
@@ -217,6 +222,7 @@ fun HomeScreen(
     isGuest: Boolean,
     onLoad: () -> Unit,
     onRooms: () -> Unit,
+    onRoom: (String) -> Unit,
     onPeople: () -> Unit,
     onCreators: () -> Unit,
     onProfile: (String) -> Unit,
@@ -240,9 +246,9 @@ fun HomeScreen(
                     ).padding(24.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("VOICECLOUD", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                        Text(VoiceCloudBrand.name.uppercase(), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
                         Text("Listen. Connect. Be heard.", color = ConsumerColors.Ink, fontSize = 29.sp, fontWeight = FontWeight.Bold)
-                        Text("Join live conversations and discover creators and people across VoiceCloud.", color = ConsumerColors.Text)
+                        Text("Join live conversations and discover creators and people across ${VoiceCloudBrand.name}.", color = ConsumerColors.Text)
                         Button(onClick = onRooms) { Text("Explore live rooms", maxLines = 1, softWrap = false) }
                     }
                 }
@@ -257,7 +263,7 @@ fun HomeScreen(
             if (isGuest) item {
                 Card(Modifier.fillMaxWidth().padding(horizontal = 20.dp), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) { Text("Save your VoiceCloud identity", fontWeight = FontWeight.Bold); Text("Upgrade your guest account to follow, connect and keep your profile.") }
+                        Column(Modifier.weight(1f)) { Text("Save your ${VoiceCloudBrand.name} identity", fontWeight = FontWeight.Bold); Text("Upgrade your guest account to follow, connect and keep your profile.") }
                         TextButton(onClick = onUpgrade) { Text("Upgrade") }
                     }
                 }
@@ -265,7 +271,7 @@ fun HomeScreen(
             item { StatusBlock(state, onLoad) }
             item { Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { SectionTitle("Live now", "View all", onRooms) } }
             if (state.home.rooms.isEmpty() && !state.loading) item { Box(Modifier.padding(horizontal = 20.dp)) { EmptyBlock("No rooms are live right now", "New live conversations will appear here automatically.") } }
-            itemsIndexed(state.home.rooms.distinctBy { it.id }, key = { index, room -> "home-room:${room.id}:$index" }) { _, room -> Box(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) { RoomCard(room) } }
+            itemsIndexed(state.home.rooms.distinctBy { it.id }, key = { index, room -> "home-room:${room.id}:$index" }) { _, room -> Box(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) { RoomCard(room) { onRoom(room.id) } } }
             item { Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { SectionTitle("People to discover", "See people", onPeople) } }
             itemsIndexed(state.home.people.distinctBy { it.id }.take(5), key = { index, user -> "home-person:${user.id}:$index" }) { _, user -> Box(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) { UserCard(user, { onProfile(user.username) }) } }
             item { Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { SectionTitle("Creators", "See creators", onCreators) } }
@@ -280,6 +286,7 @@ fun ExploreScreen(
     state: DiscoveryUiState,
     onLoad: () -> Unit,
     onRooms: () -> Unit,
+    onRoom: (String) -> Unit,
     onPeople: () -> Unit,
     onCreators: () -> Unit,
     onProfile: (String) -> Unit,
@@ -292,12 +299,12 @@ fun ExploreScreen(
     LaunchedEffect(Unit) { onLoad() }
     ConsumerScaffold("explore", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Explore", "Discover live conversations, creators, and people across VoiceCloud.") }
+            item { ScreenHeader("Explore", "Discover live conversations, creators, and people across ${VoiceCloudBrand.name}.") }
             item { StatusBlock(state, onLoad) }
             item { SectionTitle("Live rooms", "All rooms", onRooms) }
-            itemsIndexed(state.explore.liveRooms.distinctBy { it.id }.take(6), key = { index, room -> "explore-live:${room.id}:$index" }) { _, room -> RoomCard(room) }
+            itemsIndexed(state.explore.liveRooms.distinctBy { it.id }.take(6), key = { index, room -> "explore-live:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
             item { SectionTitle("Trending rooms") }
-            itemsIndexed(state.explore.trendingRooms.distinctBy { it.id }.take(5), key = { index, room -> "explore-trend:${room.id}:$index" }) { _, room -> RoomCard(room) }
+            itemsIndexed(state.explore.trendingRooms.distinctBy { it.id }.take(5), key = { index, room -> "explore-trend:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
             item { SectionTitle("People", "View all", onPeople) }
             itemsIndexed(state.explore.people.distinctBy { it.id }.take(6), key = { index, user -> "explore-person:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
             item { SectionTitle("Creators", "View all", onCreators) }
@@ -307,17 +314,17 @@ fun ExploreScreen(
 }
 
 @Composable
-fun RoomsScreen(state: DiscoveryUiState, onLoad: () -> Unit, onBack: () -> Unit) {
+fun RoomsScreen(state: DiscoveryUiState, onLoad: () -> Unit, onRoom: (String) -> Unit, onBack: () -> Unit) {
     LaunchedEffect(Unit) { onLoad() }
     SecondaryPageLayout(
         title = "Live Rooms",
-        subtitle = "Discover conversations happening live across VoiceCloud.",
+        subtitle = "Discover conversations happening live across ${VoiceCloudBrand.name}.",
         onBack = onBack,
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { StatusBlock(state, onLoad) }
             if (state.rooms.isEmpty() && !state.loading) item { EmptyBlock("No live rooms", "There are no discoverable live rooms at the moment.") }
-            itemsIndexed(state.rooms.distinctBy { it.id }, key = { index, room -> "rooms:${room.id}:$index" }) { _, room -> RoomCard(room) }
+            itemsIndexed(state.rooms.distinctBy { it.id }, key = { index, room -> "rooms:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
         }
     }
 }
@@ -338,7 +345,7 @@ fun PeopleScreen(
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { StatusBlock(state, onLoad) }
-            if (state.people.isEmpty() && !state.loading) item { EmptyBlock("No profiles found", "Try again later as the VoiceCloud community grows.") }
+            if (state.people.isEmpty() && !state.loading) item { EmptyBlock("No profiles found", "Try again later as the ${VoiceCloudBrand.name} community grows.") }
             itemsIndexed(state.people.distinctBy { it.id }, key = { index, user -> "people:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
         }
     }
@@ -349,6 +356,7 @@ fun SearchScreen(
     state: DiscoveryUiState,
     onSubmit: (String) -> Unit,
     onProfile: (String) -> Unit,
+    onRoom: (String) -> Unit,
     onHome: () -> Unit,
     onExplore: () -> Unit,
     onSearch: () -> Unit,
@@ -358,12 +366,12 @@ fun SearchScreen(
     var query by rememberSaveable { mutableStateOf(state.search.query) }
     ConsumerScaffold("search", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Search", "Find people and live conversations across VoiceCloud.") }
+            item { ScreenHeader("Search", "Find people and live conversations across ${VoiceCloudBrand.name}.") }
             item {
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    label = { Text("Search VoiceCloud") },
+                    label = { Text("Search ${VoiceCloudBrand.name}") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     trailingIcon = { TextButton(enabled = query.trim().isNotEmpty(), onClick = { onSubmit(query) }) { Text("Search") } },
@@ -373,7 +381,7 @@ fun SearchScreen(
             if (state.search.query.isNotBlank()) item { SectionTitle("People") }
             itemsIndexed(state.search.users.distinctBy { it.id }, key = { index, user -> "search-user:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
             if (state.search.query.isNotBlank()) item { SectionTitle("Rooms") }
-            itemsIndexed(state.search.rooms.distinctBy { it.id }, key = { index, room -> "search-room:${room.id}:$index" }) { _, room -> RoomCard(room) }
+            itemsIndexed(state.search.rooms.distinctBy { it.id }, key = { index, room -> "search-room:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
             if (state.search.query.isNotBlank() && state.search.users.isEmpty() && state.search.rooms.isEmpty() && !state.loading) item { EmptyBlock("No results", "Try another username, display name, room title or category.") }
         }
     }
@@ -407,9 +415,9 @@ fun PublicProfileScreen(
                         Spacer(Modifier.height(12.dp))
                         Text(profile.displayName.ifBlank { profile.username }, color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
                         Text("@${profile.username}", color = ConsumerColors.SapphireDeep)
-                        if (profile.isVerified) Text("Verified VoiceCloud profile", color = ConsumerColors.SapphireDeep)
+                        if (profile.isVerified) Text("Verified ${VoiceCloudBrand.name} profile", color = ConsumerColors.SapphireDeep)
                         Spacer(Modifier.height(12.dp))
-                        Text(profile.bio ?: profile.statusMessage ?: "VoiceCloud member", color = ConsumerColors.Text, modifier = Modifier.fillMaxWidth())
+                        Text(profile.bio ?: profile.statusMessage ?: "${VoiceCloudBrand.name} member", color = ConsumerColors.Text, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(14.dp))
                         if (isSelf) Button(onClick = onMyProfile) { Text("My profile") }
                         else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -465,7 +473,7 @@ fun MyProfileScreen(
     val profile = state.myProfile
     ConsumerScaffold("profile", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            item { ScreenHeader("My Profile", "Your VoiceCloud profile and connections.") }
+            item { ScreenHeader("My Profile", "Your ${VoiceCloudBrand.name} profile and connections.") }
             item { StatusBlock(state, onLoad) }
             if (profile != null) {
                 item {
@@ -520,7 +528,7 @@ fun SocialListScreen(
                 )
             }
             item { StatusBlock(state) }
-            if (state.socialUsers.isEmpty() && !state.loading) item { EmptyBlock("No ${mode} found", "Matching VoiceCloud profiles will appear here.") }
+            if (state.socialUsers.isEmpty() && !state.loading) item { EmptyBlock("No ${mode} found", "Matching ${VoiceCloudBrand.name} profiles will appear here.") }
             itemsIndexed(state.socialUsers.distinctBy { it.id }, key = { index, user -> "social:${user.id}:$index" }) { _, user ->
                 UserCard(
                     user = user,

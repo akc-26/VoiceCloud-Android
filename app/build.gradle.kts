@@ -1,3 +1,4 @@
+import java.util.Properties
 import java.net.URI
 
 plugins {
@@ -7,23 +8,36 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+val brandProperties = Properties().apply {
+    rootProject.file("branding/voicecloud-brand.properties").inputStream().use { load(it) }
+}
+fun brand(key: String): String = brandProperties.getProperty(key)?.trim().orEmpty().ifBlank {
+    error("Missing white-label branding property: $key")
+}
+
+
+
 android {
     namespace = "app.voicecloud.android"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "app.voicecloud.android"
+        applicationId = brand("brand.applicationId")
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph04"
+        versionName = "1.0.0-ph05"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        resValue("string", "vc_brand_app_name", brand("brand.name"))
+        resValue("color", "vc_brand_launcher_background", brand("consumer.sapphire"))
+        resValue("color", "vc_brand_system_surface", brand("consumer.surface"))
     }
 
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     fun property(name: String): String = providers.gradleProperty(name).orNull.orEmpty().trim()
@@ -119,8 +133,10 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:discovery"))
     implementation(project(":feature:engagement"))
+    implementation(project(":feature:live"))
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)

@@ -1,3 +1,38 @@
+# VoiceCloud Android Changelog
+
+## VC-ANDROID-PH05-R04
+- Corrects the post-splash startup crash `ArrayIndexOutOfBoundsException: length=20; index=46` from Compose `ColorSpace` conversion.
+- Changes the centralized brand parser from `Color(argb.toULong())` to the 32-bit ARGB `Color(argb.toInt())` constructor.
+- Adds a full centralized Consumer/Creator/Common palette instrumentation test using `toArgb()` so invalid packed colors fail the device gate before manual QA.
+- Makes the instrumentation package identity assertion follow generated `BuildConfig.APPLICATION_ID` for white-label application-id changes.
+- Preserves PH05-R03 compile correction, PH05-R02 AGP9 resource wiring, PH05-R01 runtime scope and all PH01-PH04 regressions.
+
+## VC-ANDROID-PH05-R03
+- Corrected AndroidX Core SplashScreen Kotlin extension import so `:app` Debug, Staging and Release Kotlin compilation can resolve `installSplashScreen()`.
+- Preserved PH05-R02 AGP9 white-label resource wiring and all PH05 listener/runtime behavior.
+- Added durable SplashScreen compile regression and R03 Windows acceptance entry point.
+
+# VC-ANDROID-PH05-R02
+
+- Preserves PH05-R01 product functionality and the frozen PH04-R04 parent lineage.
+- Corrects Windows acceptance failure `defaultConfig contains custom resource values, but the feature is disabled` by enabling AGP `resValues` in `:app` and `:core:designsystem`.
+- Corrects Android Studio/Gradle configuration `AndroidLibrarySourceSet` class-cast failure by replacing legacy typed `sourceSets` resource wiring with the AGP 9 public `androidComponents` variant sources API.
+- Keeps splash/app-icon assets centralized under root `branding/res` and white-label properties under `branding/voicecloud-brand.properties`.
+- Adds PH05-R02 Windows corrective authority and a durable AGP9 branding Gradle regression.
+- Production-source/build delta from PH05-R01 is restricted to `app/build.gradle.kts` and `core/designsystem/build.gradle.kts`; no feature/API/auth/RTC/runtime implementation is changed.
+
+# VC-ANDROID-PH05-R01
+
+- Starts strictly from frozen PH04-R04 commit `702cf4c1ae966cf826ddbc64c6cd86487f6d91e9`.
+- Adds isolated `:feature:live` for the locked listener-only live-room phase.
+- Implements room preview, RTC join/rejoin/leave, remote-audio LiveKit subscription, participants, room access states, raise hand, speaker invitation response, chat/reactions, gifts, saved rooms, room activity and pause/resume/end handling.
+- Keeps local LiveKit audio/video capture disabled and does not request microphone permission; PH06 publishing/host controls remain deferred.
+- Hardens rapid leave/retry/rejoin/room-switch races with session generations, coroutine cancellation and shared RTC-engine connection ownership.
+- Replaces bottom-tab placeholder glyphs with proper vector icons.
+- Integrates AndroidX SplashScreen with a temporary replaceable splash drawable.
+- Centralizes white-label identity, application ID, colors, gradients, radii, motion and brand assets under the root `branding/` authority.
+- Adds PH05 source, lifecycle/concurrency and module-dependency regressions while retaining every accumulated PH01-PH04 protection.
+
 # VC-ANDROID-PH04-R04
 
 - Corrects secondary-route status/navigation-bar crowding with one application-level safe drawing inset boundary.

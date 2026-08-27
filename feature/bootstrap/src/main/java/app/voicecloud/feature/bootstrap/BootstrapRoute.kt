@@ -1,5 +1,7 @@
 package app.voicecloud.feature.bootstrap
 
+import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedContent
@@ -66,11 +68,11 @@ fun BootstrapRoute(viewModel: BootstrapViewModel = hiltViewModel(), onReady: (ap
             is BootstrapState.Maintenance -> MessageScreen(
                 title = "We'll be right back",
                 message = current.message,
-                caption = "VoiceCloud is temporarily unavailable while maintenance is completed.",
+                caption = "${VoiceCloudBrand.name} is temporarily unavailable while maintenance is completed.",
             )
             is BootstrapState.ForceUpdate -> ForceUpdateScreen(current)
             is BootstrapState.Error -> MessageScreen(
-                title = "Couldn't connect to VoiceCloud",
+                title = "Couldn't connect to ${VoiceCloudBrand.name}",
                 message = current.message,
                 action = if (current.canRetry) "Try again" else null,
                 onAction = viewModel::refresh,
@@ -108,7 +110,7 @@ private fun LoadingScreen() {
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             VoiceCloudBrandMark(72.dp, Modifier.scale(pulse))
-            Text("VoiceCloud", style = MaterialTheme.typography.headlineMedium)
+            Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineMedium)
             Text("Real voices. Real connections.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             LinearProgressIndicator(Modifier.width(120.dp), strokeCap = StrokeCap.Round)
         }
@@ -154,8 +156,8 @@ private fun MessageScreen(
 private fun ForceUpdateScreen(state: BootstrapState.ForceUpdate) {
     val context = LocalContext.current
     MessageScreen(
-        title = "Update VoiceCloud",
-        message = state.message ?: "A newer VoiceCloud version is required to continue.",
+        title = "Update ${VoiceCloudBrand.name}",
+        message = state.message ?: "A newer ${VoiceCloudBrand.name} version is required to continue.",
         caption = listOfNotNull(
             state.minimum?.let { "Minimum supported: $it" },
             state.latest?.let { "Latest: $it" },
@@ -181,7 +183,7 @@ private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: 
         ) {
             VoiceCloudBrandMark(68.dp)
             Spacer(Modifier.height(18.dp))
-            Text("VoiceCloud", style = MaterialTheme.typography.displaySmall)
+            Text(VoiceCloudBrand.name, style = MaterialTheme.typography.displaySmall)
             Text("Android foundation is ready", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(28.dp))
             Card(shape = RoundedCornerShape(24.dp)) {

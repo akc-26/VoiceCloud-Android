@@ -9,6 +9,7 @@ def read(path: str) -> str:
 root = read('app/src/main/java/app/voicecloud/android/ui/VoiceCloudRoot.kt')
 topbar = read('core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPageTopBar.kt')
 colors = read('core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudColors.kt')
+branding = read('branding/voicecloud-brand.properties')
 theme = read('core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt')
 discovery = read('feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt')
 engagement = read('feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt')
@@ -61,11 +62,20 @@ ck('PH04 QuickAction labels are forced single-line', 'Text(label, fontSize = 12.
 ck('community Members action is single-line', 'Text("Members", maxLines = 1, softWrap = false)' in engagement)
 ck('community Rooms and events action is single-line', 'Text("Rooms & events", maxLines = 1, softWrap = false' in engagement)
 
-# Website-derived consumer presentation authority.
-for literal in ['0xFF0B7C86','0xFF075762','0xFFDDF2F4','0xFF22C7CF','0xFFF1F7F8','0xFFE8F4F5','0xFF071820','0xFF10262E','0xFF50666E','0xFFA9CED2']:
-    ck(f'website premium color {literal} retained', literal in colors)
-for literal in ['0xFF087E8A','0xFF075F70','0xFFF5FCFD','0xFFECF9FA','0xFFDEF5F7']:
-    ck(f'website gradient color {literal} retained', literal in colors)
+# Website-derived consumer presentation authority. PH05 moves the exact values into the
+# single white-label properties file; the Kotlin theme must consume generated BuildConfig aliases.
+for prop, literal in [
+    ('consumer.sapphire','#0B7C86'),('consumer.sapphireDeep','#075762'),('consumer.sapphireSoft','#DDF2F4'),
+    ('consumer.ice','#22C7CF'),('consumer.cloud','#F1F7F8'),('consumer.surfaceSoft','#E8F4F5'),
+    ('consumer.ink','#071820'),('consumer.text','#10262E'),('consumer.textMuted','#50666E'),('consumer.border','#A9CED2'),
+]:
+    ck(f'website premium color {literal} retained through branding authority', f'{prop}={literal}' in branding)
+for prop, literal in [
+    ('consumer.primaryGradientStart','#087E8A'),('consumer.primaryGradientEnd','#075F70'),
+    ('consumer.heroGradientStart','#F5FCFD'),('consumer.heroGradientMiddle','#ECF9FA'),('consumer.heroGradientEnd','#DEF5F7'),
+]:
+    ck(f'website gradient color {literal} retained through branding authority', f'{prop}={literal}' in branding)
+ck('consumer colors resolve through white-label BuildConfig aliases', 'VoiceCloudBrand.color(BuildConfig.CONSUMER_SAPPHIRE)' in colors and 'VoiceCloudBrand.color(BuildConfig.CONSUMER_HEROGRADIENTEND)' in colors)
 ck('primary Website gradient is centralized', 'ConsumerColors.PrimaryGradientStart, ConsumerColors.PrimaryGradientEnd' in colors)
 ck('light Website hero gradient is centralized', 'ConsumerColors.HeroGradientStart, ConsumerColors.HeroGradientMiddle, ConsumerColors.HeroGradientEnd' in colors)
 ck('Home uses Website hero brush', 'background(\n                        ConsumerBrushes.Hero' in discovery)
@@ -74,7 +84,7 @@ ck('communities uses Website hero brush', 'background(ConsumerBrushes.Hero)' in 
 ck('old teal-to-indigo hero construction is absent', 'SapphireDeep, ConsumerColors.Indigo' not in discovery + engagement)
 for role in ['surfaceContainerLowest','surfaceContainerLow','surfaceContainer =','surfaceContainerHigh','surfaceContainerHighest','surfaceBright','surfaceDim','outlineVariant']:
     ck(f'Material3 role {role} is explicitly branded', role in theme)
-ck('centralized Website radii map to Material shapes', 'Shapes(' in theme and 'RoundedCornerShape(12.dp)' in theme and 'RoundedCornerShape(18.dp)' in theme and 'RoundedCornerShape(24.dp)' in theme and 'RoundedCornerShape(30.dp)' in theme)
+ck('centralized Website radii map to Material shapes', all(x in branding for x in ['radius.small=12','radius.medium=18','radius.large=24','radius.extraLarge=30']) and 'BuildConfig.RADIUS_SMALL.dp' in theme and 'BuildConfig.RADIUS_MEDIUM.dp' in theme and 'BuildConfig.RADIUS_LARGE.dp' in theme and 'BuildConfig.RADIUS_EXTRA_LARGE.dp' in theme)
 
 # Product-facing copy hygiene.
 string_literals = re.findall(r'"([^"\\]*(?:\\.[^"\\]*)*)"', discovery + engagement)

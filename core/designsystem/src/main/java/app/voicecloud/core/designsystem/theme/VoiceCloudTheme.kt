@@ -21,8 +21,17 @@ import androidx.compose.ui.unit.sp
 sealed interface PortalTheme { data object User : PortalTheme; data object Creator : PortalTheme }
 
 @Immutable
-data class VoiceCloudRadii(val small: androidx.compose.ui.unit.Dp = 12.dp, val medium: androidx.compose.ui.unit.Dp = 18.dp, val large: androidx.compose.ui.unit.Dp = 24.dp, val extraLarge: androidx.compose.ui.unit.Dp = 30.dp)
-object VoiceCloudMotion { const val FastMs = 160; const val StandardMs = 220; const val SlowMs = 420 }
+data class VoiceCloudRadii(
+    val small: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_SMALL.dp,
+    val medium: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_MEDIUM.dp,
+    val large: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_LARGE.dp,
+    val extraLarge: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_EXTRA_LARGE.dp,
+)
+object VoiceCloudMotion {
+    val FastMs: Int get() = app.voicecloud.core.designsystem.BuildConfig.MOTION_FAST_MS
+    val StandardMs: Int get() = app.voicecloud.core.designsystem.BuildConfig.MOTION_STANDARD_MS
+    val SlowMs: Int get() = app.voicecloud.core.designsystem.BuildConfig.MOTION_SLOW_MS
+}
 val LocalVoiceCloudRadii = staticCompositionLocalOf { VoiceCloudRadii() }
 
 private val consumerLight = lightColorScheme(
@@ -51,53 +60,53 @@ private val consumerLight = lightColorScheme(
 )
 private val consumerDark = darkColorScheme(
     primary = ConsumerColors.DarkSapphire, onPrimary = ConsumerColors.DarkBackground,
-    primaryContainer = Color(0xFF0A2A34), onPrimaryContainer = ConsumerColors.DarkText,
+    primaryContainer = ConsumerColors.DarkSurfaceSoft, onPrimaryContainer = ConsumerColors.DarkText,
     inversePrimary = ConsumerColors.SapphireDeep,
-    secondary = Color(0xFF6171FF), onSecondary = Color.White,
-    secondaryContainer = Color(0xFF111D36), onSecondaryContainer = ConsumerColors.DarkText,
-    tertiary = Color(0xFF7C63FF), onTertiary = Color.White,
-    tertiaryContainer = Color(0xFF172842), onTertiaryContainer = ConsumerColors.DarkText,
+    secondary = ConsumerColors.DarkSapphireDeep, onSecondary = ConsumerColors.DarkBackground,
+    secondaryContainer = ConsumerColors.LiveSurface, onSecondaryContainer = ConsumerColors.DarkText,
+    tertiary = ConsumerColors.Ice, onTertiary = ConsumerColors.DarkBackground,
+    tertiaryContainer = ConsumerColors.LiveSurfaceElevated, onTertiaryContainer = ConsumerColors.DarkText,
     background = ConsumerColors.DarkBackground, onBackground = ConsumerColors.DarkText,
     surface = ConsumerColors.DarkSurface, onSurface = ConsumerColors.DarkText,
     surfaceVariant = ConsumerColors.DarkSurfaceSoft, onSurfaceVariant = ConsumerColors.DarkMuted,
     surfaceTint = ConsumerColors.DarkSapphire,
     inverseSurface = ConsumerColors.Surface, inverseOnSurface = ConsumerColors.Ink,
-    outline = ConsumerColors.DarkBorder, outlineVariant = Color(0xFF0B2230),
-    surfaceBright = Color(0xFF0A1D27),
+    outline = ConsumerColors.DarkBorder, outlineVariant = ConsumerColors.Navy,
+    surfaceBright = ConsumerColors.DarkSurfaceSoft,
     surfaceDim = ConsumerColors.DarkBackground,
     surfaceContainerLowest = ConsumerColors.DarkBackground,
     surfaceContainerLow = ConsumerColors.DarkSurface,
     surfaceContainer = ConsumerColors.DarkSurfaceSoft,
-    surfaceContainerHigh = Color(0xFF0B2230),
-    surfaceContainerHighest = Color(0xFF172842),
+    surfaceContainerHigh = ConsumerColors.Navy,
+    surfaceContainerHighest = ConsumerColors.LiveSurfaceElevated,
     scrim = Color.Black,
     error = CommonColors.Error,
 )
 private val creatorLight = lightColorScheme(
-    primary = CreatorColors.Primary, onPrimary = Color(0xFF07130D),
+    primary = CreatorColors.Primary, onPrimary = CreatorColors.DarkBackground,
     secondary = CreatorColors.Secondary, onSecondary = Color.White,
-    tertiary = CreatorColors.Accent, onTertiary = Color(0xFF062A25),
+    tertiary = CreatorColors.Accent, onTertiary = CreatorColors.Navigation,
     background = CreatorColors.LightBackground, onBackground = CreatorColors.Text,
     surface = CreatorColors.LightSurface, onSurface = CreatorColors.Text,
     surfaceVariant = CreatorColors.Elevated, onSurfaceVariant = CreatorColors.TextMuted,
-    outline = CreatorColors.Border, error = Color(0xFFDC2626),
+    outline = CreatorColors.Border, error = CommonColors.Error,
 )
 private val creatorDark = darkColorScheme(
-    primary = CreatorColors.PrimaryLight, onPrimary = Color(0xFF07130D),
-    secondary = CreatorColors.SecondaryLight, onSecondary = Color(0xFF062A25),
+    primary = CreatorColors.PrimaryLight, onPrimary = CreatorColors.DarkBackground,
+    secondary = CreatorColors.SecondaryLight, onSecondary = CreatorColors.Navigation,
     background = CreatorColors.DarkBackground, onBackground = CreatorColors.DarkText,
     surface = CreatorColors.DarkSurface, onSurface = CreatorColors.DarkText,
     surfaceVariant = CreatorColors.DarkElevated, onSurfaceVariant = CreatorColors.DarkMuted,
-    outline = CreatorColors.DarkBorder, error = Color(0xFFEF4444),
+    outline = CreatorColors.DarkBorder, error = CommonColors.Error,
 )
 
 
 private val voiceCloudShapes = Shapes(
-    extraSmall = RoundedCornerShape(12.dp),
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(18.dp),
-    large = RoundedCornerShape(24.dp),
-    extraLarge = RoundedCornerShape(30.dp),
+    extraSmall = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_SMALL.dp),
+    small = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_SMALL.dp),
+    medium = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_MEDIUM.dp),
+    large = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_LARGE.dp),
+    extraLarge = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_EXTRA_LARGE.dp),
 )
 
 private val voiceCloudTypography = Typography(

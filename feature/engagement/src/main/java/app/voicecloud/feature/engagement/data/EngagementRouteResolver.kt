@@ -21,7 +21,7 @@ object EngagementRouteResolver {
             string("eventId") != null -> "events/${string("eventId")}"
             string("clubId") != null -> "communities/${string("clubId")}"
             string("communityId") != null -> "communities/${string("communityId")}"
-            string("roomId") != null -> Rooms // PH05 owns live-room detail/join.
+            string("roomId") != null -> "rooms/${string("roomId")}/preview"
             else -> Notifications
         }
     }

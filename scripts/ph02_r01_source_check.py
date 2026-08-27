@@ -78,7 +78,7 @@ check("first-time onboarding remains three-step", 'Step $step of 3' in screens a
 check("completed onboarding is persisted per user without logout-loop regression", 'markOnboardingCompleted(user.id)' in repo and 'hasCompletedOnboarding(user.id)' in repo and 'stringSetPreferencesKey("onboarding_completed_users")' in prefs and 'it.remove(Keys.onboardingCompletedUsers)' not in prefs)
 check("restricted account and session-expired UI exist", 'RestrictedScreen' in screens and 'SessionExpiredScreen' in screens)
 check("maintenance handling remains backend-authoritative", 'MaintenanceScreen' in screens and '503 ->' in vm)
-check("PH02 ready screens stop before PH03 product scope", 'Consumer Home and discovery begin in PH03' in screens and 'dashboard/product modules begin in the locked later phase' in screens)
+check("PH02 auth module remains authentication-only as later phases evolve", all(token not in screens for token in ['fun HomeScreen(', 'fun ExploreScreen(', 'fun RoomsScreen(', 'LiveKit', 'setMicrophoneEnabled', 'publishTrack']))
 
 check("phone OTP validates E.164 and six-digit code", 'Regex("^\\\\+[1-9]\\\\d{1,14}$")' in repo and 'code.length == 6' in repo)
 check("guest upgrade supports email phone Google", all(x in repo for x in ['method = "email"','method = "phone"','method = "google"']))
