@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,21 +28,50 @@ val LocalVoiceCloudRadii = staticCompositionLocalOf { VoiceCloudRadii() }
 private val consumerLight = lightColorScheme(
     primary = ConsumerColors.Sapphire, onPrimary = Color.White,
     primaryContainer = ConsumerColors.SapphireSoft, onPrimaryContainer = ConsumerColors.Ink,
+    inversePrimary = ConsumerColors.Ice,
     secondary = ConsumerColors.Indigo, onSecondary = Color.White,
+    secondaryContainer = ConsumerColors.SapphireSoft, onSecondaryContainer = ConsumerColors.Ink,
     tertiary = ConsumerColors.Violet, onTertiary = Color.White,
+    tertiaryContainer = ConsumerColors.Lavender, onTertiaryContainer = ConsumerColors.Ink,
     background = ConsumerColors.Cloud, onBackground = ConsumerColors.Text,
     surface = ConsumerColors.Surface, onSurface = ConsumerColors.Text,
     surfaceVariant = ConsumerColors.SurfaceSoft, onSurfaceVariant = ConsumerColors.TextMuted,
-    outline = ConsumerColors.Border, error = CommonColors.Error,
+    surfaceTint = ConsumerColors.Sapphire,
+    inverseSurface = ConsumerColors.DeepNavy, inverseOnSurface = ConsumerColors.TextOnDark,
+    outline = ConsumerColors.Border, outlineVariant = ConsumerColors.Sky,
+    surfaceBright = ConsumerColors.Surface,
+    surfaceDim = ConsumerColors.SurfaceSoft,
+    surfaceContainerLowest = ConsumerColors.Surface,
+    surfaceContainerLow = ConsumerColors.Surface,
+    surfaceContainer = ConsumerColors.Cloud,
+    surfaceContainerHigh = ConsumerColors.SurfaceSoft,
+    surfaceContainerHighest = ConsumerColors.SapphireSoft,
+    scrim = ConsumerColors.DeepNavy,
+    error = CommonColors.Error,
 )
 private val consumerDark = darkColorScheme(
     primary = ConsumerColors.DarkSapphire, onPrimary = ConsumerColors.DarkBackground,
     primaryContainer = Color(0xFF0A2A34), onPrimaryContainer = ConsumerColors.DarkText,
+    inversePrimary = ConsumerColors.SapphireDeep,
     secondary = Color(0xFF6171FF), onSecondary = Color.White,
+    secondaryContainer = Color(0xFF111D36), onSecondaryContainer = ConsumerColors.DarkText,
+    tertiary = Color(0xFF7C63FF), onTertiary = Color.White,
+    tertiaryContainer = Color(0xFF172842), onTertiaryContainer = ConsumerColors.DarkText,
     background = ConsumerColors.DarkBackground, onBackground = ConsumerColors.DarkText,
     surface = ConsumerColors.DarkSurface, onSurface = ConsumerColors.DarkText,
     surfaceVariant = ConsumerColors.DarkSurfaceSoft, onSurfaceVariant = ConsumerColors.DarkMuted,
-    outline = ConsumerColors.DarkBorder, error = CommonColors.Error,
+    surfaceTint = ConsumerColors.DarkSapphire,
+    inverseSurface = ConsumerColors.Surface, inverseOnSurface = ConsumerColors.Ink,
+    outline = ConsumerColors.DarkBorder, outlineVariant = Color(0xFF0B2230),
+    surfaceBright = Color(0xFF0A1D27),
+    surfaceDim = ConsumerColors.DarkBackground,
+    surfaceContainerLowest = ConsumerColors.DarkBackground,
+    surfaceContainerLow = ConsumerColors.DarkSurface,
+    surfaceContainer = ConsumerColors.DarkSurfaceSoft,
+    surfaceContainerHigh = Color(0xFF0B2230),
+    surfaceContainerHighest = Color(0xFF172842),
+    scrim = Color.Black,
+    error = CommonColors.Error,
 )
 private val creatorLight = lightColorScheme(
     primary = CreatorColors.Primary, onPrimary = Color(0xFF07130D),
@@ -60,6 +91,15 @@ private val creatorDark = darkColorScheme(
     outline = CreatorColors.DarkBorder, error = Color(0xFFEF4444),
 )
 
+
+private val voiceCloudShapes = Shapes(
+    extraSmall = RoundedCornerShape(12.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(30.dp),
+)
+
 private val voiceCloudTypography = Typography(
     displaySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp),
     headlineMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp),
@@ -77,6 +117,6 @@ fun VoiceCloudTheme(portal: PortalTheme, darkTheme: Boolean = isSystemInDarkThem
         PortalTheme.Creator -> if (darkTheme) creatorDark else creatorLight
     }
     androidx.compose.runtime.CompositionLocalProvider(LocalVoiceCloudRadii provides VoiceCloudRadii()) {
-        MaterialTheme(colorScheme = colors, typography = voiceCloudTypography, content = content)
+        MaterialTheme(colorScheme = colors, typography = voiceCloudTypography, shapes = voiceCloudShapes, content = content)
     }
 }

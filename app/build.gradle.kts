@@ -16,7 +16,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph03"
+        versionName = "1.0.0-ph04"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -118,6 +118,7 @@ dependencies {
     implementation(project(":feature:bootstrap"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:discovery"))
+    implementation(project(":feature:engagement"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -127,12 +128,16 @@ dependencies {
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
     implementation(libs.moshi.kotlin)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
     ksp(libs.hilt.compiler)
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)

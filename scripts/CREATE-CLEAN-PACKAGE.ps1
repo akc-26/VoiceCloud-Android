@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$false)]
-    [string]$OutputPath = (Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) 'VoiceCloud-Android-VC-ANDROID-PH02-R05.zip')
+    [string]$OutputPath = (Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) 'VoiceCloud-Android-VC-ANDROID-PH04-R01.zip')
 )
 
 $ErrorActionPreference = 'Stop'

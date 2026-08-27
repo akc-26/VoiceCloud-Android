@@ -1,3 +1,44 @@
+# VC-ANDROID-PH04-R04
+
+- Corrects secondary-route status/navigation-bar crowding with one application-level safe drawing inset boundary.
+- Adds centralized `VoiceCloudPageTopBar` with icon-only back navigation, centered single-line title, stable geometry, optional subtitle and right action.
+- Converts discovery/profile and PH04 engagement secondary pages to the shared page chrome.
+- Aligns Android consumer gradients and Material surface-container roles with the current Website premium presentation authority.
+- Adds centralized 12/18/24/30dp Material shape radii.
+- Hardens Home and PH04 equal-width actions against text wrapping and corrects paired community-action label sizing.
+- Removes implementation/roadmap language from consumer-facing UI while changing historical regressions to assert the underlying product boundary instead of debug copy.
+- Adds a 91-check durable UI-quality regression while retaining PH03 scroll-crash, PH04-R02 Compose-scope and PH04-R03 healthy-device protections.
+- Changes only seven UI/design-system/root/build production files; API/repository/auth/security/database/realtime behavior is preserved.
+
+# VC-ANDROID-PH04-R03
+
+- Preserves PH04-R02 production source unchanged.
+- Corrects the workstation Gate 6 failure caused by stale wireless/mDNS ADB aliases being enumerated by Gradle/UTP as Unknown/API 1 devices.
+- Builds `:app:assembleDebugAndroidTest` inside the broad host build sweep.
+- Adds healthy-device preflight with an 8-second SDK probe timeout and minSdk 26 enforcement.
+- Prefers a direct/non-mDNS device when multiple healthy transports are visible.
+- Installs the app and test APKs directly to one selected serial and runs instrumentation with `adb -s`.
+- Requires proof that at least one instrumentation test executed and passed.
+- Adds a durable 15-check device-gate regression and R03 Windows source authority.
+
+# VC-ANDROID-PH04-R02
+
+- Corrected PH04-R01 `EngagementScreens.kt:73` Compose scope compile failure by declaring `QuickAction` as a `RowScope` extension.
+- Added a durable PH04-R02 Compose-scope regression and R02 Windows acceptance entry point.
+- Preserved all PH01-PH04-R01 behavior and regressions.
+
+# VC-ANDROID-PH04-R01
+
+- Starts from PH03-R02 exact parent `3665f606e43c677d7d2e4652e2a6451d3fe459a4`.
+- Adds isolated `:feature:engagement` for Communities, Events, Messaging and Notifications.
+- Implements public/private community membership, invite-code join/rotation, community roles/member management and community CRUD.
+- Implements scheduled-event listing/detail/reminders without pulling premium purchase or PH05 RTC forward.
+- Implements direct-message inbox/conversation/send/read-state with HTTP conversation refresh.
+- Implements notification lifecycle plus authenticated realtime notification refresh.
+- Adds Firebase Messaging service/token synchronization using the existing PH02 centralized public Firebase configuration and fail-closed initialization.
+- Adds Android 13+ notification permission and allowlisted notification deep-route resolution.
+- Preserves PH03-R02 duplicate-key crash protection and all accumulated PH01-PH03 regressions.
+
 # VC-ANDROID-PH03-R02
 
 - Fixed fatal Home scroll crash caused by the same user UUID being used as a Compose `LazyColumn` key in both People and Creators sections.

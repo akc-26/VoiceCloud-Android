@@ -17,7 +17,8 @@ build=text('feature/discovery/build.gradle.kts')
 
 ck('PH03 discovery module registered', 'include(":feature:discovery")' in settings)
 ck('app consumes PH03 discovery module', 'implementation(project(":feature:discovery"))' in app)
-ck('PH03 app version marker present', 'versionName = "1.0.0-ph03"' in app)
+version_match=re.search(r'versionName\s*=\s*"1\.0\.0-ph(\d+)"', app)
+ck('PH03 or later app version marker present', version_match is not None and int(version_match.group(1)) >= 3)
 ck('PH02 auth module remains registered', 'include(":feature:auth")' in settings)
 ck('PH02 bootstrap module remains registered', 'include(":feature:bootstrap")' in settings)
 
@@ -45,17 +46,16 @@ ck('guest upgrade remains reachable from PH03 consumer shell', 'VoiceCloudRoutes
 
 for screen in ['HomeScreen','ExploreScreen','RoomsScreen','PeopleScreen','SearchScreen','PublicProfileScreen','MyProfileScreen','SocialListScreen','FriendsScreen']:
     ck(f'PH03 UI {screen} exists', f'fun {screen}(' in screens)
-ck('live room UI remains discovery-only before PH05', 'Room detail/join is introduced in PH05' in screens)
+ck('live room UI remains discovery-only before PH05', 'include(":feature:rtc")' not in settings and all(x not in nav for x in ['LiveRoomDetail', 'RoomJoin', 'RtcRoom']))
 ck('friends supports request accept reject and remove', all(x in vm for x in ['sendFriendRequest','acceptFriendRequest','rejectFriendRequest','removeFriend']))
 ck('follow and unfollow supported', 'followProfile' in vm and 'unfollowFromList' in vm)
 ck('search returns users and rooms only for consumer scope', 'SearchSnapshot' in models and 'users = visibleUsers' in repo and 'rooms = rooms.await().results.rooms' in repo)
 ck('Creator list is derived from consumer-visible CREATOR identities', 'it.role?.uppercase() == "CREATOR"' in repo)
-ck('User portal remains centralized Light-first theme', 'ConsumerColors.Sapphire' in screens and 'ConsumerColors.Indigo' in screens)
+ck('User portal remains centralized Light-first theme', 'ConsumerColors.Sapphire' in screens and 'ConsumerBrushes.Hero' in screens)
 
 feature_modules=set(re.findall(r'include\(":feature:([^\"]+)"\)', settings))
-ck('PH03 feature module set is scoped to bootstrap auth discovery', feature_modules == {'bootstrap','auth','discovery'})
-for forbidden in [':feature:communities',':feature:messages',':feature:notifications',':feature:rtc',':feature:wallet']:
-    ck(f'PH04+ module {forbidden} absent', forbidden not in settings)
+ck('PH03 required feature modules remain registered', {'bootstrap','auth','discovery'}.issubset(feature_modules))
+ck('PH03 discovery module remains isolated from later feature modules', ':feature:engagement' not in build and ':feature:rtc' not in build and ':feature:wallet' not in build)
 
 ck('discovery declares Hilt directly', 'implementation(libs.hilt.android)' in build and 'ksp(libs.hilt.compiler)' in build)
 ck('discovery exports coroutine public ABI directly', 'api(libs.kotlinx.coroutines.android)' in build)

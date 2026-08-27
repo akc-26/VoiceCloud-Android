@@ -13,12 +13,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.feature.discovery.model.*
 
@@ -78,6 +79,33 @@ private fun ScreenHeader(title: String, subtitle: String? = null, action: (@Comp
 }
 
 @Composable
+private fun SecondaryPageLayout(
+    title: String,
+    subtitle: String? = null,
+    onBack: () -> Unit,
+    content: @Composable (Modifier) -> Unit,
+) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = { VoiceCloudPageTopBar(title = title, subtitle = subtitle, onBack = onBack) },
+    ) { innerPadding ->
+        content(Modifier.fillMaxSize().padding(innerPadding))
+    }
+}
+
+@Composable
+private fun RowScope.HomeShortcut(label: String, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.weight(1f).heightIn(min = 44.dp),
+        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
+        shape = RoundedCornerShape(14.dp),
+    ) {
+        Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+    }
+}
+
+@Composable
 private fun StatusBlock(state: DiscoveryUiState, onRetry: (() -> Unit)? = null) {
     when {
         state.loading -> Box(Modifier.fillMaxWidth().padding(28.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -108,7 +136,7 @@ private fun UserAvatar(user: VoiceCloudUser, size: Int = 48) {
     val initial = (user.displayName.ifBlank { user.username }.firstOrNull() ?: 'V').uppercaseChar().toString()
     Box(
         Modifier.size(size.dp).clip(CircleShape).background(
-            Brush.linearGradient(listOf(ConsumerColors.Sapphire, ConsumerColors.Indigo))
+            ConsumerBrushes.Primary
         ),
         contentAlignment = Alignment.Center,
     ) { Text(initial, color = Color.White, fontWeight = FontWeight.Bold) }
@@ -198,6 +226,9 @@ fun HomeScreen(
     onSearch: () -> Unit,
     onFriends: () -> Unit,
     onMe: () -> Unit,
+    onCommunities: () -> Unit,
+    onMessages: () -> Unit,
+    onNotifications: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad() }
     ConsumerScaffold("home", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
@@ -205,15 +236,22 @@ fun HomeScreen(
             item {
                 Box(
                     Modifier.fillMaxWidth().padding(20.dp).clip(RoundedCornerShape(28.dp)).background(
-                        Brush.linearGradient(listOf(ConsumerColors.SapphireDeep, ConsumerColors.Indigo))
+                        ConsumerBrushes.Hero
                     ).padding(24.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("VOICECLOUD", color = Color.White.copy(alpha = .8f), fontWeight = FontWeight.Bold)
-                        Text("Listen. Connect. Be heard.", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
-                        Text("Join live conversations and discover creators and people across VoiceCloud.", color = Color.White.copy(alpha = .9f))
-                        Button(onClick = onRooms, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = ConsumerColors.SapphireDeep)) { Text("Explore live rooms") }
+                        Text("VOICECLOUD", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                        Text("Listen. Connect. Be heard.", color = ConsumerColors.Ink, fontSize = 29.sp, fontWeight = FontWeight.Bold)
+                        Text("Join live conversations and discover creators and people across VoiceCloud.", color = ConsumerColors.Text)
+                        Button(onClick = onRooms) { Text("Explore live rooms", maxLines = 1, softWrap = false) }
                     }
+                }
+            }
+            item {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    HomeShortcut("Communities", onCommunities)
+                    HomeShortcut("Messages", onMessages)
+                    HomeShortcut("Alerts", onNotifications)
                 }
             }
             if (isGuest) item {
@@ -254,7 +292,7 @@ fun ExploreScreen(
     LaunchedEffect(Unit) { onLoad() }
     ConsumerScaffold("explore", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Explore", "Live conversations and consumer-visible people from the finalized VoiceCloud discovery APIs.") }
+            item { ScreenHeader("Explore", "Discover live conversations, creators, and people across VoiceCloud.") }
             item { StatusBlock(state, onLoad) }
             item { SectionTitle("Live rooms", "All rooms", onRooms) }
             itemsIndexed(state.explore.liveRooms.distinctBy { it.id }.take(6), key = { index, room -> "explore-live:${room.id}:$index" }) { _, room -> RoomCard(room) }
@@ -271,11 +309,16 @@ fun ExploreScreen(
 @Composable
 fun RoomsScreen(state: DiscoveryUiState, onLoad: () -> Unit, onBack: () -> Unit) {
     LaunchedEffect(Unit) { onLoad() }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { ScreenHeader("Live Rooms", "Discovery and listing only in PH03. Room detail/join is introduced in PH05.", action = { TextButton(onClick = onBack) { Text("Back") } }) }
-        item { StatusBlock(state, onLoad) }
-        if (state.rooms.isEmpty() && !state.loading) item { EmptyBlock("No live rooms", "There are no discoverable live rooms at the moment.") }
-        itemsIndexed(state.rooms.distinctBy { it.id }, key = { index, room -> "rooms:${room.id}:$index" }) { _, room -> RoomCard(room) }
+    SecondaryPageLayout(
+        title = "Live Rooms",
+        subtitle = "Discover conversations happening live across VoiceCloud.",
+        onBack = onBack,
+    ) { pageModifier ->
+        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item { StatusBlock(state, onLoad) }
+            if (state.rooms.isEmpty() && !state.loading) item { EmptyBlock("No live rooms", "There are no discoverable live rooms at the moment.") }
+            itemsIndexed(state.rooms.distinctBy { it.id }, key = { index, room -> "rooms:${room.id}:$index" }) { _, room -> RoomCard(room) }
+        }
     }
 }
 
@@ -288,11 +331,16 @@ fun PeopleScreen(
     onBack: () -> Unit,
 ) {
     LaunchedEffect(creatorsOnly) { onLoad() }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { ScreenHeader(if (creatorsOnly) "Creators" else "People", if (creatorsOnly) "Creator accounts visible to VoiceCloud consumers." else "Consumer-visible VoiceCloud people. Administrative and guest identities are excluded.", action = { TextButton(onClick = onBack) { Text("Back") } }) }
-        item { StatusBlock(state, onLoad) }
-        if (state.people.isEmpty() && !state.loading) item { EmptyBlock("No profiles found", "VoiceCloud discovery did not return matching consumer profiles.") }
-        itemsIndexed(state.people.distinctBy { it.id }, key = { index, user -> "people:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
+    SecondaryPageLayout(
+        title = if (creatorsOnly) "Creators" else "People",
+        subtitle = if (creatorsOnly) "Discover creators and voices worth following." else "Discover people to follow and connect with.",
+        onBack = onBack,
+    ) { pageModifier ->
+        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item { StatusBlock(state, onLoad) }
+            if (state.people.isEmpty() && !state.loading) item { EmptyBlock("No profiles found", "Try again later as the VoiceCloud community grows.") }
+            itemsIndexed(state.people.distinctBy { it.id }, key = { index, user -> "people:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
+        }
     }
 }
 
@@ -310,7 +358,7 @@ fun SearchScreen(
     var query by rememberSaveable { mutableStateOf(state.search.query) }
     ConsumerScaffold("search", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Search", "Find live rooms and people by human-readable VoiceCloud identity.") }
+            item { ScreenHeader("Search", "Find people and live conversations across VoiceCloud.") }
             item {
                 OutlinedTextField(
                     value = query,
@@ -338,32 +386,36 @@ fun PublicProfileScreen(
     isSelf: Boolean,
     onLoad: () -> Unit,
     onFollow: () -> Unit,
+    onMessage: (String) -> Unit,
     onMyProfile: () -> Unit,
     onBack: () -> Unit,
 ) {
     LaunchedEffect(username) { onLoad() }
     val profile = state.profile
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 28.dp)) {
-        item { ScreenHeader("Profile", "@${username}", action = { TextButton(onClick = onBack) { Text("Back") } }) }
+    SecondaryPageLayout(title = "Profile", subtitle = "@${username}", onBack = onBack) { pageModifier ->
+        LazyColumn(pageModifier, contentPadding = PaddingValues(bottom = 28.dp)) {
         item { StatusBlock(state, onLoad) }
         if (profile != null) {
             item {
                 Box(
                     Modifier.fillMaxWidth().padding(horizontal = 20.dp).clip(RoundedCornerShape(28.dp)).background(
-                        Brush.linearGradient(listOf(ConsumerColors.SapphireDeep, ConsumerColors.Indigo))
+                        ConsumerBrushes.Hero
                     ).padding(22.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                         UserAvatar(profile.asUser(), 72)
                         Spacer(Modifier.height(12.dp))
-                        Text(profile.displayName.ifBlank { profile.username }, color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Bold)
-                        Text("@${profile.username}", color = Color.White.copy(alpha = .8f))
-                        if (profile.isVerified) Text("Verified VoiceCloud profile", color = Color.White.copy(alpha = .9f))
+                        Text(profile.displayName.ifBlank { profile.username }, color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+                        Text("@${profile.username}", color = ConsumerColors.SapphireDeep)
+                        if (profile.isVerified) Text("Verified VoiceCloud profile", color = ConsumerColors.SapphireDeep)
                         Spacer(Modifier.height(12.dp))
-                        Text(profile.bio ?: profile.statusMessage ?: "VoiceCloud member", color = Color.White, modifier = Modifier.fillMaxWidth())
+                        Text(profile.bio ?: profile.statusMessage ?: "VoiceCloud member", color = ConsumerColors.Text, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(14.dp))
                         if (isSelf) Button(onClick = onMyProfile) { Text("My profile") }
-                        else Button(enabled = !state.mutationBusy, onClick = onFollow) { Text(if (profile.relationship?.isFollowing == true) "Following" else "Follow") }
+                        else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(enabled = !state.mutationBusy, onClick = onFollow) { Text(if (profile.relationship?.isFollowing == true) "Following" else "Follow") }
+                            OutlinedButton(enabled = !state.mutationBusy, onClick = { onMessage(profile.id) }) { Text("Message") }
+                        }
                     }
                 }
             }
@@ -386,6 +438,7 @@ fun PublicProfileScreen(
             }
         }
     }
+}
 }
 
 @Composable
@@ -412,7 +465,7 @@ fun MyProfileScreen(
     val profile = state.myProfile
     ConsumerScaffold("profile", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            item { ScreenHeader("My Profile", "Your authenticated VoiceCloud identity.") }
+            item { ScreenHeader("My Profile", "Your VoiceCloud profile and connections.") }
             item { StatusBlock(state, onLoad) }
             if (profile != null) {
                 item {
@@ -451,27 +504,32 @@ fun SocialListScreen(
 ) {
     var search by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(mode) { onLoad("") }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { ScreenHeader(if (mode == "followers") "Followers" else "Following", if (mode == "followers") "People who follow your profile." else "People you follow.", action = { TextButton(onClick = onBack) { Text("Back") } }) }
-        item {
-            OutlinedTextField(
-                value = search,
-                onValueChange = { search = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Search ${mode}") },
-                trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } },
-            )
-        }
-        item { StatusBlock(state) }
-        if (state.socialUsers.isEmpty() && !state.loading) item { EmptyBlock("No ${mode} found", "Matching consumer-visible profiles will appear here.") }
-        itemsIndexed(state.socialUsers.distinctBy { it.id }, key = { index, user -> "social:${user.id}:$index" }) { _, user ->
-            UserCard(
-                user = user,
-                onOpen = { onProfile(user.username) },
-                actionLabel = if (mode == "following") "Unfollow" else null,
-                actionEnabled = !state.mutationBusy,
-                onAction = if (mode == "following") ({ onUnfollow(user.id, search) }) else null,
-            )
+    SecondaryPageLayout(
+        title = if (mode == "followers") "Followers" else "Following",
+        subtitle = if (mode == "followers") "People who follow your profile." else "People you follow.",
+        onBack = onBack,
+    ) { pageModifier ->
+        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item {
+                OutlinedTextField(
+                    value = search,
+                    onValueChange = { search = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Search ${mode}") },
+                    trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } },
+                )
+            }
+            item { StatusBlock(state) }
+            if (state.socialUsers.isEmpty() && !state.loading) item { EmptyBlock("No ${mode} found", "Matching VoiceCloud profiles will appear here.") }
+            itemsIndexed(state.socialUsers.distinctBy { it.id }, key = { index, user -> "social:${user.id}:$index" }) { _, user ->
+                UserCard(
+                    user = user,
+                    onOpen = { onProfile(user.username) },
+                    actionLabel = if (mode == "following") "Unfollow" else null,
+                    actionEnabled = !state.mutationBusy,
+                    onAction = if (mode == "following") ({ onUnfollow(user.id, search) }) else null,
+                )
+            }
         }
     }
 }
@@ -494,7 +552,7 @@ fun FriendsScreen(
     LaunchedEffect(Unit) { onLoad() }
     ConsumerScaffold("friends", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Friends", "Requests, connections and suggestions from the finalized VoiceCloud social APIs.") }
+            item { ScreenHeader("Friends", "Manage requests, connections, and people you may know.") }
             item { StatusBlock(state, onLoad) }
             item { SectionTitle("Incoming requests") }
             if (state.pending.incoming.isEmpty() && !state.loading) item { Text("No incoming requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }

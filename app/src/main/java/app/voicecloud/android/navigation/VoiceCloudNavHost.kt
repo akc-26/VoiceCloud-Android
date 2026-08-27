@@ -7,11 +7,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import app.voicecloud.core.model.MobileConfig
 import app.voicecloud.feature.auth.model.FirebaseClientConfig
 import app.voicecloud.feature.auth.ui.*
 import app.voicecloud.feature.bootstrap.BootstrapRoute
 import app.voicecloud.feature.discovery.ui.*
+import app.voicecloud.feature.engagement.ui.*
 
 object VoiceCloudRoutes {
     const val Bootstrap = "bootstrap"
@@ -49,19 +51,44 @@ object VoiceCloudRoutes {
     const val Friends = "friends"
     const val PublicProfile = "profile/{username}"
 
+    // PH04 communities, events, messaging and notifications.
+    const val Communities = "communities"
+    const val CommunityDetail = "communities/{communityId}"
+    const val CommunityCreate = "communities/create"
+    const val CommunityManage = "communities/{communityId}/manage"
+    const val CommunityMembers = "communities/{communityId}/members"
+    const val CommunityEvents = "communities/{communityId}/events"
+    const val Events = "events"
+    const val EventDetail = "events/{eventId}"
+    const val Messages = "messages"
+    const val Conversation = "messages/{conversationId}"
+    const val Notifications = "notifications"
+
     fun profile(username: String): String = "profile/${Uri.encode(username.trim())}"
+    fun community(id: String): String = "communities/${Uri.encode(id.trim())}"
+    fun communityManage(id: String): String = "communities/${Uri.encode(id.trim())}/manage"
+    fun communityMembers(id: String): String = "communities/${Uri.encode(id.trim())}/members"
+    fun communityEvents(id: String): String = "communities/${Uri.encode(id.trim())}/events"
+    fun event(id: String): String = "events/${Uri.encode(id.trim())}"
+    fun conversation(id: String): String = "messages/${Uri.encode(id.trim())}"
 }
 
 @Composable
 fun VoiceCloudNavHost(
     navController: NavHostController,
     initialResetToken: String? = null,
+    initialNavigationRoute: String? = null,
     firebaseClientConfig: FirebaseClientConfig = FirebaseClientConfig(),
 ) {
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.state.collectAsStateWithLifecycle()
+    val engagementViewModel: EngagementViewModel = hiltViewModel()
+    val engagementState by engagementViewModel.state.collectAsStateWithLifecycle()
     var mobileConfig by remember { mutableStateOf<MobileConfig?>(null) }
     var resetToken by remember(initialResetToken) { mutableStateOf(initialResetToken.orEmpty()) }
+    var pendingExternalRoute by remember(initialNavigationRoute) { mutableStateOf(initialNavigationRoute.orEmpty()) }
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     fun open(route: String) {
         if (navController.currentDestination?.route != route) {
@@ -81,6 +108,26 @@ fun VoiceCloudNavHost(
             if (mobileConfig != null && route != VoiceCloudRoutes.Bootstrap && route != VoiceCloudRoutes.ResetPassword) {
                 navController.navigate(VoiceCloudRoutes.ResetPassword) { launchSingleTop = true }
             }
+        }
+    }
+
+    LaunchedEffect(initialNavigationRoute) {
+        val incoming = initialNavigationRoute?.trim().orEmpty()
+        if (incoming.isNotBlank()) pendingExternalRoute = incoming
+    }
+
+    LaunchedEffect(authState.user?.id) {
+        if (authState.user != null) engagementViewModel.syncPushToken()
+    }
+
+    LaunchedEffect(currentRoute, pendingExternalRoute, authState.user?.id) {
+        val route = pendingExternalRoute.trim()
+        val authenticated = authState.user != null
+        val routeNow = currentRoute
+        val authRoute = routeNow == null || routeNow == VoiceCloudRoutes.Bootstrap || routeNow.startsWith("auth/")
+        if (route.isNotBlank() && authenticated && !authRoute) {
+            pendingExternalRoute = ""
+            open(route)
         }
     }
 
@@ -219,6 +266,9 @@ fun VoiceCloudNavHost(
                 onSearch = { open(VoiceCloudRoutes.Search) },
                 onFriends = { open(VoiceCloudRoutes.Friends) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
+                onCommunities = { open(VoiceCloudRoutes.Communities) },
+                onMessages = { open(VoiceCloudRoutes.Messages) },
+                onNotifications = { open(VoiceCloudRoutes.Notifications) },
             )
         }
         composable(VoiceCloudRoutes.Explore) {
@@ -282,6 +332,7 @@ fun VoiceCloudNavHost(
                 isSelf = viewer?.username?.equals(username, ignoreCase = true) == true,
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadPublicProfile(username) },
                 onFollow = vm::followProfile,
+                onMessage = { userId -> engagementViewModel.startDirectConversation(userId) { conversation -> open(VoiceCloudRoutes.conversation(conversation.id)) } },
                 onMyProfile = { open(VoiceCloudRoutes.MyProfile) },
                 onBack = { navController.popBackStack() },
             )
@@ -347,6 +398,122 @@ fun VoiceCloudNavHost(
                 onSearch = { open(VoiceCloudRoutes.Search) },
                 onFriends = { open(VoiceCloudRoutes.Friends) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
+            )
+        }
+
+        composable(VoiceCloudRoutes.Communities) {
+            CommunitiesScreen(
+                state = engagementState,
+                onLoad = engagementViewModel::loadCommunities,
+                onOpen = { open(VoiceCloudRoutes.community(it)) },
+                onCreate = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.CommunityCreate) },
+                onEvents = { open(VoiceCloudRoutes.Events) },
+                onMessages = { open(VoiceCloudRoutes.Messages) },
+                onNotifications = { open(VoiceCloudRoutes.Notifications) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.CommunityCreate) {
+            CommunityEditorScreen(
+                state = engagementState,
+                onSubmit = { input -> engagementViewModel.createCommunity(input) { created -> open(VoiceCloudRoutes.community(created.handle.ifBlank { created.id })) } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.CommunityDetail) { entry ->
+            val communityId = Uri.decode(entry.arguments?.getString("communityId").orEmpty())
+            CommunityDetailScreen(
+                state = engagementState,
+                id = communityId,
+                isGuest = authState.user?.isGuest == true,
+                onLoad = { engagementViewModel.loadCommunity(communityId) },
+                onJoin = engagementViewModel::joinCommunity,
+                onLeave = engagementViewModel::leaveCommunity,
+                onManage = { engagementState.community?.id?.let { open(VoiceCloudRoutes.communityManage(it)) } },
+                onMembers = { engagementState.community?.id?.let { open(VoiceCloudRoutes.communityMembers(it)) } },
+                onEvents = { engagementState.community?.id?.let { open(VoiceCloudRoutes.communityEvents(it)) } },
+                onUpgrade = { open(VoiceCloudRoutes.GuestUpgrade) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.CommunityManage) { entry ->
+            val communityId = Uri.decode(entry.arguments?.getString("communityId").orEmpty())
+            LaunchedEffect(communityId) { engagementViewModel.loadCommunity(communityId) }
+            CommunityEditorScreen(
+                state = engagementState,
+                existing = engagementState.community,
+                onSubmit = engagementViewModel::updateCommunity,
+                onRotateInvite = engagementViewModel::rotateInviteCode,
+                onMembers = { engagementState.community?.id?.let { open(VoiceCloudRoutes.communityMembers(it)) } },
+                onDelete = { engagementViewModel.deleteCommunity { open(VoiceCloudRoutes.Communities) } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.CommunityMembers) { entry ->
+            val communityId = Uri.decode(entry.arguments?.getString("communityId").orEmpty())
+            LaunchedEffect(communityId) { engagementViewModel.loadCommunity(communityId) }
+            CommunityMembersScreen(
+                state = engagementState,
+                canManage = engagementState.membership?.role?.uppercase() in setOf("OWNER", "ADMIN"),
+                viewerRole = engagementState.membership?.role,
+                viewerId = authState.user?.id,
+                onRole = engagementViewModel::updateMemberRole,
+                onRemove = engagementViewModel::removeMember,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.CommunityEvents) { entry ->
+            val communityId = Uri.decode(entry.arguments?.getString("communityId").orEmpty())
+            LaunchedEffect(communityId) { engagementViewModel.loadCommunity(communityId) }
+            EventsScreen(
+                state = engagementState.copy(events = engagementState.communityEvents),
+                onLoad = { _ -> engagementViewModel.loadCommunity(communityId) },
+                onOpen = { open(VoiceCloudRoutes.event(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.Events) {
+            EventsScreen(engagementState, engagementViewModel::loadEvents, { open(VoiceCloudRoutes.event(it)) }, { navController.popBackStack() })
+        }
+        composable(VoiceCloudRoutes.EventDetail) { entry ->
+            val eventId = Uri.decode(entry.arguments?.getString("eventId").orEmpty())
+            EventDetailScreen(
+                state = engagementState,
+                onLoad = { engagementViewModel.loadEvent(eventId) },
+                onReminder = engagementViewModel::remindEvent,
+                onCommunity = { open(VoiceCloudRoutes.community(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.Messages) {
+            MessagesScreen(
+                state = engagementState,
+                onLoad = engagementViewModel::loadConversations,
+                onOpen = { open(VoiceCloudRoutes.conversation(it)) },
+                onDelete = engagementViewModel::deleteConversation,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.Conversation) { entry ->
+            val conversationId = Uri.decode(entry.arguments?.getString("conversationId").orEmpty())
+            ConversationScreen(
+                state = engagementState,
+                viewerId = authState.user?.id,
+                onLoad = { engagementViewModel.loadConversation(conversationId) },
+                onRefresh = { engagementViewModel.refreshConversationSilently(conversationId) },
+                onSend = engagementViewModel::sendMessage,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.Notifications) {
+            NotificationsScreen(
+                state = engagementState,
+                onLoad = { engagementViewModel.loadNotifications() },
+                onOpen = ::open,
+                onRead = engagementViewModel::markNotificationRead,
+                onReadAll = engagementViewModel::markAllNotificationsRead,
+                onDelete = engagementViewModel::deleteNotification,
+                onBack = { navController.popBackStack() },
             )
         }
     }

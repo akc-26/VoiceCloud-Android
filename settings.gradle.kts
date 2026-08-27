@@ -30,3 +30,5 @@ include(":core:realtime")
 include(":feature:auth")
 
 include(":feature:discovery")
+
+include(":feature:engagement")

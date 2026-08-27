@@ -1,9 +1,11 @@
 package app.voicecloud.core.designsystem.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-/** Exact Android translation of finalized R06 shared/branding presentation authority. */
+/** Exact Android translation of finalized R06 Website presentation authority. */
 object ConsumerColors {
+    // Website premium light palette.
     val Sapphire = Color(0xFF0B7C86)
     val SapphireDeep = Color(0xFF075762)
     val SapphireSoft = Color(0xFFDDF2F4)
@@ -21,7 +23,20 @@ object ConsumerColors {
     val Text = Color(0xFF10262E)
     val TextMuted = Color(0xFF50666E)
     val Border = Color(0xFFA9CED2)
+    val DeepNavy = Color(0xFF081225)
+    val Navy = Color(0xFF0F1D3A)
+    val LiveSurface = Color(0xFF132750)
+    val LiveSurfaceElevated = Color(0xFF1A3468)
+    val TextOnDark = Color(0xFFF7FAFF)
+    val TextOnDarkSecondary = Color(0xFFB7C5E1)
     val VipGold = Color(0xFFF6C85F)
+
+    // Website presentation gradients. These intentionally do not use Indigo.
+    val PrimaryGradientStart = Color(0xFF087E8A)
+    val PrimaryGradientEnd = Color(0xFF075F70)
+    val HeroGradientStart = Color(0xFFF5FCFD)
+    val HeroGradientMiddle = Color(0xFFECF9FA)
+    val HeroGradientEnd = Color(0xFFDEF5F7)
 
     val DarkSapphire = Color(0xFF20E0E5)
     val DarkSapphireDeep = Color(0xFF56EDF0)
@@ -31,6 +46,13 @@ object ConsumerColors {
     val DarkText = Color(0xFFDDECEF)
     val DarkMuted = Color(0xFF8FA8B2)
     val DarkBorder = Color(0xFF163946)
+}
+
+object ConsumerBrushes {
+    val Primary: Brush
+        get() = Brush.linearGradient(listOf(ConsumerColors.PrimaryGradientStart, ConsumerColors.PrimaryGradientEnd))
+    val Hero: Brush
+        get() = Brush.linearGradient(listOf(ConsumerColors.HeroGradientStart, ConsumerColors.HeroGradientMiddle, ConsumerColors.HeroGradientEnd))
 }
 
 object CreatorColors {
