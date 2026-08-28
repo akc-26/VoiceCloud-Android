@@ -23,6 +23,8 @@ import app.voicecloud.feature.discovery.ui.*
 import app.voicecloud.feature.engagement.ui.*
 import app.voicecloud.feature.live.ui.*
 import app.voicecloud.feature.hosting.ui.*
+import app.voicecloud.feature.economy.model.EconomySection
+import app.voicecloud.feature.economy.ui.*
 
 object VoiceCloudRoutes {
     const val Bootstrap = "bootstrap"
@@ -88,6 +90,11 @@ object VoiceCloudRoutes {
     const val HostScheduleEdit = "host/schedules/{scheduleId}/edit"
     const val HostInteractive = "host/rooms/{roomId}/interactive"
 
+    // PH07 consumer economy & progression.
+    const val Economy = "economy"
+    const val EconomySection = "economy/{section}"
+    fun economySection(section: app.voicecloud.feature.economy.model.EconomySection): String = "economy/${section.name}"
+
     fun roomPreview(id: String): String = "rooms/${Uri.encode(id.trim())}/preview"
     fun roomExperience(id: String): String = "rooms/${Uri.encode(id.trim())}/live"
 
@@ -119,6 +126,8 @@ fun VoiceCloudNavHost(
     val engagementState by engagementViewModel.state.collectAsStateWithLifecycle()
     val hostingViewModel: HostingViewModel = hiltViewModel()
     val hostingState by hostingViewModel.state.collectAsStateWithLifecycle()
+    val economyViewModel: EconomyViewModel = hiltViewModel()
+    val economyState by economyViewModel.state.collectAsStateWithLifecycle()
     var mobileConfig by remember { mutableStateOf<MobileConfig?>(null) }
     var resetToken by remember(initialResetToken) { mutableStateOf(initialResetToken.orEmpty()) }
     var pendingExternalRoute by remember(initialNavigationRoute) { mutableStateOf(initialNavigationRoute.orEmpty()) }
@@ -469,6 +478,7 @@ fun VoiceCloudNavHost(
                 onLoad = vm::loadMyProfile,
                 onFollowers = { open(VoiceCloudRoutes.Followers) },
                 onFollowing = { open(VoiceCloudRoutes.Following) },
+                onEconomy = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Economy) },
                 onUpgrade = { open(VoiceCloudRoutes.GuestUpgrade) },
                 onLogout = { authViewModel.logout() },
                 onHome = { open(VoiceCloudRoutes.Home) },
@@ -743,6 +753,24 @@ fun VoiceCloudNavHost(
                 onBack = { navController.popBackStack() },
             )
         }
+        composable(VoiceCloudRoutes.Economy) {
+            EconomyHubScreen(
+                onOpen = { open(VoiceCloudRoutes.economySection(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.EconomySection) { entry ->
+            val sectionName = Uri.decode(entry.arguments?.getString("section").orEmpty())
+            val section = runCatching { EconomySection.valueOf(sectionName) }.getOrDefault(EconomySection.WALLET)
+            EconomySectionScreen(
+                section = section,
+                state = economyState,
+                onLoad = { economyViewModel.load(section) },
+                onBack = { navController.popBackStack() },
+                onClaimCheckIn = economyViewModel::claimCheckIn,
+            )
+        }
+
     }
 }
 

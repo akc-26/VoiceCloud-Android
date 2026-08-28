@@ -595,6 +595,7 @@ fun MyProfileScreen(
     onLoad: () -> Unit,
     onFollowers: () -> Unit,
     onFollowing: () -> Unit,
+    onEconomy: () -> Unit,
     onUpgrade: () -> Unit,
     onLogout: () -> Unit,
     onHome: () -> Unit,
@@ -628,6 +629,7 @@ fun MyProfileScreen(
                     }
                 }
                 item { Text("Profile complete · ${profile.profileCompletionPercentage}%", fontWeight = FontWeight.SemiBold) }
+                item { Button(onClick = onEconomy, modifier = Modifier.fillMaxWidth()) { Text("Economy & progression") } }
             }
             if (isGuest) item { Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade guest account") } }
             item { OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Sign out") } }

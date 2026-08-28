@@ -37,3 +37,5 @@ include(":feature:engagement")
 include(":feature:live")
 
 include(":feature:hosting")
+
+include(":feature:economy")

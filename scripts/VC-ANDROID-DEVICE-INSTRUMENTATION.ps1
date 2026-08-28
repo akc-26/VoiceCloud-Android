@@ -49,7 +49,18 @@ if (-not $adb -or -not (Test-Path $adb)) {
     exit 1
 }
 
-$deviceOutput = & $adb devices 2>&1
+$deviceProbe = Invoke-CapturedProcess -FilePath $adb -Arguments @('devices') -TimeoutSeconds 20
+if ($deviceProbe.StdErr) {
+    foreach ($line in ($deviceProbe.StdErr -split "`r?`n")) {
+        if (-not [string]::IsNullOrWhiteSpace($line)) { Write-Host "[INFO] adb: $line" }
+    }
+}
+if ($deviceProbe.ExitCode -ne 0 -or $deviceProbe.TimedOut) {
+    Write-Host '[FAIL] adb devices failed or timed out.'
+    exit 1
+}
+
+$deviceOutput = $deviceProbe.StdOut -split "`r?`n"
 $candidates = @()
 foreach ($line in $deviceOutput) {
     if ([string]::IsNullOrWhiteSpace($line) -or $line -like 'List of devices attached*') { continue }

@@ -26,7 +26,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph06"
+        versionName = "1.0.0-ph07"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         resValue("string", "vc_brand_app_name", brand("brand.name"))
@@ -135,6 +135,7 @@ dependencies {
     implementation(project(":feature:engagement"))
     implementation(project(":feature:live"))
     implementation(project(":feature:hosting"))
+    implementation(project(":feature:economy"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
