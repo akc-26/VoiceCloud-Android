@@ -1,51 +1,24 @@
-# VoiceCloud Android — VC-ANDROID-PH08-R02
+# VoiceCloud Android — VC-ANDROID-PH09-R08
 
-PH08-R02 is the consolidated corrective/integration revision built on the frozen PH07-R03 Git baseline.
+PH09 implements the locked **Preferences, Security, Safety, CMS & Support** phase on frozen PH08-R02 commit `1739f081ac386acca9a24b37863b72c4db952089`.
 
-## Parent authority
-- Git branch: `VoiceCloud-Android-VC-ANDROID-PH07-R03`
-- Exact parent commit: `fe2e7857802861e2ace2733a313c00c5d27d331d`
-- PH01-PH07 behavior remains inherited; PH08-R01 replay/activity/extended-profile scope remains present.
+R08 is the closure corrective revision from the complete R07 Windows acceptance output. R07 proved Debug/Staging/Release Kotlin compilation, unit tests, lint and assemblies all succeed, but Gate 7 never executed because the PowerShell device script had three invalid unbraced variable-before-colon interpolations. The same R07 compiler output also still contained one FCM override-deprecation warning in each variant.
 
-## PH08-R02 completion scope
-- Live-room dominant Home with centralized VoiceCloud branding
-- differentiated Explore experience
-- nonblank Search landing with People, Creators, Rooms and Communities plus View all and tab-specific empty states
-- completed Friends requests/suggestions/cancellation flow
-- Profile-first Economy & Progression navigation with corrected priority order
-- structured Economy data/actions rather than raw payload rendering
-- CMS-driven Help, Terms & Information pages
-- first-setup-only onboarding
-- avatar/cover create + replace flows with recommended resolutions
-- smooth navigation transitions and arrow-based back navigation
-- professional live-room header, persistent chat, leave action, emoji/gift sheets and direct room entry
-- PH08-R01 replay/activity/extended-profile functionality preserved
+## R08 closure
+- Adds a **real Windows PowerShell parser gate** across every `scripts/*.ps1` before Python, Gradle or device work begins.
+- Corrects all three invalid PowerShell interpolations by using `${UserId}:` / `${currentUser}:`.
+- Audits the complete current PowerShell surface for the same parser hazard.
+- Hardens redirected process capture with asynchronous stdout/stderr draining so verbose ADB/instrumentation output cannot deadlock the harness.
+- Retains AGP-metadata-derived app/test APK identity, foreground-user-aware install/package verification and dynamic runner-target validation from R07.
+- Corrects the remaining Kotlin compiler warning with `@Suppress("OVERRIDE_DEPRECATION")` on the retained FCM callback compatibility path.
+- Preserves PH08 payment/live/profile authority and all inherited compile/runtime regressions.
 
-## Payment rails
-The APK exposes only two launch modes:
-- `HOSTED_GATEWAY` — backend/Admin selects the active healthy hosted provider. Stripe is the current testing provider; Razorpay and PayPal use the same Android flow when Admin switches the backend provider.
-- `GOOGLE_PLAY` — native Google Play Billing 9.1.0 with ProductDetails query, purchase/restore, VoiceCloud server verification and only then consume/acknowledge.
-
-Default in this package:
-```properties
-VOICECLOUD_ANDROID_PAYMENT_MODE=HOSTED_GATEWAY
-```
-For a Google Play launch build, change only the Gradle property to:
-```properties
-VOICECLOUD_ANDROID_PAYMENT_MODE=GOOGLE_PLAY
-```
-Provider credentials remain server-side and are never compiled into the APK.
-
-## Full Windows acceptance
+## Acceptance
+Run only:
 ```powershell
-scripts\VC-ANDROID-PH08-R02-ACCEPTANCE.cmd
+scripts\VC-ANDROID-PH09-R08-ACCEPTANCE.cmd
 ```
 
-The acceptance order is locked: source/regression gates, `compileDebugKotlin`, `compileStagingKotlin`, `compileReleaseKotlin`, unit tests, lint, assemblies, then physical-device instrumentation.
+R08 first parses every PowerShell script with `System.Management.Automation.Language.Parser`. Only after that succeeds does it run PH09/inherited regressions and the locked order: `compileDebugKotlin` → `compileStagingKotlin` → `compileReleaseKotlin` → unit tests → lint → assemblies → physical-device instrumentation.
 
-## Documentation
-- `docs/VC-ANDROID-PH08-R02-IMPLEMENTATION-REPORT.md`
-- `docs/VC-ANDROID-PH08-R02-AUTOMATED-EVIDENCE.md`
-- `docs/VC-ANDROID-PH08-R02-MANUAL-QA.md`
-
-PH08-R02 implementation/package verification is not a substitute for the Windows Gradle/device acceptance run.
+Do not freeze PH09 to Git until the Windows/device acceptance reaches the final R08 PASS line.

@@ -259,13 +259,23 @@ class AuthRepository @Inject constructor(
     suspend fun registerPushToken(pushToken: String) = registerDeviceFoundation(pushToken.trim().takeIf { it.isNotEmpty() })
 
     suspend fun logout(allDevices: Boolean = false) {
-        runCatching { if (allDevices) authenticatedApi.logoutAll() else authenticatedApi.logout() }
-        clearLocalSession()
+        if (allDevices) {
+            val response = authenticatedApi.logoutAll()
+            if (!response.isSuccessful) throw AuthApiException(errorParser.parse(response))
+            clearLocalSession()
+        } else {
+            // A normal local sign-out must remain possible even if the network is unavailable.
+            runCatching { authenticatedApi.logout() }
+            clearLocalSession()
+        }
     }
 
     suspend fun currentUser(): AuthUser = requireBody(authenticatedApi.me())
 
+    suspend fun invalidateLocalSession() = clearLocalSession()
+
     fun hasSecureSession(): Boolean = !tokenVault.accessToken().isNullOrBlank() || !tokenVault.refreshToken().isNullOrBlank()
+    fun isRestrictedAccount(user: AuthUser): Boolean = isRestricted(user)
 
     private suspend fun refreshCurrentUser(fallback: AuthUser): AuthUser = runCatching { requireBody(authenticatedApi.me()) }
         .getOrElse { fallback }

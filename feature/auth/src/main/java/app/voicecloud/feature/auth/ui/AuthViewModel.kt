@@ -80,7 +80,10 @@ class AuthViewModel @Inject constructor(
     fun login(identifier: String, password: String, creatorPortal: Boolean) = launchOperation {
         val user = repository.login(identifier, password, creatorPortal)
         _state.value = _state.value.copy(user = user)
-        if (creatorPortal) navigate(AuthScreen.CREATOR_READY, true) else routeUser(user)
+        if (repository.isRestrictedAccount(user)) {
+            _state.value = _state.value.copy(restrictedMessage = "This account is currently restricted. Follow the account instructions or contact VoiceCloud support.")
+            navigate(AuthScreen.RESTRICTED, true)
+        } else if (creatorPortal) navigate(AuthScreen.CREATOR_READY, true) else routeUser(user)
     }
 
     fun register(username: String, displayName: String, email: String, password: String) = launchOperation {
@@ -182,7 +185,28 @@ class AuthViewModel @Inject constructor(
         navigate(AuthScreen.PORTAL_SELECTOR, true)
     }
 
+    fun handleAuthenticatedFailure(httpStatus: Int, message: String? = null) {
+        viewModelScope.launch {
+            when (httpStatus) {
+                401 -> {
+                    repository.invalidateLocalSession()
+                    _state.value = AuthUiState()
+                    navigate(AuthScreen.SESSION_EXPIRED, true)
+                }
+                503 -> {
+                    _state.value = _state.value.copy(maintenanceMessage = message?.takeIf { it.isNotBlank() })
+                    navigate(AuthScreen.MAINTENANCE, true)
+                }
+            }
+        }
+    }
+
     private suspend fun routeUser(user: AuthUser) {
+        if (repository.isRestrictedAccount(user)) {
+            _state.value = _state.value.copy(restrictedMessage = "This account is currently restricted. Follow the account instructions or contact VoiceCloud support.")
+            navigate(AuthScreen.RESTRICTED, true)
+            return
+        }
         val needsOnboarding = repository.requiresOnboarding(user)
         navigate(if (needsOnboarding) AuthScreen.ONBOARDING else AuthScreen.USER_READY, true)
     }

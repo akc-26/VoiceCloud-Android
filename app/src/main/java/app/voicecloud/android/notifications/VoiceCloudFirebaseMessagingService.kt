@@ -28,6 +28,7 @@ class VoiceCloudFirebaseMessagingService : FirebaseMessagingService() {
     @Inject lateinit var tokenRegistration: FcmTokenRegistrationFoundation
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    @Suppress("OVERRIDE_DEPRECATION") // Upstream callback is deprecated; retained until the R06 backend token-registration contract migrates.
     override fun onNewToken(token: String) {
         serviceScope.launch { tokenRegistration.onNewToken(token) }
     }

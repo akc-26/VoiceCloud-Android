@@ -226,7 +226,7 @@ private fun UserCard(
                     !user.bio.isNullOrBlank() -> user.bio
                     else -> "${VoiceCloudBrand.name} member"
                 }
-                Text(descriptor ?: "${VoiceCloudBrand.name} member", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                Text(descriptor, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
             }
             if (actionLabel != null && onAction != null) {
                 OutlinedButton(enabled = actionEnabled, onClick = onAction) { Text(actionLabel) }
@@ -618,6 +618,7 @@ fun PublicProfileScreen(
     onLoad: () -> Unit,
     onFollow: () -> Unit,
     onMessage: (String) -> Unit,
+    onReport: (String, String) -> Unit,
     onMyProfile: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -643,9 +644,12 @@ fun PublicProfileScreen(
                         Text(profile.bio ?: profile.statusMessage ?: "${VoiceCloudBrand.name} member", color = ConsumerColors.Text, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(14.dp))
                         if (isSelf) Button(onClick = onMyProfile) { Text("My profile") }
-                        else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(enabled = !state.mutationBusy, onClick = onFollow) { Text(if (profile.relationship?.isFollowing == true) "Following" else "Follow") }
-                            OutlinedButton(enabled = !state.mutationBusy, onClick = { onMessage(profile.id) }) { Text("Message") }
+                        else {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(enabled = !state.mutationBusy, onClick = onFollow) { Text(if (profile.relationship?.isFollowing == true) "Following" else "Follow") }
+                                OutlinedButton(enabled = !state.mutationBusy, onClick = { onMessage(profile.id) }) { Text("Message") }
+                            }
+                            TextButton(onClick = { onReport(profile.id, profile.displayName.ifBlank { "@${profile.username}" }) }) { Text("Report profile") }
                         }
                     }
                 }
@@ -687,6 +691,9 @@ fun MyProfileScreen(
     onEconomySection: (String) -> Unit,
     onEditProfile: () -> Unit,
     onProfileTools: () -> Unit,
+    onSettings: () -> Unit,
+    onSecurity: () -> Unit,
+    onSafety: () -> Unit,
     onHelpPages: () -> Unit,
     onUpgrade: () -> Unit,
     onLogout: () -> Unit,
@@ -733,6 +740,9 @@ fun MyProfileScreen(
                     }
                 }
                 item { Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) { Text("Edit profile") } }
+                item { OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth()) { Text("Settings") } }
+                item { OutlinedButton(onClick = onSecurity, modifier = Modifier.fillMaxWidth()) { Text("Security & devices") } }
+                item { OutlinedButton(onClick = onSafety, modifier = Modifier.fillMaxWidth()) { Text("Safety Center") } }
                 item { OutlinedButton(onClick = onProfileTools, modifier = Modifier.fillMaxWidth()) { Text("Replays, activity & privacy") } }
                 item { SectionTitle("Economy & progression") }
                 items(economy, key = { it.first }) { (key, label) ->

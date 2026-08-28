@@ -618,7 +618,8 @@ fun ConversationScreen(state: EngagementUiState, viewerId: String?, onLoad: () -
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (mine) Arrangement.End else Arrangement.Start) {
                         Surface(color = if (mine) ConsumerColors.SapphireSoft else MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(18.dp), modifier = Modifier.widthIn(max = 300.dp)) {
                             Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-                                if (!mine && !message.sender?.displayName.isNullOrBlank()) Text(message.sender?.displayName.orEmpty(), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                                val senderName = message.sender?.displayName.orEmpty()
+                                if (!mine && senderName.isNotBlank()) Text(senderName, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                                 Text(message.content ?: "[${message.type}]")
                                 Text(message.createdAt.replace('T', ' ').take(16) + if (message.isEdited) " · edited" else "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }

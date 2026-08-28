@@ -1,0 +1,6 @@
+VC-ANDROID-PH09-R07
+Parent Git baseline: VoiceCloud-Android-VC-ANDROID-PH08-R02
+Parent exact commit: 1739f081ac386acca9a24b37863b72c4db952089
+Scope: PH09 closure corrective revision after full Windows compile/lint/assembly/device acceptance findings.
+Key corrections: metadata/user-aware device instrumentation; R06 compiler-warning cleanup/classification; explicit JNI strip authority.
+Acceptance: scripts\VC-ANDROID-PH09-R07-ACCEPTANCE.cmd

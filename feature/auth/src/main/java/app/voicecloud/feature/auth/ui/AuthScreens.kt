@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // Backend-compatible Google/Firebase token exchange retained until Credential Manager migration is coordinated.
+
 package app.voicecloud.feature.auth.ui
 
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand

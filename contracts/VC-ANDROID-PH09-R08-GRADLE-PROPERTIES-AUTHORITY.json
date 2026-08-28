@@ -1,0 +1,41 @@
+{
+  "baselineRequired": {
+    "VOICECLOUD_ANDROID_PAYMENT_MODE": "HOSTED_GATEWAY",
+    "VOICECLOUD_DEBUG_API_BASE_URL": "https://voicecloud.tailfca77b.ts.net",
+    "VOICECLOUD_DEBUG_SOCKET_BASE_URL": "https://voicecloud.tailfca77b.ts.net",
+    "VOICECLOUD_DEBUG_WEB_BASE_URL": "https://voicecloud.tailfca77b.ts.net",
+    "VOICECLOUD_FIREBASE_API_KEY": "",
+    "VOICECLOUD_FIREBASE_APPLICATION_ID": "",
+    "VOICECLOUD_FIREBASE_PROJECT_ID": "",
+    "VOICECLOUD_GOOGLE_WEB_CLIENT_ID": "",
+    "VOICECLOUD_RELEASE_API_BASE_URL": "",
+    "VOICECLOUD_RELEASE_SOCKET_BASE_URL": "",
+    "VOICECLOUD_RELEASE_WEB_BASE_URL": "",
+    "VOICECLOUD_STAGING_API_BASE_URL": "",
+    "VOICECLOUD_STAGING_SOCKET_BASE_URL": "",
+    "VOICECLOUD_STAGING_WEB_BASE_URL": "",
+    "android.nonFinalResIds": "true",
+    "android.nonTransitiveRClass": "true",
+    "android.useAndroidX": "true",
+    "kotlin.code.style": "official",
+    "org.gradle.caching": "true",
+    "org.gradle.configuration-cache": "true",
+    "org.gradle.jvmargs": "-Xmx4g -Dfile.encoding=UTF-8",
+    "org.gradle.parallel": "true"
+  },
+  "controlledTooling": {
+    "org.gradle.tooling.parallel": "true"
+  },
+  "allowedRuntimeExtraPrefixes": [
+    "org.gradle.",
+    "systemProp."
+  ],
+  "sensitiveExtraPrefixes": [
+    "VOICECLOUD_",
+    "android.",
+    "kotlin.",
+    "kapt.",
+    "ksp.",
+    "org.jetbrains.kotlin."
+  ]
+}

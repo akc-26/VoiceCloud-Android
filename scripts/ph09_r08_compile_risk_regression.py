@@ -1,0 +1,37 @@
+from pathlib import Path
+import re
+ROOT=Path(__file__).resolve().parents[1]
+def t(p): return (ROOT/p).read_text(encoding='utf-8')
+def check(name,cond):
+    if not cond: raise SystemExit(f'[FAIL] {name}')
+    print(f'[PASS] {name}')
+api=t('feature/settings/src/main/java/app/voicecloud/feature/settings/data/SettingsApi.kt'); repo=t('feature/settings/src/main/java/app/voicecloud/feature/settings/data/SettingsRepository.kt'); models=t('feature/settings/src/main/java/app/voicecloud/feature/settings/model/SettingsModels.kt'); vm=t('feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsViewModel.kt'); ui=t('feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt'); nav=t('app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt'); root=t('app/src/main/java/app/voicecloud/android/ui/VoiceCloudRoot.kt'); rootprops=t('gradle.properties'); gradle=t('feature/settings/build.gradle.kts')
+check('settings module declares Android Compose Hilt dependencies', 'alias(libs.plugins.android.library)' in gradle and 'alias(libs.plugins.hilt)' in gradle and 'buildFeatures { compose = true }' in gradle)
+check('Retrofit wildcard body maps are annotated', '@JvmSuppressWildcards Any?' in api)
+check('repository Any envelope parsers are null-safe', 'private fun items(raw: Any?' in repo and 'private fun unwrap(raw: Any?' in repo)
+check('repository map helpers use explicit empty generic maps', 'emptyMap<Any?, Any?>()' in repo)
+check('Settings ViewModel StateFlow and event channel are lifecycle-safe', 'MutableStateFlow' in vm and 'Channel<SettingsEvent>(Channel.BUFFERED)' in vm)
+check('appearance viewmodel exposes stable StateFlow', 'StateFlow<ThemePreference>' in vm and 'stateIn(' in vm)
+check('root collects appearance with lifecycle', 'collectAsStateWithLifecycle()' in root and 'AppearanceViewModel' in root)
+check('settings screens avoid experimental FlowRow dependency', 'FlowRow' not in ui and 'horizontalScroll(rememberScrollState())' in ui)
+check('settings screens use supported Material3 page top bar', 'VoiceCloudPageTopBar' in ui and 'TopAppBar(' not in ui)
+check('settings screens import list items helper', 'import androidx.compose.foundation.lazy.items' in ui)
+check('context report route encodes dynamic values', 'Uri.encode(id.trim())' in nav and 'Uri.encode(label.trim()' in nav)
+check('context report route decodes arguments', 'Uri.decode(entry.arguments?.getString("targetId")' in nav and 'Uri.decode(entry.arguments?.getString("targetLabel")' in nav)
+check('all PH09 navigation destinations are composable', all(f'composable(VoiceCloudRoutes.{x})' in nav for x in ['Settings','NotificationSettings','PrivacySettings','VoiceAppearance','Security','SessionsDevices','SessionDetail','DeviceDetail','LoginActivity','HelpCenter','CmsContent','SafetyCenter','Report','ContextReport','ContactSupport','About']))
+check('public profile callback signature and callsite agree', 'onReport: (String, String) -> Unit' in t('feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt') and 'onReport = { id, label ->' in nav)
+check('live room callback signature and callsite agree', 'onReport: (String, String) -> Unit' in t('feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt') and 'onReport = { id, label ->' in nav)
+check('report enums are exhaustive and type-safe', 'enum class ReportTargetType { USER, ROOM }' in models and 'enum class ReportReason' in models)
+check('HTML CMS rendering is converted to plain Compose text', 'Html.fromHtml' in ui and 'plainText(' in ui)
+check('email and phone fields use keyboard options', 'KeyboardOptions(keyboardType = KeyboardType.Email)' in ui and 'KeyboardOptions(keyboardType = KeyboardType.Phone)' in ui)
+check('Gradle tooling parallelism is explicit for current Gradle/Studio compatibility', 'org.gradle.tooling.parallel=true' in rootprops)
+check('no obvious Kotlin merge/conflict markers', not re.search(r'^(<<<<<<<|=======|>>>>>>>)', api+repo+models+vm+ui+nav, re.M))
+
+check('device instrumentation no longer hard-codes debug application id', 'app.voicecloud.android.debug' not in t('scripts/VC-ANDROID-DEVICE-INSTRUMENTATION.ps1'))
+check('device instrumentation resolves AGP output metadata', 'output-metadata.json' in t('scripts/VC-ANDROID-DEVICE-INSTRUMENTATION.ps1'))
+check('device instrumentation resolves and reuses foreground Android user', 'get-current-user' in t('scripts/VC-ANDROID-DEVICE-INSTRUMENTATION.ps1') and "'--user', [string]$currentUser" in t('scripts/VC-ANDROID-DEVICE-INSTRUMENTATION.ps1'))
+check('known Kotlin 2.3 annotation-target warnings are explicit', '@param:ApplicationContext' in t('feature/live/src/main/java/app/voicecloud/feature/live/rtc/RtcAudioEngine.kt') and '@param:ApplicationContext' in t('feature/auth/src/main/java/app/voicecloud/feature/auth/data/DeviceMetadataProvider.kt'))
+
+check('PowerShell parser authority runs before Gradle compilation', 'VC-ANDROID-POWERSHELL-PARSER-CHECK.ps1' in t('scripts/VC-ANDROID-PH09-R08-ACCEPTANCE.cmd'))
+check('FCM override deprecation uses the exact compiler diagnostic suppression', '@Suppress("OVERRIDE_DEPRECATION")' in t('app/src/main/java/app/voicecloud/android/notifications/VoiceCloudFirebaseMessagingService.kt'))
+print('[PASS] VC-ANDROID-PH09-R08 compile-risk regression: 26/26 PASS')

@@ -26,7 +26,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph08"
+        versionName = "1.0.0-ph09"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         resValue("string", "vc_brand_app_name", brand("brand.name"))
@@ -115,7 +115,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    packaging.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    packaging {
+        resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        // These third-party native libraries are already shipped unstripped by their publishers.
+        // Mark them explicitly so AGP does not emit repeated strip warnings for every variant.
+        jniLibs.keepDebugSymbols += setOf(
+            "**/libandroidx.graphics.path.so",
+            "**/libdatastore_shared_counter.so",
+            "**/liblkjingle_peerconnection_so.so",
+        )
+    }
 }
 
 ksp { arg("dagger.fastInit", "enabled") }
@@ -137,6 +146,7 @@ dependencies {
     implementation(project(":feature:hosting"))
     implementation(project(":feature:economy"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:settings"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)

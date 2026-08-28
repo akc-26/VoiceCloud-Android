@@ -26,6 +26,8 @@ import app.voicecloud.feature.hosting.ui.*
 import app.voicecloud.feature.economy.model.EconomySection
 import app.voicecloud.feature.economy.ui.*
 import app.voicecloud.feature.profile.ui.*
+import app.voicecloud.feature.settings.model.ReportTargetType
+import app.voicecloud.feature.settings.ui.*
 
 object VoiceCloudRoutes {
     const val Bootstrap = "bootstrap"
@@ -105,10 +107,34 @@ object VoiceCloudRoutes {
     const val BlockedUsers = "me/blocked"
     const val HelpPages = "me/help"
     const val HelpPage = "me/help/{slug}"
+
+    // PH09 preferences, security, safety, CMS and support graph.
+    const val Settings = "settings"
+    const val NotificationSettings = "settings/notifications"
+    const val PrivacySettings = "settings/privacy"
+    const val VoiceAppearance = "settings/voice-appearance"
+    const val Security = "security"
+    const val SessionsDevices = "security/devices"
+    const val SessionDetail = "security/sessions/{sessionId}"
+    const val DeviceDetail = "security/devices/{deviceId}"
+    const val LoginActivity = "security/login-activity"
+    const val HelpCenter = "help"
+    const val CmsContent = "content/{slug}"
+    const val SafetyCenter = "safety"
+    const val Report = "report"
+    const val ContextReport = "report/{targetType}/{targetId}/{targetLabel}"
+    const val ContactSupport = "support/contact"
+    const val About = "about"
+
     fun economySection(section: app.voicecloud.feature.economy.model.EconomySection): String = "economy/${section.name}"
 
     fun replay(id: String): String = "replays/${Uri.encode(id.trim())}"
     fun helpPage(slug: String): String = "me/help/${Uri.encode(slug.trim())}"
+    fun cmsContent(slug: String): String = "content/${Uri.encode(slug.trim())}"
+    fun securitySession(id: String): String = "security/sessions/${Uri.encode(id.trim())}"
+    fun securityDevice(id: String): String = "security/devices/${Uri.encode(id.trim())}"
+    fun contextualReport(type: ReportTargetType, id: String, label: String): String =
+        "report/${type.name}/${Uri.encode(id.trim())}/${Uri.encode(label.trim().ifBlank { if (type == ReportTargetType.USER) "VoiceCloud member" else "VoiceCloud room" })}"
 
     fun roomPreview(id: String): String = "rooms/${Uri.encode(id.trim())}/preview"
     fun roomExperience(id: String): String = "rooms/${Uri.encode(id.trim())}/live"
@@ -145,6 +171,8 @@ fun VoiceCloudNavHost(
     val economyState by economyViewModel.state.collectAsStateWithLifecycle()
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val profileState by profileViewModel.state.collectAsStateWithLifecycle()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
     var mobileConfig by remember { mutableStateOf<MobileConfig?>(null) }
     var resetToken by remember(initialResetToken) { mutableStateOf(initialResetToken.orEmpty()) }
     var pendingExternalRoute by remember(initialNavigationRoute) { mutableStateOf(initialNavigationRoute.orEmpty()) }
@@ -206,6 +234,15 @@ fun VoiceCloudNavHost(
                         }
                     }
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(settingsViewModel) {
+        settingsViewModel.events.collect { event ->
+            when (event) {
+                SettingsEvent.SessionExpired -> authViewModel.handleAuthenticatedFailure(401)
+                is SettingsEvent.Maintenance -> authViewModel.handleAuthenticatedFailure(503, event.message)
             }
         }
     }
@@ -406,6 +443,7 @@ fun VoiceCloudNavHost(
                 onRejectInvitation = vm::rejectSpeakerInvitation,
                 onBackground = vm::onBackground,
                 onForeground = vm::onForeground,
+                onReport = { id, label -> open(VoiceCloudRoutes.contextualReport(ReportTargetType.ROOM, id, label)) },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -502,6 +540,7 @@ fun VoiceCloudNavHost(
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadPublicProfile(username) },
                 onFollow = vm::followProfile,
                 onMessage = { userId -> engagementViewModel.startDirectConversation(userId) { conversation -> open(VoiceCloudRoutes.conversation(conversation.id)) } },
+                onReport = { userId, label -> open(VoiceCloudRoutes.contextualReport(ReportTargetType.USER, userId, label)) },
                 onMyProfile = { open(VoiceCloudRoutes.MyProfile) },
                 onBack = { navController.popBackStack() },
             )
@@ -521,7 +560,10 @@ fun VoiceCloudNavHost(
                 },
                 onEditProfile = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.EditProfile) },
                 onProfileTools = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.ProfileTools) },
-                onHelpPages = { open(VoiceCloudRoutes.HelpPages) },
+                onSettings = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Settings) },
+                onSecurity = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Security) },
+                onSafety = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.SafetyCenter) },
+                onHelpPages = { open(VoiceCloudRoutes.HelpCenter) },
                 onUpgrade = { open(VoiceCloudRoutes.GuestUpgrade) },
                 onLogout = { authViewModel.logout() },
                 onHome = { open(VoiceCloudRoutes.Home) },
@@ -782,6 +824,173 @@ fun VoiceCloudNavHost(
                 onStartQuiz = { hostingViewModel.startQuiz(it, roomId) },
                 onNextQuiz = { hostingViewModel.nextQuizRound(it, roomId) },
                 onStopQuiz = { hostingViewModel.stopQuiz(it, roomId) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        // PH09 — Preferences, security, safety, CMS and support.
+        composable(VoiceCloudRoutes.Settings) {
+            SettingsOverviewScreen(
+                onProfile = { open(VoiceCloudRoutes.EditProfile) },
+                onNotifications = { open(VoiceCloudRoutes.NotificationSettings) },
+                onPrivacy = { open(VoiceCloudRoutes.PrivacySettings) },
+                onVoiceAppearance = { open(VoiceCloudRoutes.VoiceAppearance) },
+                onSecurity = { open(VoiceCloudRoutes.Security) },
+                onHelp = { open(VoiceCloudRoutes.HelpCenter) },
+                onSafety = { open(VoiceCloudRoutes.SafetyCenter) },
+                onContact = { open(VoiceCloudRoutes.ContactSupport) },
+                onAbout = { open(VoiceCloudRoutes.About) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.NotificationSettings) {
+            NotificationPreferencesScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadSettings,
+                onSave = settingsViewModel::saveNotifications,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.PrivacySettings) {
+            PrivacySettingsScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadPrivacy,
+                onSave = settingsViewModel::savePrivacy,
+                onBlocked = { open(VoiceCloudRoutes.BlockedUsers) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.VoiceAppearance) {
+            VoiceAppearanceScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadSettings,
+                onSaveVoice = settingsViewModel::saveVoice,
+                onSaveTheme = settingsViewModel::saveTheme,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.Security) {
+            SecurityOverviewScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadSecurity,
+                onSessionsDevices = { open(VoiceCloudRoutes.SessionsDevices) },
+                onLoginActivity = { open(VoiceCloudRoutes.LoginActivity) },
+                onSignOutAll = { authViewModel.logout(allDevices = true) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.SessionsDevices) {
+            SessionsDevicesScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadSecurity,
+                onSession = { open(VoiceCloudRoutes.securitySession(it)) },
+                onDevice = { open(VoiceCloudRoutes.securityDevice(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.SessionDetail) { entry ->
+            val id = Uri.decode(entry.arguments?.getString("sessionId").orEmpty())
+            SessionDetailScreen(
+                state = settingsState,
+                id = id,
+                onLoad = { settingsViewModel.loadSession(id) },
+                onRevoke = { settingsViewModel.revokeSession(id) { navController.popBackStack() } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.DeviceDetail) { entry ->
+            val id = Uri.decode(entry.arguments?.getString("deviceId").orEmpty())
+            DeviceDetailScreen(
+                state = settingsState,
+                id = id,
+                onLoad = { settingsViewModel.loadDevice(id) },
+                onRevoke = { settingsViewModel.revokeDevice(id) { navController.popBackStack() } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.LoginActivity) {
+            LoginActivityScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadSecurity,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HelpCenter) {
+            HelpCenterScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadCmsPages,
+                onPage = { open(VoiceCloudRoutes.cmsContent(it)) },
+                onContact = { open(VoiceCloudRoutes.ContactSupport) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.CmsContent) { entry ->
+            val slug = Uri.decode(entry.arguments?.getString("slug").orEmpty())
+            CmsContentScreen(
+                state = settingsState,
+                slug = slug,
+                onLoad = { settingsViewModel.loadCmsPage(slug) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.SafetyCenter) {
+            SafetyCenterScreen(
+                state = settingsState,
+                onLoad = settingsViewModel::loadCmsPages,
+                onReport = { open(VoiceCloudRoutes.Report) },
+                onBlocked = { open(VoiceCloudRoutes.BlockedUsers) },
+                onPrivacy = { open(VoiceCloudRoutes.PrivacySettings) },
+                onCommunities = { open(VoiceCloudRoutes.Communities) },
+                onPage = { open(VoiceCloudRoutes.cmsContent(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.Report) {
+            ReportScreen(
+                state = settingsState,
+                contextualType = null,
+                contextualId = null,
+                contextualLabel = null,
+                onLoadContext = settingsViewModel::prepareReport,
+                onSearch = settingsViewModel::searchReportTargets,
+                onSelect = settingsViewModel::selectReportTarget,
+                onSubmit = { reason, description -> settingsViewModel.submitReport(reason, description) },
+                onReloadReports = settingsViewModel::loadReports,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.ContextReport) { entry ->
+            val type = runCatching { ReportTargetType.valueOf(Uri.decode(entry.arguments?.getString("targetType").orEmpty()).uppercase()) }.getOrNull()
+            val id = Uri.decode(entry.arguments?.getString("targetId").orEmpty())
+            val label = Uri.decode(entry.arguments?.getString("targetLabel").orEmpty())
+            ReportScreen(
+                state = settingsState,
+                contextualType = type,
+                contextualId = id,
+                contextualLabel = label,
+                onLoadContext = { if (type != null && id.isNotBlank()) settingsViewModel.loadReporting(type, id, label) },
+                onSearch = settingsViewModel::searchReportTargets,
+                onSelect = settingsViewModel::selectReportTarget,
+                onSubmit = { reason, description -> settingsViewModel.submitReport(reason, description) },
+                onReloadReports = {},
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.ContactSupport) {
+            val user = authState.user
+            ContactSupportScreen(
+                state = settingsState,
+                defaultName = user?.displayName.orEmpty(),
+                defaultEmail = user?.email.orEmpty(),
+                defaultPhone = user?.phoneNumber,
+                onSend = { name, email, phone, description -> settingsViewModel.sendSupport(name, email, phone, description) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.About) {
+            AboutScreen(
+                versionName = app.voicecloud.android.BuildConfig.VERSION_NAME,
+                onHelp = { open(VoiceCloudRoutes.HelpCenter) },
                 onBack = { navController.popBackStack() },
             )
         }

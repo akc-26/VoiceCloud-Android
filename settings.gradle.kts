@@ -41,3 +41,5 @@ include(":feature:hosting")
 include(":feature:economy")
 
 include(":feature:profile")
+
+include(":feature:settings")

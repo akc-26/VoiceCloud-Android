@@ -44,7 +44,7 @@ interface RtcAudioEngine {
  */
 @Singleton
 class LiveKitListenerEngine @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : RtcAudioEngine {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val mutableState = MutableStateFlow<RtcAudioState>(RtcAudioState.Disconnected)

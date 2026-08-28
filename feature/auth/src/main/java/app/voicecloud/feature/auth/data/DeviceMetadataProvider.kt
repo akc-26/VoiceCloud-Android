@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DeviceMetadataProvider @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val appIdentity: AppIdentity,
 ) {
     fun current(): DeviceMetadata {

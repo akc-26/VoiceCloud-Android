@@ -10,6 +10,7 @@ import javax.inject.Singleton
 class PushNotificationCoordinator @Inject constructor(
     private val tokenRegistration: FcmTokenRegistrationFoundation,
 ) {
+    @Suppress("DEPRECATION") // R06 backend still persists FCM registration tokens; migrate with the backend registration contract.
     suspend fun syncCurrentToken() {
         val messaging = runCatching { FirebaseMessaging.getInstance() }.getOrNull() ?: return
         val deferred = CompletableDeferred<String?>()

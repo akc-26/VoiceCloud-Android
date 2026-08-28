@@ -1,0 +1,4 @@
+VC-ANDROID-PH09-R08
+Parent frozen Git baseline: VC-ANDROID-PH08-R02 @ 1739f081ac386acca9a24b37863b72c4db952089
+Correction authority: full PowerShell parser/device harness closure + remaining compiler-warning closure
+Acceptance: scripts\VC-ANDROID-PH09-R08-ACCEPTANCE.cmd

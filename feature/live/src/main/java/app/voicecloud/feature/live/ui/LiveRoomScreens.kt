@@ -128,6 +128,7 @@ fun LiveRoomScreen(
     onRejectInvitation: () -> Unit,
     onBackground: () -> Unit,
     onForeground: () -> Unit,
+    onReport: (String, String) -> Unit,
     onBack: () -> Unit,
 ) {
     LaunchedEffect(roomId) { onEnter() }
@@ -182,6 +183,7 @@ fun LiveRoomScreen(
                 busy = state.mutationBusy,
                 onBack = closeRoom,
                 onSave = onToggleSave,
+                onReport = { onReport(roomId, state.room?.title?.ifBlank { "Live room" } ?: "Live room") },
                 onLeave = closeRoom,
             )
         },
@@ -258,6 +260,7 @@ private fun LiveRoomTopBar(
     busy: Boolean,
     onBack: () -> Unit,
     onSave: () -> Unit,
+    onReport: () -> Unit,
     onLeave: () -> Unit,
 ) {
     Surface(color = ConsumerColors.DeepNavy, shadowElevation = 3.dp) {
@@ -283,10 +286,13 @@ private fun LiveRoomTopBar(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
-            TextButton(enabled = !busy, onClick = onSave, contentPadding = PaddingValues(horizontal = 7.dp)) {
+            TextButton(enabled = !busy, onClick = onSave, contentPadding = PaddingValues(horizontal = 5.dp)) {
                 Text(if (saved) "Saved" else "Save", color = ConsumerColors.Ice, maxLines = 1)
             }
-            TextButton(onClick = onLeave, contentPadding = PaddingValues(horizontal = 8.dp)) {
+            TextButton(enabled = !busy, onClick = onReport, contentPadding = PaddingValues(horizontal = 5.dp)) {
+                Text("Report", color = ConsumerColors.TextOnDarkSecondary, maxLines = 1)
+            }
+            TextButton(onClick = onLeave, contentPadding = PaddingValues(horizontal = 6.dp)) {
                 Text("Leave", color = CommonColors.Error, fontWeight = FontWeight.Bold, maxLines = 1)
             }
         }
