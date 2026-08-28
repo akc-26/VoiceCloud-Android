@@ -8,6 +8,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerColors
@@ -266,6 +269,65 @@ private fun EmptyBlock(title: String, body: String) {
 }
 
 @Composable
+private fun CompactPeopleRow(users: List<VoiceCloudUser>, onProfile: (String) -> Unit) {
+    if (users.isEmpty()) {
+        Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Text("Nothing to show right now.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        return
+    }
+    LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        items(users.distinctBy { it.id }.take(4), key = { it.id.ifBlank { it.username } }) { user -> CompactUserCard(user, onProfile) }
+    }
+}
+
+@Composable
+private fun CompactUserCard(user: VoiceCloudUser, onProfile: (String) -> Unit) {
+    ElevatedCard(onClick = { onProfile(user.username) }, modifier = Modifier.width(154.dp), shape = RoundedCornerShape(18.dp)) {
+        Column(Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            UserAvatar(user, 52)
+            Text(user.displayName.ifBlank { user.username }, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
+            Text(if (user.isOnline) "Active now" else "@${user.username}", maxLines = 1, color = if (user.isOnline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+        }
+    }
+}
+
+@Composable
+private fun SearchCompactRowUsers(users: List<VoiceCloudUser>, keyPrefix: String, onProfile: (String) -> Unit, searched: Boolean, emptyLabel: String) {
+    if (users.isEmpty()) { Text(if (searched) emptyLabel else "No profiles available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant); return }
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) { items(users, key = { "$keyPrefix:${it.id}" }) { CompactUserCard(it, onProfile) } }
+}
+
+@Composable
+private fun SearchCompactRowRooms(rooms: List<VoiceCloudRoom>, onRoom: (String) -> Unit, searched: Boolean) {
+    if (rooms.isEmpty()) { Text(if (searched) "No rooms found" else "No live rooms available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant); return }
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        items(rooms, key = { it.id }) { room ->
+            ElevatedCard(onClick = { onRoom(room.id) }, modifier = Modifier.width(230.dp), shape = RoundedCornerShape(18.dp)) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(room.title.ifBlank { "VoiceCloud room" }, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text("${room.listenerCount} listening · ${room.category.ifBlank { "Live" }}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchCompactRowCommunities(communities: List<CommunitySearchItem>, onCommunity: (String) -> Unit, searched: Boolean) {
+    if (communities.isEmpty()) { Text(if (searched) "No communities found" else "No communities available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant); return }
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) { items(communities, key = { it.id }) { CommunityCompactCard(it, onCommunity) } }
+}
+
+@Composable
+private fun CommunityCompactCard(community: CommunitySearchItem, onCommunity: (String) -> Unit) {
+    ElevatedCard(onClick = { onCommunity(community.handle.ifBlank { community.id }) }, modifier = Modifier.width(220.dp), shape = RoundedCornerShape(18.dp)) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Text(community.name, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("@${community.handle} · ${community.memberCount} members", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+        }
+    }
+}
+
+@Composable
 fun HomeScreen(
     state: DiscoveryUiState,
     isGuest: Boolean,
@@ -288,54 +350,61 @@ fun HomeScreen(
 ) {
     LaunchedEffect(Unit) { onLoad() }
     ConsumerScaffold("home", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(bottom = 24.dp)) {
+        LazyColumn(
+            Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             item {
-                Box(
-                    Modifier.fillMaxWidth().padding(20.dp).clip(RoundedCornerShape(28.dp)).background(
-                        ConsumerBrushes.Hero
-                    ).padding(24.dp)
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("LIVE AUDIO", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
-                        Text("Join the conversation", color = ConsumerColors.Ink, fontSize = 29.sp, fontWeight = FontWeight.Bold)
-                        Text("Live rooms, creators and communities.", color = ConsumerColors.Text)
-                        Button(onClick = onRooms) { Text("Explore rooms", maxLines = 1, softWrap = false) }
+                    VoiceCloudBrandMark(size = 44.dp)
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text("Live conversations happening now", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                    }
+                    IconButton(onClick = onNotifications) { Icon(painterResource(R.drawable.vc_icon_bell), contentDescription = "Notifications") }
+                }
+            }
+            item { StatusBlock(state, onLoad) }
+            if (isGuest) item {
+                Card(Modifier.fillMaxWidth().padding(horizontal = 20.dp), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
+                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text("Save your profile and connections", modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
+                        TextButton(onClick = onUpgrade) { Text("Upgrade") }
                     }
                 }
             }
             item {
+                Column(Modifier.padding(horizontal = 20.dp, vertical = 2.dp)) {
+                    SectionTitle("Live now", "View all", onRooms)
+                    Text("Tap a room to enter the live experience directly.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            if (state.home.rooms.isEmpty() && !state.loading) item { Box(Modifier.padding(horizontal = 20.dp)) { EmptyBlock("No live rooms", "Check again soon.") } }
+            itemsIndexed(state.home.rooms.distinctBy { it.id }, key = { index, room -> "home-room:${room.id}:$index" }) { _, room ->
+                Box(Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) { RoomCard(room) { onRoom(room.id) } }
+            }
+            item {
                 val metrics = VoiceCloudPageMetrics.current()
-                Column(
-                    Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
+                Column(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding, vertical = 2.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         HomeShortcut("Communities", R.drawable.vc_icon_community, onCommunities)
                         HomeShortcut("Messages", R.drawable.vc_icon_message, onMessages)
                     }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        HomeShortcut("Alerts", R.drawable.vc_icon_bell, onNotifications)
+                        HomeShortcut("Explore", R.drawable.vc_nav_explore, onExplore)
                         HomeShortcut("Host Studio", R.drawable.vc_icon_host, onHostStudio)
                     }
                 }
             }
-            if (isGuest) item {
-                Card(Modifier.fillMaxWidth().padding(horizontal = 20.dp), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) { Text("Keep your profile", fontWeight = FontWeight.Bold); Text("Upgrade your guest account.", style = MaterialTheme.typography.bodyMedium) }
-                        TextButton(onClick = onUpgrade) { Text("Upgrade") }
-                    }
-                }
-            }
-            item { StatusBlock(state, onLoad) }
-            item { Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { SectionTitle("Live now", "View all", onRooms) } }
-            if (state.home.rooms.isEmpty() && !state.loading) item { Box(Modifier.padding(horizontal = 20.dp)) { EmptyBlock("No live rooms", "Check again soon.") } }
-            itemsIndexed(state.home.rooms.distinctBy { it.id }, key = { index, room -> "home-room:${room.id}:$index" }) { _, room -> Box(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) { RoomCard(room) { onRoom(room.id) } } }
-            item { Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { SectionTitle("People to discover", "See people", onPeople) } }
-            itemsIndexed(state.home.people.distinctBy { it.id }.take(5), key = { index, user -> "home-person:${user.id}:$index" }) { _, user -> Box(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) { UserCard(user, { onProfile(user.username) }) } }
-            item { Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { SectionTitle("Creators", "See creators", onCreators) } }
-            if (state.home.creators.isEmpty() && !state.loading) item { Box(Modifier.padding(horizontal = 20.dp)) { EmptyBlock("No creators yet", "Discover more soon.") } }
-            itemsIndexed(state.home.creators.distinctBy { it.id }.take(5), key = { index, user -> "home-creator:${user.id}:$index" }) { _, user -> Box(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) { UserCard(user, { onProfile(user.username) }) } }
+            item { Column(Modifier.padding(horizontal = 20.dp)) { SectionTitle("People to discover", "View all", onPeople) } }
+            item { CompactPeopleRow(state.home.people, onProfile) }
+            item { Column(Modifier.padding(horizontal = 20.dp)) { SectionTitle("Creators", "View all", onCreators) } }
+            item { CompactPeopleRow(state.home.creators, onProfile) }
         }
     }
 }
@@ -354,20 +423,36 @@ fun ExploreScreen(
     onSearch: () -> Unit,
     onFriends: () -> Unit,
     onMe: () -> Unit,
+    onCommunities: () -> Unit,
+    onEvents: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad() }
+    val categories = (state.explore.trendingRooms + state.explore.liveRooms).map { it.category.trim() }.filter(String::isNotBlank).distinct().take(8)
     ConsumerScaffold("explore", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Explore", "Discover live conversations, creators, and people across ${VoiceCloudBrand.name}.") }
+        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            item { ScreenHeader("Explore", "Trends, categories, communities and voices beyond your live feed.") }
             item { StatusBlock(state, onLoad) }
-            item { SectionTitle("Live rooms", "All rooms", onRooms) }
-            itemsIndexed(state.explore.liveRooms.distinctBy { it.id }.take(6), key = { index, room -> "explore-live:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
-            item { SectionTitle("Trending rooms") }
-            itemsIndexed(state.explore.trendingRooms.distinctBy { it.id }.take(5), key = { index, room -> "explore-trend:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
-            item { SectionTitle("People", "View all", onPeople) }
-            itemsIndexed(state.explore.people.distinctBy { it.id }.take(6), key = { index, user -> "explore-person:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
-            item { SectionTitle("Creators", "View all", onCreators) }
-            itemsIndexed(state.explore.creators.distinctBy { it.id }.take(6), key = { index, user -> "explore-creator:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
+            item {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    HomeShortcut("Communities", R.drawable.vc_icon_community, onCommunities)
+                    HomeShortcut("Events", R.drawable.vc_icon_calendar, onEvents)
+                }
+            }
+            if (categories.isNotEmpty()) item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SectionTitle("Browse topics")
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(categories, key = { it }) { category -> AssistChip(onClick = onRooms, label = { Text(category) }) }
+                    }
+                }
+            }
+            item { SectionTitle("Trending rooms", "All live rooms", onRooms) }
+            if (state.explore.trendingRooms.isEmpty() && !state.loading) item { EmptyBlock("No trends yet", "Trending conversations will appear here as activity grows.") }
+            itemsIndexed(state.explore.trendingRooms.distinctBy { it.id }.take(8), key = { index, room -> "explore-trend:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
+            item { SectionTitle("Trending people", "View all", onPeople) }
+            item { CompactPeopleRow(state.explore.people.filter { it.role?.uppercase() != "CREATOR" }.take(6), onProfile) }
+            item { SectionTitle("Creators to discover", "View all", onCreators) }
+            item { CompactPeopleRow(state.explore.creators.take(6), onProfile) }
         }
     }
 }
@@ -424,28 +509,40 @@ fun SearchScreen(
     communities: List<CommunitySearchItem>,
     communitiesLoading: Boolean,
     initialTab: String = "All",
+    onLoadDefaults: () -> Unit,
     onSubmit: (String) -> Unit,
     onProfile: (String) -> Unit,
     onRoom: (String) -> Unit,
     onCommunity: (String) -> Unit,
+    onPeopleViewAll: () -> Unit,
+    onCreatorsViewAll: () -> Unit,
+    onRoomsViewAll: () -> Unit,
+    onCommunitiesViewAll: () -> Unit,
     onHome: () -> Unit,
     onExplore: () -> Unit,
     onSearch: () -> Unit,
     onFriends: () -> Unit,
     onMe: () -> Unit,
 ) {
-    var query by rememberSaveable { mutableStateOf(state.search.query) }
+    var query by rememberSaveable { mutableStateOf("") }
     var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     val tabs = listOf("All", "People", "Creators", "Rooms", "Communities")
-    val people = state.search.users.filter { it.role?.uppercase() != "CREATOR" }
-    val creators = state.search.users.filter { it.role?.uppercase() == "CREATOR" }
+    LaunchedEffect(Unit) { onLoadDefaults() }
+
+    val hasQuery = state.search.query.isNotBlank()
+    val resultPeople = state.search.users.filter { it.role?.uppercase() != "CREATOR" }
+    val resultCreators = state.search.users.filter { it.role?.uppercase() == "CREATOR" }
+    val people = if (hasQuery) resultPeople else state.searchLanding.people
+    val creators = if (hasQuery) resultCreators else state.searchLanding.creators
+    val rooms = if (hasQuery) state.search.rooms else state.searchLanding.rooms
+
     ConsumerScaffold("search", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item { ScreenHeader("Search") }
+            item { ScreenHeader("Search", if (hasQuery) "Results for “${state.search.query}”" else "Discover active people, creators, rooms and communities.") }
             item {
                 OutlinedTextField(
                     value = query,
@@ -464,59 +561,51 @@ fun SearchScreen(
             }
             item {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    tabs.forEach { tab ->
-                        FilterChip(
-                            selected = selectedTab == tab,
-                            onClick = { selectedTab = tab },
-                            label = { Text(tab, maxLines = 1, softWrap = false) },
-                        )
-                    }
+                    tabs.forEach { tab -> FilterChip(selected = selectedTab == tab, onClick = { selectedTab = tab }, label = { Text(tab, maxLines = 1) }) }
                 }
             }
             item { StatusBlock(state) }
             if (communitiesLoading) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
 
-            if (state.search.query.isNotBlank() && selectedTab in setOf("All", "People")) {
-                if (selectedTab == "All") item { SectionTitle("People") }
-                itemsIndexed(people.distinctBy { it.id }, key = { index, user -> "search-person:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
-            }
-            if (state.search.query.isNotBlank() && selectedTab in setOf("All", "Creators")) {
-                if (selectedTab == "All") item { SectionTitle("Creators") }
-                itemsIndexed(creators.distinctBy { it.id }, key = { index, user -> "search-creator:${user.id}:$index" }) { _, user -> UserCard(user, { onProfile(user.username) }) }
-            }
-            if (state.search.query.isNotBlank() && selectedTab in setOf("All", "Rooms")) {
-                if (selectedTab == "All") item { SectionTitle("Rooms") }
-                itemsIndexed(state.search.rooms.distinctBy { it.id }, key = { index, room -> "search-room:${room.id}:$index" }) { _, room -> RoomCard(room) { onRoom(room.id) } }
-            }
-            if (state.search.query.isNotBlank() && selectedTab in setOf("All", "Communities")) {
-                if (selectedTab == "All") item { SectionTitle("Communities") }
-                itemsIndexed(communities.distinctBy { it.id }, key = { index, community -> "search-community:${community.id}:$index" }) { _, community ->
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().clickable { onCommunity(community.handle.ifBlank { community.id }) },
-                        shape = RoundedCornerShape(20.dp),
-                    ) {
-                        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Surface(shape = RoundedCornerShape(14.dp), color = ConsumerColors.SapphireSoft) {
-                                Icon(
-                                    painter = painterResource(R.drawable.vc_icon_community),
-                                    contentDescription = null,
-                                    tint = ConsumerColors.SapphireDeep,
-                                    modifier = Modifier.padding(9.dp).size(22.dp),
-                                )
-                            }
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(community.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text("@${community.handle} · ${community.memberCount} members", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
+            if (selectedTab == "All") {
+                val allEmpty = people.isEmpty() && creators.isEmpty() && rooms.isEmpty() && communities.isEmpty()
+                if (hasQuery && allEmpty && !state.loading && !communitiesLoading) {
+                    item {
+                        Box(Modifier.fillParentMaxHeight(.55f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text("No results found for “${state.search.query}”.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
+                } else {
+                    item { SectionTitle("People", "View all", onPeopleViewAll) }
+                    item { SearchCompactRowUsers(people.take(4), "people", onProfile, hasQuery, "No people found") }
+                    item { SectionTitle("Creators", "View all", onCreatorsViewAll) }
+                    item { SearchCompactRowUsers(creators.take(4), "creators", onProfile, hasQuery, "No creators found") }
+                    item { SectionTitle("Rooms", "View all", onRoomsViewAll) }
+                    item { SearchCompactRowRooms(rooms.take(4), onRoom, hasQuery) }
+                    item { SectionTitle("Communities", "View all", onCommunitiesViewAll) }
+                    item { SearchCompactRowCommunities(communities.take(4), onCommunity, hasQuery) }
+                }
+            } else {
+                val empty = when (selectedTab) {
+                    "People" -> people.isEmpty()
+                    "Creators" -> creators.isEmpty()
+                    "Rooms" -> rooms.isEmpty()
+                    else -> communities.isEmpty()
+                }
+                if (empty && !state.loading && !communitiesLoading) {
+                    item {
+                        Box(Modifier.fillParentMaxHeight(.55f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text(if (hasQuery) "No ${selectedTab.lowercase()} found for “${state.search.query}”." else "No ${selectedTab.lowercase()} available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                } else when (selectedTab) {
+                    "People" -> itemsIndexed(people.distinctBy { it.id }, key = { i, u -> "search-people:${u.id}:$i" }) { _, u -> UserCard(u, { onProfile(u.username) }) }
+                    "Creators" -> itemsIndexed(creators.distinctBy { it.id }, key = { i, u -> "search-creators:${u.id}:$i" }) { _, u -> UserCard(u, { onProfile(u.username) }) }
+                    "Rooms" -> itemsIndexed(rooms.distinctBy { it.id }, key = { i, r -> "search-rooms:${r.id}:$i" }) { _, r -> RoomCard(r) { onRoom(r.id) } }
+                    "Communities" -> itemsIndexed(communities.distinctBy { it.id }, key = { i, c -> "search-community:${c.id}:$i" }) { _, c -> CommunityCompactCard(c, onCommunity) }
+                    else -> Unit
                 }
             }
-            val noResults = state.search.query.isNotBlank() &&
-                state.search.users.isEmpty() && state.search.rooms.isEmpty() && communities.isEmpty() &&
-                !state.loading && !communitiesLoading
-            if (noResults) item { EmptyBlock("No results", "Try another search.") }
         }
     }
 }
@@ -595,7 +684,10 @@ fun MyProfileScreen(
     onLoad: () -> Unit,
     onFollowers: () -> Unit,
     onFollowing: () -> Unit,
-    onEconomy: () -> Unit,
+    onEconomySection: (String) -> Unit,
+    onEditProfile: () -> Unit,
+    onProfileTools: () -> Unit,
+    onHelpPages: () -> Unit,
     onUpgrade: () -> Unit,
     onLogout: () -> Unit,
     onHome: () -> Unit,
@@ -606,9 +698,21 @@ fun MyProfileScreen(
 ) {
     LaunchedEffect(Unit) { onLoad() }
     val profile = state.myProfile
+    val economy = listOf(
+        "WALLET" to "Wallet",
+        "VIP" to "VIP",
+        "STORE" to "Store",
+        "GIFTS" to "Gifts",
+        "TASKS" to "Tasks",
+        "ACHIEVEMENTS" to "Achievements",
+        "PROGRESSION" to "XP & Check-in",
+        "RANKINGS" to "Rankings",
+        "TICKETS" to "Tickets",
+        "REFERRALS" to "Referrals",
+    )
     ConsumerScaffold("profile", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            item { ScreenHeader("My Profile", "Your ${VoiceCloudBrand.name} profile and connections.") }
+        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item { ScreenHeader("My Profile", "Your ${VoiceCloudBrand.name} identity, activity and account tools.") }
             item { StatusBlock(state, onLoad) }
             if (profile != null) {
                 item {
@@ -618,7 +722,7 @@ fun MyProfileScreen(
                             Spacer(Modifier.height(10.dp))
                             Text(profile.displayName.ifBlank { profile.username }, style = MaterialTheme.typography.headlineMedium)
                             Text("@${profile.username}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            profile.bio?.takeIf { it.isNotBlank() }?.let { bio -> Text(bio, modifier = Modifier.padding(top = 12.dp)) }
+                            profile.bio?.takeIf { it.isNotBlank() }?.let { Text(it, modifier = Modifier.padding(top = 10.dp)) }
                         }
                     }
                 }
@@ -628,8 +732,19 @@ fun MyProfileScreen(
                         OutlinedButton(onClick = onFollowing, modifier = Modifier.weight(1f)) { Text("${profile.stats?.followingCount ?: profile.followingCount}\nFollowing") }
                     }
                 }
-                item { Text("Profile complete · ${profile.profileCompletionPercentage}%", fontWeight = FontWeight.SemiBold) }
-                item { Button(onClick = onEconomy, modifier = Modifier.fillMaxWidth()) { Text("Economy & progression") } }
+                item { Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) { Text("Edit profile") } }
+                item { OutlinedButton(onClick = onProfileTools, modifier = Modifier.fillMaxWidth()) { Text("Replays, activity & privacy") } }
+                item { SectionTitle("Economy & progression") }
+                items(economy, key = { it.first }) { (key, label) ->
+                    ElevatedCard(onClick = { onEconomySection(key) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(label, modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
+                            Text("›", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
+                item { SectionTitle("Support & information") }
+                item { OutlinedButton(onClick = onHelpPages, modifier = Modifier.fillMaxWidth()) { Text("Help, terms & information") } }
             }
             if (isGuest) item { Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade guest account") } }
             item { OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Sign out") } }
@@ -686,6 +801,7 @@ fun FriendsScreen(
     onSend: (String) -> Unit,
     onAccept: (String) -> Unit,
     onReject: (String) -> Unit,
+    onCancel: (String) -> Unit,
     onRemove: (String) -> Unit,
     onHome: () -> Unit,
     onExplore: () -> Unit,
@@ -694,31 +810,45 @@ fun FriendsScreen(
     onMe: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad() }
+    var selected by rememberSaveable { mutableStateOf("Friends") }
+    val tabs = listOf("Friends", "Requests", "Suggestions")
     ConsumerScaffold("friends", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("Friends", "Manage requests, connections, and people you may know.") }
+            item { ScreenHeader("Friends", "Connections and friend requests from VoiceCloud.") }
             item { StatusBlock(state, onLoad) }
-            item { SectionTitle("Incoming requests") }
-            if (state.pending.incoming.isEmpty() && !state.loading) item { Text("No incoming requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            itemsIndexed(state.pending.incoming.distinctBy { it.id }, key = { index, request -> "friend-in:${request.id}:$index" }) { _, request ->
-                request.sender?.let { user ->
-                    UserCard(user, { onProfile(user.username) }, "Accept", !state.mutationBusy) { onAccept(request.id) }
-                    TextButton(enabled = !state.mutationBusy, onClick = { onReject(request.id) }) { Text("Decline request") }
+            item {
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    tabs.forEach { tab -> FilterChip(selected == tab, { selected = tab }, label = { Text(if (tab == "Requests" && state.pending.incoming.isNotEmpty()) "$tab (${state.pending.incoming.size})" else tab) }) }
                 }
             }
-            item { SectionTitle("Friends") }
-            if (state.friends.isEmpty() && !state.loading) item { Text("No friends yet.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            itemsIndexed(state.friends.distinctBy { it.friendshipId.ifBlank { it.user.id } }, key = { index, friend -> "friend:${friend.friendshipId.ifBlank { friend.user.id }}:$index" }) { _, friend ->
-                UserCard(friend.user, { onProfile(friend.user.username) }, "Remove", !state.mutationBusy) { onRemove(friend.user.id) }
-            }
-            item { SectionTitle("Suggested people") }
-            itemsIndexed(state.friendSuggestions.distinctBy { it.id }, key = { index, user -> "friend-suggest:${user.id}:$index" }) { _, user ->
-                UserCard(user, { onProfile(user.username) }, "Add", !state.mutationBusy) { onSend(user.id) }
-            }
-            item { SectionTitle("Sent requests") }
-            if (state.pending.outgoing.isEmpty() && !state.loading) item { Text("No pending sent requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            itemsIndexed(state.pending.outgoing.distinctBy { it.id }, key = { index, request -> "friend-out:${request.id}:$index" }) { _, request ->
-                request.receiver?.let { user -> UserCard(user, { onProfile(user.username) }, "Pending", false, null) }
+            when (selected) {
+                "Friends" -> {
+                    if (state.friends.isEmpty() && !state.loading) item { EmptyBlock("No friends yet", "Accepted friends will appear here. Open Suggestions to discover people.") }
+                    itemsIndexed(state.friends.distinctBy { it.friendshipId.ifBlank { it.user.id } }, key = { i, f -> "friend:${f.friendshipId.ifBlank { f.user.id }}:$i" }) { _, friend ->
+                        UserCard(friend.user, { onProfile(friend.user.username) }, "Remove", !state.mutationBusy) { onRemove(friend.user.id) }
+                    }
+                }
+                "Requests" -> {
+                    item { SectionTitle("Incoming") }
+                    if (state.pending.incoming.isEmpty() && !state.loading) item { Text("No incoming requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    itemsIndexed(state.pending.incoming.distinctBy { it.id }, key = { i, r -> "friend-in:${r.id}:$i" }) { _, request ->
+                        request.sender?.let { user ->
+                            UserCard(user, { onProfile(user.username) }, "Accept", !state.mutationBusy) { onAccept(request.id) }
+                            TextButton(enabled = !state.mutationBusy, onClick = { onReject(request.id) }) { Text("Decline") }
+                        }
+                    }
+                    item { SectionTitle("Sent") }
+                    if (state.pending.outgoing.isEmpty() && !state.loading) item { Text("No pending sent requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    itemsIndexed(state.pending.outgoing.distinctBy { it.id }, key = { i, r -> "friend-out:${r.id}:$i" }) { _, request ->
+                        request.receiver?.let { user -> UserCard(user, { onProfile(user.username) }, "Cancel", !state.mutationBusy) { onCancel(request.id) } }
+                    }
+                }
+                else -> {
+                    if (state.friendSuggestions.isEmpty() && !state.loading) item { EmptyBlock("No suggestions right now", "VoiceCloud suggestions update as your activity and connections change.") }
+                    itemsIndexed(state.friendSuggestions.distinctBy { it.id }, key = { i, u -> "friend-suggest:${u.id}:$i" }) { _, user ->
+                        UserCard(user, { onProfile(user.username) }, "Add", !state.mutationBusy) { onSend(user.id) }
+                    }
+                }
             }
         }
     }

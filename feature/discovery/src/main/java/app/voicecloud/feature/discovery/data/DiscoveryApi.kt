@@ -55,13 +55,13 @@ interface DiscoveryApi {
     suspend fun following(@Query("page") page: Int = 1, @Query("limit") limit: Int = 50, @Query("search") search: String? = null): PaginatedData<VoiceCloudUser>
 
     @GET("users/friends")
-    suspend fun friends(@Query("page") page: Int = 1, @Query("limit") limit: Int = 50, @Query("category") category: String? = null): PaginatedData<FriendListItem>
+    suspend fun friends(@Query("page") page: Int = 1, @Query("limit") limit: Int = 50, @Query("category") category: String? = null): Any
 
     @GET("users/friends/requests/pending")
-    suspend fun pendingFriendRequests(): PendingFriendRequests
+    suspend fun pendingFriendRequests(): Any
 
     @GET("users/friends/suggested")
-    suspend fun suggestedFriends(@Query("page") page: Int = 1, @Query("limit") limit: Int = 20): SuggestedFriends
+    suspend fun suggestedFriends(@Query("page") page: Int = 1, @Query("limit") limit: Int = 20): Any
 
     @POST("users/friends/request")
     suspend fun sendFriendRequest(@Body body: FriendRequestBody): ApiMessage
@@ -71,6 +71,9 @@ interface DiscoveryApi {
 
     @POST("users/friends/request/{requestId}/reject")
     suspend fun rejectFriendRequest(@Path("requestId") requestId: String): ApiMessage
+
+    @DELETE("users/friends/request/{requestId}/cancel")
+    suspend fun cancelFriendRequest(@Path("requestId") requestId: String): ApiMessage
 
     @DELETE("users/friends/{friendId}")
     suspend fun removeFriend(@Path("friendId") friendId: String): ApiMessage

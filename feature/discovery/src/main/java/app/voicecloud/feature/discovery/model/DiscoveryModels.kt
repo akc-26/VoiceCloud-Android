@@ -169,6 +169,12 @@ data class ExploreSnapshot(
     val creators: List<VoiceCloudUser> = emptyList(),
 )
 
+data class SearchLandingSnapshot(
+    val people: List<VoiceCloudUser> = emptyList(),
+    val creators: List<VoiceCloudUser> = emptyList(),
+    val rooms: List<VoiceCloudRoom> = emptyList(),
+)
+
 data class SearchSnapshot(
     val query: String = "",
     val users: List<VoiceCloudUser> = emptyList(),

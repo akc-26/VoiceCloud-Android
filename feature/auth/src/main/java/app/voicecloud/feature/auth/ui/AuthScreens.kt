@@ -402,7 +402,7 @@ fun OnboardingScreen(state: AuthUiState, onFinish: (String, String, List<String>
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (step > 1) OutlinedButton(onClick = { step-- }, Modifier.weight(1f)) { Text("Back") }
+            if (step > 1) OutlinedButton(onClick = { step-- }, Modifier.weight(1f)) { Text("Previous") }
             Button(
                 onClick = { if (step < 3) step++ else onFinish(bio, country, interests, reminders) },
                 enabled = !state.busy,

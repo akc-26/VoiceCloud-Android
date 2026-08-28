@@ -8,13 +8,20 @@ interface EconomyApi {
     @GET("wallet/transactions") suspend fun walletTransactions(@Query("page") page:Int=1,@Query("limit") limit:Int=50): JsonMap
     @GET("wallet/packages") suspend fun walletPackages(): List<JsonMap>
     @GET("wallet/purchases/history") suspend fun purchaseHistory(@Query("page") page:Int=1,@Query("limit") limit:Int=50): JsonMap
+    @POST("wallet/purchase/initiate") suspend fun initiatePlayPurchase(@Body body: JsonMap): JsonMap
     @POST("wallet/purchase/validate") suspend fun validatePurchase(@Body body: JsonMap): JsonMap
+    @POST("wallet/purchase/web/initiate") suspend fun initiateWalletWebCheckout(@Body body: JsonMap): JsonMap
+    @POST("wallet/purchase/web/complete") suspend fun completeWalletWebCheckout(@Body body: JsonMap): JsonMap
+    @POST("wallet/purchase/web/cancel") suspend fun cancelWalletWebCheckout(@Body body: JsonMap): JsonMap
 
     @GET("android/billing/vip/catalog") suspend fun androidVipCatalog(): JsonMap
     @POST("android/billing/vip/verify") suspend fun verifyAndroidVip(@Body body: JsonMap): JsonMap
     @GET("vip/membership") suspend fun vipMembership(): JsonMap
     @GET("vip/history") suspend fun vipHistory(): JsonMap
     @POST("vip/cancel") suspend fun cancelVip(): JsonMap
+    @POST("vip/checkout/web/initiate") suspend fun initiateVipWebCheckout(@Body body: JsonMap): JsonMap
+    @POST("vip/checkout/web/complete") suspend fun completeVipWebCheckout(@Body body: JsonMap): JsonMap
+    @POST("vip/checkout/web/cancel") suspend fun cancelVipWebCheckout(@Body body: JsonMap): JsonMap
 
     @GET("referrals/summary") suspend fun referralSummary(): JsonMap
     @GET("referrals/history") suspend fun referralHistory(): JsonMap

@@ -4,11 +4,21 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+val voiceCloudPaymentMode = providers.gradleProperty("VOICECLOUD_ANDROID_PAYMENT_MODE")
+    .orNull
+    ?.trim()
+    ?.uppercase()
+    ?.takeIf { it in setOf("HOSTED_GATEWAY", "GOOGLE_PLAY") }
+    ?: "HOSTED_GATEWAY"
+
 android {
     namespace = "app.voicecloud.feature.economy"
     compileSdk = 37
-    defaultConfig { minSdk = 26 }
-    buildFeatures { compose = true }
+    defaultConfig {
+        minSdk = 26
+        buildConfigField("String", "VOICECLOUD_PAYMENT_MODE", "\"$voiceCloudPaymentMode\"")
+    }
+    buildFeatures { compose = true; buildConfig = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
 }
 ksp { arg("dagger.fastInit", "enabled") }

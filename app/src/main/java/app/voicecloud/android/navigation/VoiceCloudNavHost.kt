@@ -25,6 +25,7 @@ import app.voicecloud.feature.live.ui.*
 import app.voicecloud.feature.hosting.ui.*
 import app.voicecloud.feature.economy.model.EconomySection
 import app.voicecloud.feature.economy.ui.*
+import app.voicecloud.feature.profile.ui.*
 
 object VoiceCloudRoutes {
     const val Bootstrap = "bootstrap"
@@ -93,7 +94,21 @@ object VoiceCloudRoutes {
     // PH07 consumer economy & progression.
     const val Economy = "economy"
     const val EconomySection = "economy/{section}"
+
+    // PH08 replay, activity and extended-profile graph.
+    const val ProfileTools = "me/tools"
+    const val EditProfile = "me/edit"
+    const val ReplayLibrary = "replays"
+    const val ReplayPlayer = "replays/{replayId}"
+    const val ActivityHistory = "me/activity"
+    const val ProfileVisitors = "me/visitors"
+    const val BlockedUsers = "me/blocked"
+    const val HelpPages = "me/help"
+    const val HelpPage = "me/help/{slug}"
     fun economySection(section: app.voicecloud.feature.economy.model.EconomySection): String = "economy/${section.name}"
+
+    fun replay(id: String): String = "replays/${Uri.encode(id.trim())}"
+    fun helpPage(slug: String): String = "me/help/${Uri.encode(slug.trim())}"
 
     fun roomPreview(id: String): String = "rooms/${Uri.encode(id.trim())}/preview"
     fun roomExperience(id: String): String = "rooms/${Uri.encode(id.trim())}/live"
@@ -128,6 +143,8 @@ fun VoiceCloudNavHost(
     val hostingState by hostingViewModel.state.collectAsStateWithLifecycle()
     val economyViewModel: EconomyViewModel = hiltViewModel()
     val economyState by economyViewModel.state.collectAsStateWithLifecycle()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val profileState by profileViewModel.state.collectAsStateWithLifecycle()
     var mobileConfig by remember { mutableStateOf<MobileConfig?>(null) }
     var resetToken by remember(initialResetToken) { mutableStateOf(initialResetToken.orEmpty()) }
     var pendingExternalRoute by remember(initialNavigationRoute) { mutableStateOf(initialNavigationRoute.orEmpty()) }
@@ -309,7 +326,7 @@ fun VoiceCloudNavHost(
                 isGuest = viewer?.isGuest == true,
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadHome() },
                 onRooms = { open(VoiceCloudRoutes.Rooms) },
-                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
+                onRoom = { open(VoiceCloudRoutes.roomExperience(it)) },
                 onPeople = { open(VoiceCloudRoutes.People) },
                 onCreators = { open(VoiceCloudRoutes.Creators) },
                 onProfile = ::openProfile,
@@ -333,7 +350,7 @@ fun VoiceCloudNavHost(
                 state = state,
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadExplore() },
                 onRooms = { open(VoiceCloudRoutes.Rooms) },
-                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
+                onRoom = { open(VoiceCloudRoutes.roomExperience(it)) },
                 onPeople = { open(VoiceCloudRoutes.People) },
                 onCreators = { open(VoiceCloudRoutes.Creators) },
                 onProfile = ::openProfile,
@@ -342,12 +359,14 @@ fun VoiceCloudNavHost(
                 onSearch = { open(VoiceCloudRoutes.Search) },
                 onFriends = { open(VoiceCloudRoutes.Friends) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
+                onCommunities = { open(VoiceCloudRoutes.Communities) },
+                onEvents = { open(VoiceCloudRoutes.Events) },
             )
         }
         composable(VoiceCloudRoutes.Rooms) {
             val vm: DiscoveryViewModel = hiltViewModel()
             val state by vm.state.collectAsStateWithLifecycle()
-            RoomsScreen(state, { vm.loadRooms() }, { open(VoiceCloudRoutes.roomPreview(it)) }, { navController.popBackStack() })
+            RoomsScreen(state, { vm.loadRooms() }, { open(VoiceCloudRoutes.roomExperience(it)) }, { navController.popBackStack() })
         }
         composable(VoiceCloudRoutes.RoomPreview) { entry ->
             val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
@@ -412,14 +431,23 @@ fun VoiceCloudNavHost(
                     CommunitySearchItem(community.id, community.name, community.handle, community.memberCount)
                 },
                 communitiesLoading = engagementState.loading,
+                onLoadDefaults = {
+                    vm.setViewer(viewer?.id, viewer?.username)
+                    vm.loadSearchLanding()
+                    engagementViewModel.loadCommunities("")
+                },
                 onSubmit = { query ->
                     vm.setViewer(viewer?.id, viewer?.username)
                     vm.search(query)
                     engagementViewModel.loadCommunities(query)
                 },
                 onProfile = ::openProfile,
-                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
+                onRoom = { open(VoiceCloudRoutes.roomExperience(it)) },
                 onCommunity = { open(VoiceCloudRoutes.community(it)) },
+                onPeopleViewAll = { open(VoiceCloudRoutes.People) },
+                onCreatorsViewAll = { open(VoiceCloudRoutes.Creators) },
+                onRoomsViewAll = { open(VoiceCloudRoutes.Rooms) },
+                onCommunitiesViewAll = { open(VoiceCloudRoutes.Communities) },
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
@@ -438,14 +466,23 @@ fun VoiceCloudNavHost(
                 },
                 communitiesLoading = engagementState.loading,
                 initialTab = "Communities",
+                onLoadDefaults = {
+                    vm.setViewer(viewer?.id, viewer?.username)
+                    vm.loadSearchLanding()
+                    engagementViewModel.loadCommunities("")
+                },
                 onSubmit = { query ->
                     vm.setViewer(viewer?.id, viewer?.username)
                     vm.search(query)
                     engagementViewModel.loadCommunities(query)
                 },
                 onProfile = ::openProfile,
-                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
+                onRoom = { open(VoiceCloudRoutes.roomExperience(it)) },
                 onCommunity = { open(VoiceCloudRoutes.community(it)) },
+                onPeopleViewAll = { open(VoiceCloudRoutes.People) },
+                onCreatorsViewAll = { open(VoiceCloudRoutes.Creators) },
+                onRoomsViewAll = { open(VoiceCloudRoutes.Rooms) },
+                onCommunitiesViewAll = { open(VoiceCloudRoutes.Communities) },
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
@@ -478,7 +515,13 @@ fun VoiceCloudNavHost(
                 onLoad = vm::loadMyProfile,
                 onFollowers = { open(VoiceCloudRoutes.Followers) },
                 onFollowing = { open(VoiceCloudRoutes.Following) },
-                onEconomy = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Economy) },
+                onEconomySection = { sectionName ->
+                    if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade)
+                    else runCatching { EconomySection.valueOf(sectionName) }.getOrNull()?.let { open(VoiceCloudRoutes.economySection(it)) }
+                },
+                onEditProfile = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.EditProfile) },
+                onProfileTools = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.ProfileTools) },
+                onHelpPages = { open(VoiceCloudRoutes.HelpPages) },
                 onUpgrade = { open(VoiceCloudRoutes.GuestUpgrade) },
                 onLogout = { authViewModel.logout() },
                 onHome = { open(VoiceCloudRoutes.Home) },
@@ -525,6 +568,7 @@ fun VoiceCloudNavHost(
                 onSend = vm::sendFriendRequest,
                 onAccept = vm::acceptFriendRequest,
                 onReject = vm::rejectFriendRequest,
+                onCancel = vm::cancelFriendRequest,
                 onRemove = vm::removeFriend,
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
@@ -742,6 +786,83 @@ fun VoiceCloudNavHost(
             )
         }
 
+        composable(VoiceCloudRoutes.ProfileTools) {
+            ProfileToolsScreen(
+                state = profileState,
+                onLoad = { profileViewModel.loadHub() },
+                onEditProfile = { open(VoiceCloudRoutes.EditProfile) },
+                onReplays = { open(VoiceCloudRoutes.ReplayLibrary) },
+                onActivity = { open(VoiceCloudRoutes.ActivityHistory) },
+                onVisitors = { open(VoiceCloudRoutes.ProfileVisitors) },
+                onBlockedUsers = { open(VoiceCloudRoutes.BlockedUsers) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.EditProfile) {
+            EditProfileScreen(
+                state = profileState,
+                identityUsername = authState.user?.username.orEmpty(),
+                identityEmail = authState.user?.email,
+                identityPhone = authState.user?.phoneNumber,
+                onLoad = { profileViewModel.loadProfile() },
+                onSave = { body -> profileViewModel.saveProfile(body) },
+                onUploadAvatar = { bytes, fileName, mimeType -> profileViewModel.uploadAvatar(bytes, fileName, mimeType) },
+                onDeleteAvatar = { profileViewModel.deleteAvatar() },
+                onUploadCover = { bytes, fileName, mimeType -> profileViewModel.uploadCover(bytes, fileName, mimeType) },
+                onDeleteCover = { profileViewModel.deleteCover() },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.ReplayLibrary) {
+            ReplayLibraryScreen(
+                state = profileState,
+                onLoad = { profileViewModel.loadReplays() },
+                onReplay = { open(VoiceCloudRoutes.replay(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.ReplayPlayer) { entry ->
+            val replayId = Uri.decode(entry.arguments?.getString("replayId").orEmpty())
+            ReplayPlayerScreen(
+                state = profileState,
+                replayId = replayId,
+                onLoad = { replayIdValue -> profileViewModel.loadReplay(replayIdValue) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.ActivityHistory) {
+            ActivityHistoryScreen(profileState, { profileViewModel.loadActivity() }) { navController.popBackStack() }
+        }
+        composable(VoiceCloudRoutes.ProfileVisitors) {
+            ProfileVisitorsScreen(profileState, { profileViewModel.loadVisitors() }) { navController.popBackStack() }
+        }
+        composable(VoiceCloudRoutes.BlockedUsers) {
+            BlockedUsersScreen(
+                state = profileState,
+                onLoad = { profileViewModel.loadBlockedUsers() },
+                onUnblock = { userId -> profileViewModel.unblock(userId) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(VoiceCloudRoutes.HelpPages) {
+            HelpPagesScreen(
+                state = profileState,
+                onLoad = { profileViewModel.loadHelpPages() },
+                onOpen = { open(VoiceCloudRoutes.helpPage(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HelpPage) { entry ->
+            val slug = Uri.decode(entry.arguments?.getString("slug").orEmpty())
+            HelpPageScreen(
+                state = profileState,
+                slug = slug,
+                onLoad = { profileViewModel.loadHelpPage(it) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
         composable(VoiceCloudRoutes.Notifications) {
             NotificationsScreen(
                 state = engagementState,
@@ -768,6 +889,17 @@ fun VoiceCloudNavHost(
                 onLoad = { economyViewModel.load(section) },
                 onBack = { navController.popBackStack() },
                 onClaimCheckIn = economyViewModel::claimCheckIn,
+                onClaimTask = economyViewModel::claimTask,
+                onBuyItem = economyViewModel::buyItem,
+                onEquip = economyViewModel::equip,
+                onUnequip = economyViewModel::unequip,
+                onBuyTicket = economyViewModel::buyTicket,
+                paymentRail = economyViewModel.paymentRail,
+                onBuyWalletCredits = economyViewModel::buyWalletCredits,
+                onBuyVip = economyViewModel::buyVip,
+                onRestoreWallet = economyViewModel::restoreGooglePlayWallet,
+                onRestoreVip = economyViewModel::restoreGooglePlayVip,
+                onPaymentResume = economyViewModel::refreshAfterExternalCheckout,
             )
         }
 
@@ -785,19 +917,23 @@ private fun tabIndex(route: String?): Int = consumerTabs.indexOf(if (route == Vo
 private fun tabEnterTransition(fromRoute: String?, toRoute: String?): EnterTransition {
     val from = tabIndex(fromRoute)
     val to = tabIndex(toRoute)
-    if (from < 0 || to < 0 || from == to) return EnterTransition.None
-    val direction = if (to > from) 1 else -1
-    return slideInHorizontally(animationSpec = tween(190)) { fullWidth -> direction * (fullWidth / 5) } +
-        fadeIn(animationSpec = tween(145))
+    if (from >= 0 && to >= 0 && from != to) {
+        val direction = if (to > from) 1 else -1
+        return slideInHorizontally(animationSpec = tween(220)) { fullWidth -> direction * (fullWidth / 6) } + fadeIn(animationSpec = tween(180))
+    }
+    if (fromRoute == toRoute) return EnterTransition.None
+    return slideInHorizontally(animationSpec = tween(220)) { fullWidth -> fullWidth / 8 } + fadeIn(animationSpec = tween(180))
 }
 
 private fun tabExitTransition(fromRoute: String?, toRoute: String?): ExitTransition {
     val from = tabIndex(fromRoute)
     val to = tabIndex(toRoute)
-    if (from < 0 || to < 0 || from == to) return ExitTransition.None
-    val direction = if (to > from) -1 else 1
-    return slideOutHorizontally(animationSpec = tween(190)) { fullWidth -> direction * (fullWidth / 5) } +
-        fadeOut(animationSpec = tween(120))
+    if (from >= 0 && to >= 0 && from != to) {
+        val direction = if (to > from) -1 else 1
+        return slideOutHorizontally(animationSpec = tween(220)) { fullWidth -> direction * (fullWidth / 6) } + fadeOut(animationSpec = tween(150))
+    }
+    if (fromRoute == toRoute) return ExitTransition.None
+    return slideOutHorizontally(animationSpec = tween(200)) { fullWidth -> -(fullWidth / 12) } + fadeOut(animationSpec = tween(140))
 }
 
 private fun routeFor(screen: AuthScreen): String = when (screen) {

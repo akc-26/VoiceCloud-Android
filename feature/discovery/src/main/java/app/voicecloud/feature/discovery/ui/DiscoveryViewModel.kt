@@ -21,6 +21,7 @@ data class DiscoveryUiState(
     val explore: ExploreSnapshot = ExploreSnapshot(),
     val rooms: List<VoiceCloudRoom> = emptyList(),
     val people: List<VoiceCloudUser> = emptyList(),
+    val searchLanding: SearchLandingSnapshot = SearchLandingSnapshot(),
     val search: SearchSnapshot = SearchSnapshot(),
     val profile: VoiceCloudProfile? = null,
     val myProfile: VoiceCloudProfile? = null,
@@ -60,6 +61,10 @@ class DiscoveryViewModel @Inject constructor(
 
     fun loadPeople(creatorsOnly: Boolean) = load { viewer ->
         _state.value = _state.value.copy(people = repository.people(viewer, creatorsOnly))
+    }
+
+    fun loadSearchLanding() = load { viewer ->
+        _state.value = _state.value.copy(searchLanding = repository.searchLanding(viewer))
     }
 
     fun search(query: String) = load { viewer ->
@@ -113,6 +118,11 @@ class DiscoveryViewModel @Inject constructor(
 
     fun rejectFriendRequest(requestId: String) = mutate("Friend request declined.") {
         repository.rejectFriendRequest(requestId)
+        refreshFriendsAfterMutation()
+    }
+
+    fun cancelFriendRequest(requestId: String) = mutate("Friend request cancelled.") {
+        repository.cancelFriendRequest(requestId)
         refreshFriendsAfterMutation()
     }
 

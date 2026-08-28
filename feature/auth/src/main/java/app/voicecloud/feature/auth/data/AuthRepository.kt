@@ -297,8 +297,18 @@ class AuthRepository @Inject constructor(
         preferences.clearAccountPreferences()
     }
 
-    suspend fun requiresOnboarding(user: AuthUser): Boolean =
-        !user.isGuest && (user.profileCompletion ?: 100) < 100 && !preferences.hasCompletedOnboarding(user.id)
+    suspend fun requiresOnboarding(user: AuthUser): Boolean {
+        if (user.isGuest || preferences.hasCompletedOnboarding(user.id)) return false
+        // Onboarding is first-account-setup only. Server profile data is authoritative across
+        // devices/sign-ins, so an existing bio/country/interests state must not reopen it.
+        val serverProfileAlreadyConfigured = !user.bio.isNullOrBlank() ||
+            !user.country.isNullOrBlank() || user.interests.isNotEmpty()
+        if (serverProfileAlreadyConfigured) {
+            preferences.markOnboardingCompleted(user.id)
+            return false
+        }
+        return (user.profileCompletion ?: 0) < 100
+    }
 
     private fun isRestricted(user: AuthUser): Boolean {
         val value = listOfNotNull(user.status, user.accountStatus).joinToString(" ").uppercase()

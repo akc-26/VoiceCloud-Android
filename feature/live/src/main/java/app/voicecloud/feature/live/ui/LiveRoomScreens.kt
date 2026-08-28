@@ -2,6 +2,7 @@ package app.voicecloud.feature.live.ui
 
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,14 +19,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
@@ -104,6 +109,7 @@ fun RoomPreviewScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveRoomScreen(
     state: LiveRoomUiState,
@@ -139,60 +145,158 @@ fun LiveRoomScreen(
     }
     DisposableEffect(roomId) { onDispose { onLeave() } }
 
+    var showReactions by rememberSaveable { mutableStateOf(false) }
+    var showGifts by rememberSaveable { mutableStateOf(false) }
+    val closeRoom: () -> Unit = { onBack() } // onDispose performs the authoritative leave exactly once.
+
+    if (showReactions) {
+        ModalBottomSheet(onDismissRequest = { showReactions = false }, containerColor = ConsumerColors.LiveSurfaceElevated) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text("Send a reaction", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    itemsIndexed(listOf("👏", "❤️", "🔥", "😂", "🎉", "😍", "😮", "💯", "🙌", "✨")) { _, emoji ->
+                        FilledTonalButton(onClick = { onReaction(emoji); showReactions = false }) { Text(emoji, style = MaterialTheme.typography.headlineSmall) }
+                    }
+                }
+                Spacer(Modifier.height(20.dp))
+            }
+        }
+    }
+    if (showGifts) {
+        ModalBottomSheet(onDismissRequest = { showGifts = false }, containerColor = ConsumerColors.LiveSurfaceElevated) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("Send a gift", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
+                if (state.gifts.isEmpty()) Text("Gifts are unavailable for this room.", color = ConsumerColors.TextOnDarkSecondary)
+                else GiftRow(state.gifts, state.mutationBusy) { gift -> onGift(gift); showGifts = false }
+                Spacer(Modifier.height(20.dp))
+            }
+        }
+    }
+
     Scaffold(
         containerColor = ConsumerColors.DeepNavy,
         topBar = {
-            VoiceCloudPageTopBar(
+            LiveRoomTopBar(
                 title = state.room?.title?.ifBlank { "Live room" } ?: "Live room",
-                onBack = { onLeave(); onBack() },
-                actionLabel = if (state.saved) "Saved" else "Save",
-                actionEnabled = !state.mutationBusy,
-                onAction = onToggleSave,
+                saved = state.saved,
+                busy = state.mutationBusy,
+                onBack = closeRoom,
+                onSave = onToggleSave,
+                onLeave = closeRoom,
             )
         },
+        bottomBar = {
+            if (state.inRoom) {
+                Surface(color = ConsumerColors.DeepNavy, tonalElevation = 0.dp, shadowElevation = 8.dp) {
+                    ChatComposer(
+                        enabled = state.conversationId != null && !state.mutationBusy,
+                        onSend = onSendMessage,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
+                }
+            }
+        },
     ) { padding ->
-        LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.DeepNavy),
-            contentPadding = PaddingValues(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            item { RoomRuntimeHeader(state, onRetryAudio) }
-            if (state.joining) item { Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = ConsumerColors.Ice) } }
-            state.accessIssue?.let { issue -> item { AccessIssueCard(issue, onBack) } }
-            state.error?.let { message -> item { DarkMessageCard(message, true, onRetryAudio) } }
-            state.notice?.let { message -> item { DarkMessageCard(message, false, null) } }
-            if (state.paused) item { DarkMessageCard("Room paused", false, null) }
-            if (state.ended) item { DarkMessageCard("Room ended", false, onBack) }
-            if (state.speakerInvitationPending) item {
-                ElevatedCard(colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.LiveSurfaceElevated), shape = RoundedCornerShape(20.dp)) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("Stage invite", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
-                        Text("Join as a speaker?", color = ConsumerColors.TextOnDarkSecondary)
-                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Button(onClick = onAcceptInvitation, enabled = !state.mutationBusy) { Text("Accept") }
-                            OutlinedButton(onClick = onRejectInvitation, enabled = !state.mutationBusy) { Text("Decline") }
+        Box(Modifier.fillMaxSize().padding(padding).background(ConsumerColors.DeepNavy)) {
+            LazyColumn(
+                Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 18.dp, top = 12.dp, end = 62.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                item { RoomRuntimeHeader(state, onRetryAudio) }
+                if (state.joining) item { Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = ConsumerColors.Ice) } }
+                state.accessIssue?.let { issue -> item { AccessIssueCard(issue, onBack) } }
+                state.error?.let { message -> item { DarkMessageCard(message, true, onRetryAudio) } }
+                state.notice?.let { message -> item { DarkMessageCard(message, false, null) } }
+                if (state.paused) item { DarkMessageCard("Room paused", false, null) }
+                if (state.ended) item { DarkMessageCard("Room ended", false, onBack) }
+                if (state.speakerInvitationPending) item {
+                    ElevatedCard(colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.LiveSurfaceElevated), shape = RoundedCornerShape(20.dp)) {
+                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text("Stage invite", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
+                            Text("Join as a speaker?", color = ConsumerColors.TextOnDarkSecondary)
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Button(onClick = onAcceptInvitation, enabled = !state.mutationBusy) { Text("Accept") }
+                                OutlinedButton(onClick = onRejectInvitation, enabled = !state.mutationBusy) { Text("Decline") }
+                            }
                         }
                     }
                 }
+                if (state.inRoom) {
+                    item { ListenerActions(state, onToggleHand) }
+                    item { SectionHeading("People", "${state.participants.size}") }
+                    itemsIndexed(state.participants.distinctBy { it.userId }, key = { index, participant -> "live-person:${participant.userId}:$index" }) { _, participant ->
+                        ParticipantCard(participant, viewerId)
+                    }
+                    item { ReactionsStrip(state.reactions) }
+                    item { SectionHeading("Room chat", null) }
+                    if (state.messages.isEmpty()) item { Text("Messages sent in this room will appear here.", color = ConsumerColors.TextOnDarkSecondary) }
+                    itemsIndexed(state.messages.distinctBy { it.id }, key = { index, message -> "live-chat:${message.id}:$index" }) { _, message ->
+                        ChatMessageCard(message, viewerId, onMessageReaction)
+                    }
+                }
             }
+
             if (state.inRoom) {
-                item { ListenerActions(state, onToggleHand, onReaction) }
-                item { SectionHeading("People", "${state.participants.size}") }
-                itemsIndexed(state.participants.distinctBy { it.userId }, key = { index, participant -> "live-person:${participant.userId}:$index" }) { _, participant ->
-                    ParticipantCard(participant, viewerId)
+                Column(
+                    Modifier.align(Alignment.CenterEnd).padding(end = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LiveFloatingAction(R.drawable.vc_icon_emoji, "Reactions") { showReactions = true }
+                    LiveFloatingAction(R.drawable.vc_icon_gift, "Gifts") { showGifts = true }
                 }
-                item { ReactionsStrip(state.reactions) }
-                item { SectionHeading("Chat", null) }
-                itemsIndexed(state.messages.distinctBy { it.id }, key = { index, message -> "live-chat:${message.id}:$index" }) { _, message ->
-                    ChatMessageCard(message, viewerId, onMessageReaction)
-                }
-                item { ChatComposer(enabled = state.conversationId != null && !state.mutationBusy, onSend = onSendMessage) }
-                item { SectionHeading("Gifts", null) }
-                if (state.gifts.isEmpty()) item { Text("Gifts unavailable", color = ConsumerColors.TextOnDarkSecondary) }
-                else item { GiftRow(state.gifts, state.mutationBusy, onGift) }
-                item { Spacer(Modifier.height(12.dp)); OutlinedButton(onClick = { onLeave(); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Leave room", maxLines = 1) } }
             }
         }
+    }
+}
+
+@Composable
+private fun LiveRoomTopBar(
+    title: String,
+    saved: Boolean,
+    busy: Boolean,
+    onBack: () -> Unit,
+    onSave: () -> Unit,
+    onLeave: () -> Unit,
+) {
+    Surface(color = ConsumerColors.DeepNavy, shadowElevation = 3.dp) {
+        Row(
+            Modifier.fillMaxWidth().padding(start = 2.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onBack) {
+                Canvas(Modifier.size(22.dp)) {
+                    val stroke = 2.2.dp.toPx()
+                    val color = ConsumerColors.TextOnDark
+                    drawLine(color, Offset(size.width * .78f, size.height * .5f), Offset(size.width * .24f, size.height * .5f), stroke, StrokeCap.Round)
+                    drawLine(color, Offset(size.width * .24f, size.height * .5f), Offset(size.width * .48f, size.height * .25f), stroke, StrokeCap.Round)
+                    drawLine(color, Offset(size.width * .24f, size.height * .5f), Offset(size.width * .48f, size.height * .75f), stroke, StrokeCap.Round)
+                }
+            }
+            Text(
+                title,
+                modifier = Modifier.weight(1f).padding(start = 2.dp, end = 4.dp),
+                color = ConsumerColors.TextOnDark,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            TextButton(enabled = !busy, onClick = onSave, contentPadding = PaddingValues(horizontal = 7.dp)) {
+                Text(if (saved) "Saved" else "Save", color = ConsumerColors.Ice, maxLines = 1)
+            }
+            TextButton(onClick = onLeave, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                Text("Leave", color = CommonColors.Error, fontWeight = FontWeight.Bold, maxLines = 1)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LiveFloatingAction(iconRes: Int, description: String, onClick: () -> Unit) {
+    SmallFloatingActionButton(onClick = onClick, containerColor = ConsumerColors.LiveSurfaceElevated, contentColor = ConsumerColors.TextOnDark) {
+        Icon(painterResource(iconRes), contentDescription = description, tint = ConsumerColors.TextOnDark, modifier = Modifier.size(23.dp))
     }
 }
 
@@ -207,8 +311,7 @@ private fun RoomRuntimeHeader(state: LiveRoomUiState, onRetryAudio: () -> Unit) 
     }
     Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Primary).padding(18.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(state.room?.title?.ifBlank { "Live conversation" } ?: "Live conversation", color = Color.White, style = MaterialTheme.typography.headlineMedium)
-            Text(rtcLabel, color = Color.White.copy(alpha = .9f), fontWeight = FontWeight.SemiBold)
+            Text("Live audio · $rtcLabel", color = Color.White, fontWeight = FontWeight.SemiBold)
             state.room?.let { room -> Text("${room.listenerCount} listeners  •  ${room.speakerCount} speakers", color = Color.White.copy(alpha = .85f)) }
             if (state.rtcState is RtcAudioState.Failed || (state.rtcState is RtcAudioState.Disconnected && state.inRoom)) {
                 TextButton(onClick = onRetryAudio) { Text("Retry audio", color = Color.White) }
@@ -218,16 +321,9 @@ private fun RoomRuntimeHeader(state: LiveRoomUiState, onRetryAudio: () -> Unit) 
 }
 
 @Composable
-private fun ListenerActions(state: LiveRoomUiState, onToggleHand: () -> Unit, onReaction: (String) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Button(onClick = onToggleHand, enabled = !state.mutationBusy && !state.paused, modifier = Modifier.fillMaxWidth()) {
-            Text(if (state.handRaised) "Lower hand" else "Raise hand", maxLines = 1)
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            listOf("👏", "❤️", "🔥", "😂", "🎉").forEach { emoji ->
-                FilledTonalButton(onClick = { onReaction(emoji) }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) { Text(emoji) }
-            }
-        }
+private fun ListenerActions(state: LiveRoomUiState, onToggleHand: () -> Unit) {
+    Button(onClick = onToggleHand, enabled = !state.mutationBusy && !state.paused, modifier = Modifier.fillMaxWidth()) {
+        Text(if (state.handRaised) "Lower hand" else "Raise hand", maxLines = 1)
     }
 }
 
@@ -272,7 +368,7 @@ private fun ChatMessageCard(message: RoomChatMessage, viewerId: String?, onReact
 }
 
 @Composable
-private fun ChatComposer(enabled: Boolean, onSend: (String) -> Unit) {
+private fun ChatComposer(enabled: Boolean, onSend: (String) -> Unit, modifier: Modifier = Modifier) {
     var text by rememberSaveable { mutableStateOf("") }
     val keyboard = LocalSoftwareKeyboardController.current
     fun submit() {
@@ -282,9 +378,9 @@ private fun ChatComposer(enabled: Boolean, onSend: (String) -> Unit) {
     OutlinedTextField(
         value = text,
         onValueChange = { text = it.take(1000) },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         enabled = enabled,
-        label = { Text("Message the room") },
+        placeholder = { Text("Message the room") },
         minLines = 1,
         maxLines = 4,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -342,7 +438,7 @@ private fun AccessIssueCard(issue: RoomAccessIssue, onBack: () -> Unit) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(issue.title, color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
             Text(issue.message, color = ConsumerColors.TextOnDarkSecondary)
-            OutlinedButton(onClick = onBack) { Text("Back to room details") }
+            OutlinedButton(onClick = onBack) { Text("Return to rooms") }
         }
     }
 }

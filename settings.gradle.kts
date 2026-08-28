@@ -39,3 +39,5 @@ include(":feature:live")
 include(":feature:hosting")
 
 include(":feature:economy")
+
+include(":feature:profile")
