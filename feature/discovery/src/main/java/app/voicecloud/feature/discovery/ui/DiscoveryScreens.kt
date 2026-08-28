@@ -695,6 +695,8 @@ fun MyProfileScreen(
     onSecurity: () -> Unit,
     onSafety: () -> Unit,
     onHelpPages: () -> Unit,
+    canSwitchToCreator: Boolean,
+    onSwitchToCreator: () -> Unit,
     onUpgrade: () -> Unit,
     onLogout: () -> Unit,
     onHome: () -> Unit,
@@ -755,6 +757,7 @@ fun MyProfileScreen(
                 }
                 item { SectionTitle("Support & information") }
                 item { OutlinedButton(onClick = onHelpPages, modifier = Modifier.fillMaxWidth()) { Text("Help, terms & information") } }
+                if (canSwitchToCreator) item { Button(onClick = onSwitchToCreator, modifier = Modifier.fillMaxWidth()) { Text("Switch to Creator") } }
             }
             if (isGuest) item { Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade guest account") } }
             item { OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Sign out") } }

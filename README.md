@@ -1,3 +1,42 @@
+# VoiceCloud Android — VC-ANDROID-PH10-R01
+
+PH10 implements the locked **Creator Portal Core, Dashboard, Profile, Settings & Support** phase on frozen PH09-R08 commit `10e820a005d363643bcfc5568e661de96a41dbc9`.
+
+## PH10 scope
+- dedicated `:feature:creator` module
+- separate `creator/*` portal shell/navigation
+- backend `CREATOR` role guard
+- Creator dashboard from `/creator/dashboard`
+- Creator profile from `/users/profile/me` + `/users/profile`
+- Creator settings from `/users/settings`
+- Creator/Host audience CMS from `/cms/creator/pages`
+- persisted Contact Support through `/contact`
+- Creator access application linkage from Creator Sign In
+- maintenance/restricted/session-expired handling
+- CREATOR-only `Switch to Creator` / `Switch to VoiceCloud` using the same authenticated account/token
+
+PH11–PH13 functionality is intentionally **not** pulled forward.
+
+## Acceptance
+Run only:
+```powershell
+scripts\VC-ANDROID-PH10-R01-ACCEPTANCE.cmd
+```
+
+The acceptance command retains the PH09-R08/PH08/PH07/PH06 critical regression gates and then executes the locked order: `compileDebugKotlin` → `compileStagingKotlin` → `compileReleaseKotlin` → unit tests → lint → assemblies → physical-device instrumentation.
+
+Do not Git-freeze PH10 until the Windows/device acceptance reaches:
+```text
+[PASS] VC-ANDROID-PH10-R01 acceptance commands completed successfully.
+```
+
+## Documentation
+- `docs/VC-ANDROID-PH10-R01-IMPLEMENTATION-REPORT.md`
+- `docs/VC-ANDROID-PH10-R01-AUTOMATED-EVIDENCE.md`
+- `docs/VC-ANDROID-PH10-R01-MANUAL-QA.md`
+
+---
+
 # VoiceCloud Android — VC-ANDROID-PH09-R08
 
 PH09 implements the locked **Preferences, Security, Safety, CMS & Support** phase on frozen PH08-R02 commit `1739f081ac386acca9a24b37863b72c4db952089`.

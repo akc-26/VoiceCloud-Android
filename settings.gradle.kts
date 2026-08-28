@@ -43,3 +43,5 @@ include(":feature:economy")
 include(":feature:profile")
 
 include(":feature:settings")
+
+include(":feature:creator")

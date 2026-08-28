@@ -2,6 +2,7 @@ package app.voicecloud.feature.auth.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.voicecloud.core.preferences.LastPortal
 import app.voicecloud.feature.auth.data.AuthApiException
 import app.voicecloud.feature.auth.data.AuthRepository
 import app.voicecloud.feature.auth.data.CreatorRoleRequiredException
@@ -179,6 +180,18 @@ class AuthViewModel @Inject constructor(
         _state.value = _state.value.copy(notice = response.message ?: "Your Creator access application has been submitted.")
     }
 
+    fun switchToCreatorPortal() = launchOperation(authenticated = true) {
+        val user = repository.switchPortal(LastPortal.CREATOR)
+        _state.value = _state.value.copy(user = user)
+        navigate(AuthScreen.CREATOR_READY, true)
+    }
+
+    fun switchToUserPortal() = launchOperation(authenticated = true) {
+        val user = repository.switchPortal(LastPortal.USER)
+        _state.value = _state.value.copy(user = user)
+        routeUser(user, clear = true)
+    }
+
     fun logout(allDevices: Boolean = false) = launchOperation(authenticated = true) {
         repository.logout(allDevices)
         _state.value = AuthUiState()
@@ -193,6 +206,10 @@ class AuthViewModel @Inject constructor(
                     _state.value = AuthUiState()
                     navigate(AuthScreen.SESSION_EXPIRED, true)
                 }
+                403 -> {
+                    _state.value = _state.value.copy(restrictedMessage = message?.takeIf { it.isNotBlank() })
+                    navigate(AuthScreen.RESTRICTED, true)
+                }
                 503 -> {
                     _state.value = _state.value.copy(maintenanceMessage = message?.takeIf { it.isNotBlank() })
                     navigate(AuthScreen.MAINTENANCE, true)
@@ -201,14 +218,14 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private suspend fun routeUser(user: AuthUser) {
+    private suspend fun routeUser(user: AuthUser, clear: Boolean = false) {
         if (repository.isRestrictedAccount(user)) {
             _state.value = _state.value.copy(restrictedMessage = "This account is currently restricted. Follow the account instructions or contact VoiceCloud support.")
             navigate(AuthScreen.RESTRICTED, true)
             return
         }
         val needsOnboarding = repository.requiresOnboarding(user)
-        navigate(if (needsOnboarding) AuthScreen.ONBOARDING else AuthScreen.USER_READY, true)
+        navigate(if (needsOnboarding) AuthScreen.ONBOARDING else AuthScreen.USER_READY, clear)
     }
 
     private suspend fun navigate(screen: AuthScreen, clear: Boolean = false) {
@@ -232,7 +249,7 @@ class AuthViewModel @Inject constructor(
                         _state.value = _state.value.copy(maintenanceMessage = e.apiError.message)
                         navigate(AuthScreen.MAINTENANCE, true)
                     }
-                    401 -> if (authenticated) navigate(AuthScreen.SESSION_EXPIRED, true)
+                    401 -> if (authenticated) { repository.invalidateLocalSession(); navigate(AuthScreen.SESSION_EXPIRED, true) }
                     else -> Unit
                 }
                 if (!(authenticated && e.apiError.httpStatus == 401) && e.apiError.httpStatus != 403 && e.apiError.httpStatus != 503) {

@@ -17,9 +17,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import app.voicecloud.core.model.MobileConfig
 import app.voicecloud.feature.auth.model.FirebaseClientConfig
+import app.voicecloud.feature.auth.model.VoiceCloudRole
 import app.voicecloud.feature.auth.ui.*
 import app.voicecloud.feature.bootstrap.BootstrapRoute
 import app.voicecloud.feature.discovery.ui.*
+import app.voicecloud.feature.creator.model.CreatorEvent
+import app.voicecloud.feature.creator.ui.*
 import app.voicecloud.feature.engagement.ui.*
 import app.voicecloud.feature.live.ui.*
 import app.voicecloud.feature.hosting.ui.*
@@ -126,6 +129,16 @@ object VoiceCloudRoutes {
     const val ContactSupport = "support/contact"
     const val About = "about"
 
+    // PH10 Creator Portal core graph. Later Creator feature phases remain separate.
+    const val CreatorDashboard = "creator/dashboard"
+    const val CreatorProfile = "creator/profile"
+    const val CreatorSettings = "creator/settings"
+    const val CreatorHelp = "creator/help"
+    const val CreatorCmsContent = "creator/content/{slug}"
+    const val CreatorContactSupport = "creator/support/contact"
+
+    fun creatorCmsContent(slug: String): String = "creator/content/${Uri.encode(slug.trim())}"
+
     fun economySection(section: app.voicecloud.feature.economy.model.EconomySection): String = "economy/${section.name}"
 
     fun replay(id: String): String = "replays/${Uri.encode(id.trim())}"
@@ -173,6 +186,8 @@ fun VoiceCloudNavHost(
     val profileState by profileViewModel.state.collectAsStateWithLifecycle()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
+    val creatorViewModel: CreatorViewModel = hiltViewModel()
+    val creatorState by creatorViewModel.state.collectAsStateWithLifecycle()
     var mobileConfig by remember { mutableStateOf<MobileConfig?>(null) }
     var resetToken by remember(initialResetToken) { mutableStateOf(initialResetToken.orEmpty()) }
     var pendingExternalRoute by remember(initialNavigationRoute) { mutableStateOf(initialNavigationRoute.orEmpty()) }
@@ -243,6 +258,14 @@ fun VoiceCloudNavHost(
             when (event) {
                 SettingsEvent.SessionExpired -> authViewModel.handleAuthenticatedFailure(401)
                 is SettingsEvent.Maintenance -> authViewModel.handleAuthenticatedFailure(503, event.message)
+            }
+        }
+    }
+
+    LaunchedEffect(creatorViewModel) {
+        creatorViewModel.events.collect { event ->
+            when (event) {
+                is CreatorEvent.AuthFailure -> authViewModel.handleAuthenticatedFailure(event.httpStatus, event.message)
             }
         }
     }
@@ -342,8 +365,110 @@ fun VoiceCloudNavHost(
             CreatorAccessScreen(state = authState, onSubmit = authViewModel::submitCreatorAccess, onBack = { open(VoiceCloudRoutes.CreatorSignIn) })
         }
         composable(VoiceCloudRoutes.CreatorReady) {
-            CreatorReadyScreen(state = authState, onLogout = { authViewModel.logout() }, onLogoutAll = { authViewModel.logout(allDevices = true) })
+            LaunchedEffect(authState.user?.id, authState.user?.role) {
+                if (authState.user?.normalizedRole == VoiceCloudRole.CREATOR) {
+                    navController.navigate(VoiceCloudRoutes.CreatorDashboard) {
+                        launchSingleTop = true
+                        popUpTo(VoiceCloudRoutes.CreatorReady) { inclusive = true }
+                    }
+                } else {
+                    open(VoiceCloudRoutes.Restricted)
+                }
+            }
         }
+        composable(VoiceCloudRoutes.CreatorDashboard) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                CreatorDashboardScreen(
+                    state = creatorState,
+                    creatorName = authState.user?.displayName.orEmpty(),
+                    onLoad = creatorViewModel::loadDashboard,
+                    onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
+                    onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
+                    onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorProfile) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                CreatorProfileScreen(
+                    state = creatorState,
+                    onLoad = creatorViewModel::loadProfile,
+                    onSave = creatorViewModel::saveProfile,
+                    onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
+                    onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
+                    onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorSettings) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                CreatorSettingsScreen(
+                    state = creatorState,
+                    onLoad = creatorViewModel::loadSettings,
+                    onSave = creatorViewModel::saveSettings,
+                    onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
+                    onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
+                    onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorHelp) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                CreatorHelpScreen(
+                    state = creatorState,
+                    onLoad = creatorViewModel::loadCmsPages,
+                    onOpenPage = { open(VoiceCloudRoutes.creatorCmsContent(it)) },
+                    onContact = { open(VoiceCloudRoutes.CreatorContactSupport) },
+                    onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
+                    onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
+                    onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorCmsContent) { entry ->
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                val slug = Uri.decode(entry.arguments?.getString("slug").orEmpty())
+                DisposableEffect(slug) { onDispose { creatorViewModel.clearCmsPage() } }
+                CreatorCmsContentScreen(
+                    state = creatorState,
+                    slug = slug,
+                    onLoad = { creatorViewModel.loadCmsPage(slug) },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorContactSupport) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                CreatorContactSupportScreen(
+                    state = creatorState,
+                    defaultName = authState.user?.displayName.orEmpty(),
+                    defaultEmail = authState.user?.email.orEmpty(),
+                    onSubmit = creatorViewModel::contact,
+                    onBack = { navController.popBackStack() },
+                )
+            }
+        }
+
         composable(VoiceCloudRoutes.Restricted) {
             RestrictedScreen(state = authState, onSignIn = { open(VoiceCloudRoutes.UserSignIn) }, onPortal = { open(VoiceCloudRoutes.PortalSelector) })
         }
@@ -564,6 +689,8 @@ fun VoiceCloudNavHost(
                 onSecurity = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Security) },
                 onSafety = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.SafetyCenter) },
                 onHelpPages = { open(VoiceCloudRoutes.HelpCenter) },
+                canSwitchToCreator = authState.user?.normalizedRole == VoiceCloudRole.CREATOR,
+                onSwitchToCreator = authViewModel::switchToCreatorPortal,
                 onUpgrade = { open(VoiceCloudRoutes.GuestUpgrade) },
                 onLogout = { authViewModel.logout() },
                 onHome = { open(VoiceCloudRoutes.Home) },
@@ -1160,6 +1287,6 @@ private fun routeFor(screen: AuthScreen): String = when (screen) {
     AuthScreen.USER_READY -> VoiceCloudRoutes.UserReady
     AuthScreen.CREATOR_SIGN_IN -> VoiceCloudRoutes.CreatorSignIn
     AuthScreen.CREATOR_ACCESS -> VoiceCloudRoutes.CreatorAccess
-    AuthScreen.CREATOR_READY -> VoiceCloudRoutes.CreatorReady
+    AuthScreen.CREATOR_READY -> VoiceCloudRoutes.CreatorDashboard
     AuthScreen.MAINTENANCE -> VoiceCloudRoutes.Maintenance
 }

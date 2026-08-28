@@ -1,3 +1,13 @@
+# VC-ANDROID-PH10-R01
+- Parent: `VoiceCloud-Android-VC-ANDROID-PH09-R08` @ `10e820a005d363643bcfc5568e661de96a41dbc9`.
+- Adds isolated `:feature:creator` for Creator Portal Core, Dashboard, Profile, Settings, Creator CMS and Support.
+- Replaces the PH02 Creator-ready dead-end with the CREATOR-role-authorized PH10 dashboard handoff.
+- Adds CREATOR-only cross-portal switching without a second account or token and clears the prior portal back stack.
+- Uses only canonical R06 Creator/shared-user/CMS/contact/maintenance endpoints required by PH10.
+- Preserves PH11 live/schedule, PH12 audience/messages/subscribers/plans and PH13 analytics/financial/verification scope boundaries.
+- Retains PH09-R08 security/Windows/device/warning regressions plus PH08 payment, PH07 ADB and PH06 hosting regressions.
+- Use only `scripts\VC-ANDROID-PH10-R01-ACCEPTANCE.cmd` for workstation acceptance.
+
 # VC-ANDROID-PH09-R08
 - Closes the R07 Gate-7 PowerShell parser failure caused by unbraced `$UserId:` / `$currentUser:` interpolation.
 - Adds a real Windows PowerShell parser gate for every `scripts/*.ps1` before any Python/Gradle acceptance work.

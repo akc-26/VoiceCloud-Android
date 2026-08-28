@@ -255,6 +255,22 @@ class AuthRepository @Inject constructor(
         )))
     }
 
+    /** Switches portal preference without creating a second account or token. Creator entry remains role-authoritative. */
+    suspend fun switchPortal(target: LastPortal): AuthUser {
+        val user = requireBody(authenticatedApi.me())
+        if (isRestricted(user)) {
+            throw AuthApiException(ApiError(httpStatus = 403, message = "This account is currently restricted."))
+        }
+        if (target == LastPortal.CREATOR && user.normalizedRole != VoiceCloudRole.CREATOR) {
+            throw CreatorRoleRequiredException()
+        }
+        if (user.normalizedRole in setOf(VoiceCloudRole.ADMIN, VoiceCloudRole.SUPER_ADMIN)) {
+            throw AuthApiException(ApiError(httpStatus = 403, message = "Administrative accounts are not available in the VoiceCloud Android portals."))
+        }
+        preferences.setLastPortal(target)
+        return user
+    }
+
     /** FCM registration foundation: the future Firebase token provider feeds this method without changing API authority. */
     suspend fun registerPushToken(pushToken: String) = registerDeviceFoundation(pushToken.trim().takeIf { it.isNotEmpty() })
 
