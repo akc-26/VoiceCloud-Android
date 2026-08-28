@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 
@@ -111,7 +112,7 @@ private fun LoadingScreen() {
         ) {
             VoiceCloudBrandMark(72.dp, Modifier.scale(pulse))
             Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineMedium)
-            Text("Real voices. Real connections.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase("Real Voices. Real Connections."), color = MaterialTheme.colorScheme.onSurfaceVariant)
             LinearProgressIndicator(Modifier.width(120.dp), strokeCap = StrokeCap.Round)
         }
     }
@@ -139,13 +140,13 @@ private fun MessageScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 VoiceCloudBrandMark()
-                Text(title, style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-                Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+                Text(voiceCloudTitleCase(message), color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                 caption?.let {
-                    Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                    Text(voiceCloudTitleCase(it), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                 }
                 action?.let {
-                    Button(onClick = onAction, modifier = Modifier.fillMaxWidth()) { Text(it) }
+                    Button(onClick = onAction, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(it)) }
                 }
             }
         }
@@ -184,7 +185,7 @@ private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: 
             VoiceCloudBrandMark(68.dp)
             Spacer(Modifier.height(18.dp))
             Text(VoiceCloudBrand.name, style = MaterialTheme.typography.displaySmall)
-            Text("Android foundation is ready", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Text(voiceCloudTitleCase("Getting VoiceCloud Ready"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(28.dp))
             Card(shape = RoundedCornerShape(24.dp)) {
                 Column(
@@ -200,11 +201,7 @@ private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: 
                     )
                     StatusRow("Live audio", if (liveKitAvailable) "Available" else "Backend controlled")
                     HorizontalDivider()
-                    Text(
-                        "Secure account access is loading. PH02 adds User and Creator authentication without exposing later product modules.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(voiceCloudTitleCase("Secure Account Access Is Loading"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -217,8 +214,8 @@ private fun StatusRow(label: String, value: String) {
         Box(Modifier.size(9.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
-            Text(label, fontWeight = FontWeight.SemiBold)
-            Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(label), fontWeight = FontWeight.SemiBold)
+            Text(voiceCloudTitleCase(value), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

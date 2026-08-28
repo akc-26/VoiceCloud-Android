@@ -1,5 +1,6 @@
 package app.voicecloud.feature.live.ui
 
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 
 import androidx.compose.foundation.Canvas
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
@@ -50,6 +52,7 @@ fun RoomPreviewScreen(
     onBack: () -> Unit,
 ) {
     LaunchedEffect(roomId) { onLoad() }
+    VoiceCloudToastEffect(state.error, state.notice)
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { VoiceCloudPageTopBar(title = "Room", onBack = onBack) },
@@ -60,7 +63,6 @@ fun RoomPreviewScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (state.loading) item { LoadingBlock() }
-            state.error?.let { message -> item { ErrorBlock(message, onLoad) } }
             state.room?.let { room ->
                 item {
                     Box(
@@ -70,15 +72,15 @@ fun RoomPreviewScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(Modifier.size(10.dp).clip(CircleShape).background(if (room.isLive) CommonColors.Error else MaterialTheme.colorScheme.outline))
                                 Spacer(Modifier.width(8.dp))
-                                Text(if (room.isLive) "LIVE" else room.status.ifBlank { "ROOM" }, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                                Text(voiceCloudTitleCase(if (room.isLive) "LIVE" else room.status.ifBlank { "ROOM" }), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
                                 Spacer(Modifier.weight(1f))
-                                TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) { Text(if (state.saved) "Saved" else "Save") }
+                                TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) { Text(voiceCloudTitleCase(if (state.saved) "Saved" else "Save")) }
                             }
                             Text(room.title.ifBlank { "${VoiceCloudBrand.name} Room" }, style = MaterialTheme.typography.headlineMedium, color = ConsumerColors.Ink)
                             if (!room.description.isNullOrBlank()) Text(room.description, color = ConsumerColors.Text, maxLines = 3, overflow = TextOverflow.Ellipsis)
                             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                                Text("${room.listenerCount} listening", style = MaterialTheme.typography.bodyMedium)
-                                Text("${room.speakerCount} speakers", style = MaterialTheme.typography.bodyMedium)
+                                Text(voiceCloudTitleCase("${room.listenerCount} Listening"), style = MaterialTheme.typography.bodyMedium)
+                                Text(voiceCloudTitleCase("${room.speakerCount} Speakers"), style = MaterialTheme.typography.bodyMedium)
                             }
                             val metadata = listOf(room.category, room.language).filter { it.isNotBlank() }
                             if (metadata.isNotEmpty()) Text(metadata.joinToString("  •  "), color = ConsumerColors.TextMuted)
@@ -88,7 +90,7 @@ fun RoomPreviewScreen(
                 val restrictions = room.restrictionLabels()
                 if (restrictions.isNotEmpty()) item {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Access", style = MaterialTheme.typography.titleMedium)
+                        Text(voiceCloudTitleCase("Access"), style = MaterialTheme.typography.titleMedium)
                         restrictions.forEach { label ->
                             Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(14.dp)) {
                                 Text(label, Modifier.padding(horizontal = 12.dp, vertical = 9.dp), fontWeight = FontWeight.SemiBold)
@@ -102,7 +104,7 @@ fun RoomPreviewScreen(
                         enabled = room.isJoinablePresentation() && !state.joining,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
                         shape = RoundedCornerShape(16.dp),
-                    ) { Text(if (state.joining) "Joining…" else if (room.isJoinablePresentation()) "Join room" else "Unavailable", maxLines = 1) }
+                    ) { Text(voiceCloudTitleCase(if (state.joining) "Joining…" else if (room.isJoinablePresentation()) "Join room" else "Unavailable"), maxLines = 1) }
                 }
             }
         }
@@ -153,7 +155,7 @@ fun LiveRoomScreen(
     if (showReactions) {
         ModalBottomSheet(onDismissRequest = { showReactions = false }, containerColor = ConsumerColors.LiveSurfaceElevated) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Text("Send a reaction", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
+                Text(voiceCloudTitleCase("Send A Reaction"), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     itemsIndexed(listOf("👏", "❤️", "🔥", "😂", "🎉", "😍", "😮", "💯", "🙌", "✨")) { _, emoji ->
                         FilledTonalButton(onClick = { onReaction(emoji); showReactions = false }) { Text(emoji, style = MaterialTheme.typography.headlineSmall) }
@@ -166,8 +168,8 @@ fun LiveRoomScreen(
     if (showGifts) {
         ModalBottomSheet(onDismissRequest = { showGifts = false }, containerColor = ConsumerColors.LiveSurfaceElevated) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Send a gift", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
-                if (state.gifts.isEmpty()) Text("Gifts are unavailable for this room.", color = ConsumerColors.TextOnDarkSecondary)
+                Text(voiceCloudTitleCase("Send A Gift"), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
+                if (state.gifts.isEmpty()) Text(voiceCloudTitleCase("Gifts Are Unavailable For This Room."), color = ConsumerColors.TextOnDarkSecondary)
                 else GiftRow(state.gifts, state.mutationBusy) { gift -> onGift(gift); showGifts = false }
                 Spacer(Modifier.height(20.dp))
             }
@@ -208,18 +210,16 @@ fun LiveRoomScreen(
                 item { RoomRuntimeHeader(state, onRetryAudio) }
                 if (state.joining) item { Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = ConsumerColors.Ice) } }
                 state.accessIssue?.let { issue -> item { AccessIssueCard(issue, onBack) } }
-                state.error?.let { message -> item { DarkMessageCard(message, true, onRetryAudio) } }
-                state.notice?.let { message -> item { DarkMessageCard(message, false, null) } }
                 if (state.paused) item { DarkMessageCard("Room paused", false, null) }
                 if (state.ended) item { DarkMessageCard("Room ended", false, onBack) }
                 if (state.speakerInvitationPending) item {
                     ElevatedCard(colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.LiveSurfaceElevated), shape = RoundedCornerShape(20.dp)) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Text("Stage invite", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
-                            Text("Join as a speaker?", color = ConsumerColors.TextOnDarkSecondary)
+                            Text(voiceCloudTitleCase("Stage Invite"), color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
+                            Text(voiceCloudTitleCase("Join As A Speaker?"), color = ConsumerColors.TextOnDarkSecondary)
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                Button(onClick = onAcceptInvitation, enabled = !state.mutationBusy) { Text("Accept") }
-                                OutlinedButton(onClick = onRejectInvitation, enabled = !state.mutationBusy) { Text("Decline") }
+                                Button(onClick = onAcceptInvitation, enabled = !state.mutationBusy) { Text(voiceCloudTitleCase("Accept")) }
+                                OutlinedButton(onClick = onRejectInvitation, enabled = !state.mutationBusy) { Text(voiceCloudTitleCase("Decline")) }
                             }
                         }
                     }
@@ -232,7 +232,7 @@ fun LiveRoomScreen(
                     }
                     item { ReactionsStrip(state.reactions) }
                     item { SectionHeading("Room chat", null) }
-                    if (state.messages.isEmpty()) item { Text("Messages sent in this room will appear here.", color = ConsumerColors.TextOnDarkSecondary) }
+                    if (state.messages.isEmpty()) item { Text(voiceCloudTitleCase("Messages Sent In This Room Will Appear Here."), color = ConsumerColors.TextOnDarkSecondary) }
                     itemsIndexed(state.messages.distinctBy { it.id }, key = { index, message -> "live-chat:${message.id}:$index" }) { _, message ->
                         ChatMessageCard(message, viewerId, onMessageReaction)
                     }
@@ -287,13 +287,13 @@ private fun LiveRoomTopBar(
                 overflow = TextOverflow.Ellipsis,
             )
             TextButton(enabled = !busy, onClick = onSave, contentPadding = PaddingValues(horizontal = 5.dp)) {
-                Text(if (saved) "Saved" else "Save", color = ConsumerColors.Ice, maxLines = 1)
+                Text(voiceCloudTitleCase(if (saved) "Saved" else "Save"), color = ConsumerColors.Ice, maxLines = 1)
             }
             TextButton(enabled = !busy, onClick = onReport, contentPadding = PaddingValues(horizontal = 5.dp)) {
-                Text("Report", color = ConsumerColors.TextOnDarkSecondary, maxLines = 1)
+                Text(voiceCloudTitleCase("Report"), color = ConsumerColors.TextOnDarkSecondary, maxLines = 1)
             }
             TextButton(onClick = onLeave, contentPadding = PaddingValues(horizontal = 6.dp)) {
-                Text("Leave", color = CommonColors.Error, fontWeight = FontWeight.Bold, maxLines = 1)
+                Text(voiceCloudTitleCase("Leave"), color = CommonColors.Error, fontWeight = FontWeight.Bold, maxLines = 1)
             }
         }
     }
@@ -317,10 +317,10 @@ private fun RoomRuntimeHeader(state: LiveRoomUiState, onRetryAudio: () -> Unit) 
     }
     Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Primary).padding(18.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Live audio · $rtcLabel", color = Color.White, fontWeight = FontWeight.SemiBold)
-            state.room?.let { room -> Text("${room.listenerCount} listeners  •  ${room.speakerCount} speakers", color = Color.White.copy(alpha = .85f)) }
+            Text(voiceCloudTitleCase("Live Audio · $rtcLabel"), color = Color.White, fontWeight = FontWeight.SemiBold)
+            state.room?.let { room -> Text(voiceCloudTitleCase("${room.listenerCount} Listeners  •  ${room.speakerCount} Speakers"), color = Color.White.copy(alpha = .85f)) }
             if (state.rtcState is RtcAudioState.Failed || (state.rtcState is RtcAudioState.Disconnected && state.inRoom)) {
-                TextButton(onClick = onRetryAudio) { Text("Retry audio", color = Color.White) }
+                TextButton(onClick = onRetryAudio) { Text(voiceCloudTitleCase("Retry Audio"), color = Color.White) }
             }
         }
     }
@@ -329,7 +329,7 @@ private fun RoomRuntimeHeader(state: LiveRoomUiState, onRetryAudio: () -> Unit) 
 @Composable
 private fun ListenerActions(state: LiveRoomUiState, onToggleHand: () -> Unit) {
     Button(onClick = onToggleHand, enabled = !state.mutationBusy && !state.paused, modifier = Modifier.fillMaxWidth()) {
-        Text(if (state.handRaised) "Lower hand" else "Raise hand", maxLines = 1)
+        Text(voiceCloudTitleCase(if (state.handRaised) "Lower hand" else "Raise hand"), maxLines = 1)
     }
 }
 
@@ -344,11 +344,11 @@ private fun ParticipantCard(participant: RtcPresenceState, viewerId: String?) {
             Column(Modifier.weight(1f)) {
                 Text(participant.username?.takeIf { it.isNotBlank() } ?: if (participant.userId == viewerId) "You" else "${VoiceCloudBrand.name} member", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 val role = participant.role.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
-                Text(role, color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodyMedium)
+                Text(voiceCloudTitleCase(role), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodyMedium)
             }
-            if (participant.handRaised) Text("✋")
-            if (participant.isSpeaking) Text("  Speaking", color = ConsumerColors.Ice, style = MaterialTheme.typography.labelLarge)
-            else if (participant.isMuted && participant.role.lowercase() != "listener") Text("  Muted", color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelLarge)
+            if (participant.handRaised) Text(voiceCloudTitleCase("✋"))
+            if (participant.isSpeaking) Text(voiceCloudTitleCase("  Speaking"), color = ConsumerColors.Ice, style = MaterialTheme.typography.labelLarge)
+            else if (participant.isMuted && participant.role.lowercase() != "listener") Text(voiceCloudTitleCase("  Muted"), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelLarge)
         }
     }
 }
@@ -386,12 +386,12 @@ private fun ChatComposer(enabled: Boolean, onSend: (String) -> Unit, modifier: M
         onValueChange = { text = it.take(1000) },
         modifier = modifier,
         enabled = enabled,
-        placeholder = { Text("Message the room") },
+        placeholder = { Text(voiceCloudTitleCase("Message The Room")) },
         minLines = 1,
         maxLines = 4,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
         keyboardActions = KeyboardActions(onSend = { submit() }),
-        trailingIcon = { TextButton(onClick = { submit() }, enabled = enabled && text.isNotBlank()) { Text("Send") } },
+        trailingIcon = { TextButton(onClick = { submit() }, enabled = enabled && text.isNotBlank()) { Text(voiceCloudTitleCase("Send")) } },
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = ConsumerColors.TextOnDark,
             unfocusedTextColor = ConsumerColors.TextOnDark,
@@ -413,9 +413,9 @@ private fun GiftRow(gifts: List<GiftCatalogItem>, busy: Boolean, onGift: (GiftCa
                 shape = RoundedCornerShape(18.dp),
             ) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("🎁", style = MaterialTheme.typography.headlineMedium)
+                    Text(voiceCloudTitleCase("🎁"), style = MaterialTheme.typography.headlineMedium)
                     Text(gift.name, color = ConsumerColors.TextOnDark, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("${gift.coinPrice} coins", color = ConsumerColors.VipGold, style = MaterialTheme.typography.bodyMedium)
+                    Text(voiceCloudTitleCase("${gift.coinPrice} Coins"), color = ConsumerColors.VipGold, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -433,7 +433,7 @@ private fun ReactionsStrip(reactions: List<RoomReaction>) {
 @Composable
 private fun SectionHeading(title: String, meta: String?) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+        Text(voiceCloudTitleCase(title), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
         if (!meta.isNullOrBlank()) Text(meta, color = ConsumerColors.TextOnDarkSecondary)
     }
 }
@@ -442,9 +442,9 @@ private fun SectionHeading(title: String, meta: String?) {
 private fun AccessIssueCard(issue: RoomAccessIssue, onBack: () -> Unit) {
     ElevatedCard(colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.LiveSurface), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(issue.title, color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
-            Text(issue.message, color = ConsumerColors.TextOnDarkSecondary)
-            OutlinedButton(onClick = onBack) { Text("Return to rooms") }
+            Text(voiceCloudTitleCase(issue.title), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge)
+            Text(voiceCloudTitleCase(issue.message), color = ConsumerColors.TextOnDarkSecondary)
+            OutlinedButton(onClick = onBack) { Text(voiceCloudTitleCase("Return To Rooms")) }
         }
     }
 }
@@ -453,20 +453,10 @@ private fun AccessIssueCard(issue: RoomAccessIssue, onBack: () -> Unit) {
 private fun DarkMessageCard(message: String, error: Boolean, action: (() -> Unit)?) {
     Surface(color = if (error) CommonColors.Error.copy(alpha = .18f) else ConsumerColors.LiveSurface, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(message, color = ConsumerColors.TextOnDark, modifier = Modifier.weight(1f))
-            if (action != null) TextButton(onClick = action) { Text(if (error) "Retry" else "Continue") }
+            Text(voiceCloudTitleCase(message), color = ConsumerColors.TextOnDark, modifier = Modifier.weight(1f))
+            if (action != null) TextButton(onClick = action) { Text(voiceCloudTitleCase(if (error) "Retry" else "Continue")) }
         }
     }
 }
 
 @Composable private fun LoadingBlock() = Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-
-@Composable
-private fun ErrorBlock(message: String, retry: () -> Unit) {
-    ElevatedCard(shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(message, color = MaterialTheme.colorScheme.error)
-            OutlinedButton(onClick = retry) { Text("Try again") }
-        }
-    }
-}

@@ -1,9 +1,7 @@
 package app.voicecloud.feature.profile.ui
 
-import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.text.Html
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -25,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
 import app.voicecloud.feature.profile.model.*
@@ -39,15 +39,13 @@ import kotlin.math.max
 fun ProfileToolsScreen(
     state: ProfileUiState,
     onLoad: () -> Unit,
-    onEditProfile: () -> Unit,
     onReplays: () -> Unit,
     onActivity: () -> Unit,
     onVisitors: () -> Unit,
-    onBlockedUsers: () -> Unit,
     onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad() }
-    ProfilePage(title = "Profile & activity", subtitle = "Manage your profile, replays and account activity.", onBack = onBack) {
+    ProfilePage(title = "Activity & Replays", subtitle = "Your Replays, Room Activity And Profile Visitors.", onBack = onBack) {
         StatusCards(state)
         state.profile?.let { profile ->
             ElevatedCard(shape = RoundedCornerShape(24.dp)) {
@@ -68,18 +66,16 @@ fun ProfileToolsScreen(
                         Spacer(Modifier.width(14.dp))
                         Column(Modifier.weight(1f)) {
                             Text(profile.displayName.ifBlank { profile.username }, style = MaterialTheme.typography.titleLarge)
-                            if (profile.username.isNotBlank()) Text("@${profile.username}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("Profile complete · ${profile.profileCompletionPercentage}%", style = MaterialTheme.typography.bodyMedium)
+                            if (profile.username.isNotBlank()) Text(voiceCloudTitleCase("@${profile.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(voiceCloudTitleCase("Profile Complete · ${profile.profileCompletionPercentage}%"), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
             }
         }
-        ProfileToolButton("Edit profile", "Update bio, country, interests, avatar and cover.", onEditProfile)
         ProfileToolButton("Replays", "Listen to recordings you are authorized to access.", onReplays)
         ProfileToolButton("My activity", "Review your recent room participation.", onActivity)
         ProfileToolButton("Profile visitors", "See backend-authorized visitor history and statistics.", onVisitors)
-        ProfileToolButton("Blocked users", "Review and unblock accounts you have blocked.", onBlockedUsers)
     }
 }
 
@@ -103,12 +99,35 @@ fun EditProfileScreen(
     var country by remember(profile?.country) { mutableStateOf(profile?.country.orEmpty()) }
     var interests by remember(profile?.interests) { mutableStateOf(profile?.interests.orEmpty().joinToString(", ")) }
     val context = LocalContext.current
+    var pendingAvatar by remember { mutableStateOf<Uri?>(null) }
+    var pendingCover by remember { mutableStateOf<Uri?>(null) }
 
-    val avatarPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let { readSelectedMedia(context, it)?.let { media -> onUploadAvatar(media.bytes, media.fileName, media.mimeType) } }
+    val avatarPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> pendingAvatar = uri }
+    val coverPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> pendingCover = uri }
+
+    pendingAvatar?.let { uri ->
+        ProfileImageCropDialog(
+            context = context,
+            uri = uri,
+            kind = ProfileCropKind.AVATAR,
+            onDismiss = { pendingAvatar = null },
+            onConfirm = { media ->
+                pendingAvatar = null
+                onUploadAvatar(media.bytes, media.fileName, media.mimeType)
+            },
+        )
     }
-    val coverPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let { readSelectedMedia(context, it)?.let { media -> onUploadCover(media.bytes, media.fileName, media.mimeType) } }
+    pendingCover?.let { uri ->
+        ProfileImageCropDialog(
+            context = context,
+            uri = uri,
+            kind = ProfileCropKind.COVER,
+            onDismiss = { pendingCover = null },
+            onConfirm = { media ->
+                pendingCover = null
+                onUploadCover(media.bytes, media.fileName, media.mimeType)
+            },
+        )
     }
 
     ProfilePage(title = "Edit profile", subtitle = "Only backend-supported profile fields are editable here.", onBack = onBack) {
@@ -127,10 +146,10 @@ fun EditProfileScreen(
                             Button(
                                 onClick = { avatarPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                                 enabled = !state.mutating,
-                            ) { Text("Change photo") }
-                            Text("Recommended: 800 × 800 px (square)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            ) { Text(voiceCloudTitleCase("Change Photo")) }
+                            Text(voiceCloudTitleCase("Preview And Adjust Any Image Before Uploading."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             if (!profile.avatarUrl.isNullOrBlank()) {
-                                TextButton(onClick = onDeleteAvatar, enabled = !state.mutating) { Text("Remove photo") }
+                                TextButton(onClick = onDeleteAvatar, enabled = !state.mutating) { Text(voiceCloudTitleCase("Remove Photo")) }
                             }
                         }
                     }
@@ -140,12 +159,12 @@ fun EditProfileScreen(
                                 onClick = { coverPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                                 enabled = !state.mutating,
                                 modifier = Modifier.weight(1f),
-                            ) { Text("Change cover") }
+                            ) { Text(voiceCloudTitleCase("Change Cover")) }
                             if (!profile.coverUrl.isNullOrBlank()) {
-                                TextButton(onClick = onDeleteCover, enabled = !state.mutating, modifier = Modifier.weight(1f)) { Text("Remove cover") }
+                                TextButton(onClick = onDeleteCover, enabled = !state.mutating, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Remove Cover")) }
                             }
                         }
-                        Text("Recommended: 1600 × 600 px", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(voiceCloudTitleCase("Any Image Size Is Accepted And Resized After Your Crop."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Spacer(Modifier.height(10.dp))
                 }
@@ -158,7 +177,7 @@ fun EditProfileScreen(
             OutlinedTextField(
                 value = bio,
                 onValueChange = { bio = it.take(300) },
-                label = { Text("Bio") },
+                label = { Text(voiceCloudTitleCase("Bio")) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
@@ -166,15 +185,15 @@ fun EditProfileScreen(
             OutlinedTextField(
                 value = country,
                 onValueChange = { country = it.take(80) },
-                label = { Text("Country") },
+                label = { Text(voiceCloudTitleCase("Country")) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
             OutlinedTextField(
                 value = interests,
                 onValueChange = { interests = it.take(240) },
-                label = { Text("Interests") },
-                supportingText = { Text("Separate interests with commas") },
+                label = { Text(voiceCloudTitleCase("Interests")) },
+                supportingText = { Text(voiceCloudTitleCase("Separate Interests With Commas")) },
                 modifier = Modifier.fillMaxWidth(),
             )
             ReadOnlyIdentityField("Language", profile.preferredLanguage.orEmpty().ifBlank { "en" })
@@ -191,7 +210,7 @@ fun EditProfileScreen(
                 },
                 enabled = !state.mutating,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(if (state.mutating) "Saving…" else "Save profile") }
+            ) { Text(voiceCloudTitleCase(if (state.mutating) "Saving…" else "Save profile")) }
         }
     }
 }
@@ -237,7 +256,7 @@ fun ReplayPlayerScreen(
         if (replay != null) {
             RemoteMedia(replay.coverUrl, "Replay artwork", Modifier.fillMaxWidth().height(220.dp).clip(RoundedCornerShape(24.dp)), replay.title)
             Text(replay.title, style = MaterialTheme.typography.headlineMedium)
-            replay.hostName?.let { Text("Hosted by $it", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            replay.hostName?.let { Text(voiceCloudTitleCase("Hosted By $it"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
             val status = replay.status.uppercase()
             val explicitlyDenied = replay.accessAllowed == false
             val processing = status in setOf("PROCESSING", "PENDING", "QUEUED")
@@ -249,8 +268,8 @@ fun ReplayPlayerScreen(
                 replay.playbackUrl.isNullOrBlank() -> EmptyCard("Replay unavailable", "No playable recording is available from the server.")
                 else -> ReplayAudioControls(url = replay.playbackUrl)
             }
-            if (replay.durationSeconds > 0) Text("Duration · ${formatDuration(replay.durationSeconds)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            replay.createdAt?.let { Text("Recorded · ${formatTimestamp(it)}", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            if (replay.durationSeconds > 0) Text(voiceCloudTitleCase("Duration · ${formatDuration(replay.durationSeconds)}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            replay.createdAt?.let { Text(voiceCloudTitleCase("Recorded · ${formatTimestamp(it)}"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
         } else if (!state.loading) {
             EmptyCard("Replay unavailable", "This recording could not be loaded.")
         }
@@ -267,11 +286,11 @@ fun ActivityHistoryScreen(state: ProfileUiState, onLoad: () -> Unit, onBack: () 
             ElevatedCard(shape = RoundedCornerShape(20.dp)) {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Text(item.roomTitle ?: item.title, style = MaterialTheme.typography.titleMedium)
-                    item.hostName?.let { Text("Host · $it", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    item.hostName?.let { Text(voiceCloudTitleCase("Host · $it"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     Text(item.type.replace('_', ' ').lowercase().replaceFirstChar { it.titlecase() }, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                     val time = item.joinedAt ?: item.createdAt
                     time?.let { Text(formatTimestamp(it), color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                    if (item.durationSeconds > 0) Text("Duration · ${formatDuration(item.durationSeconds)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (item.durationSeconds > 0) Text(voiceCloudTitleCase("Duration · ${formatDuration(item.durationSeconds)}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -294,7 +313,7 @@ fun BlockedUsersScreen(
                 OutlinedButton(
                     onClick = { onUnblock(entry.blockedUserId.ifBlank { entry.person.id }) },
                     enabled = !state.mutating,
-                ) { Text("Unblock") }
+                ) { Text(voiceCloudTitleCase("Unblock")) }
             })
         }
     }
@@ -359,7 +378,7 @@ fun HelpPageScreen(
             }
             if (readable.isBlank()) EmptyCard("Content unavailable", "This page does not currently contain published content.")
             else Text(readable, style = MaterialTheme.typography.bodyLarge)
-            page.updatedAt?.let { Text("Updated · ${formatTimestamp(it)}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            page.updatedAt?.let { Text(voiceCloudTitleCase("Updated · ${formatTimestamp(it)}"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         } else if (!state.loading) {
             EmptyCard("Page unavailable", "This page could not be loaded.")
         }
@@ -396,33 +415,24 @@ private fun ProfilePage(
 private fun ProfileToolButton(title: String, subtitle: String, onClick: () -> Unit) {
     ElevatedCard(onClick = onClick, shape = RoundedCornerShape(22.dp)) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
+            Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
 
 @Composable
 private fun StatusCards(state: ProfileUiState) {
+    VoiceCloudToastEffect(state.error, state.notice)
     if (state.loading || state.mutating) LinearProgressIndicator(Modifier.fillMaxWidth())
-    state.notice?.let { message ->
-        Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp)) {
-            Text(message, Modifier.fillMaxWidth().padding(14.dp), color = MaterialTheme.colorScheme.onPrimaryContainer)
-        }
-    }
-    state.error?.let { message ->
-        Surface(color = MaterialTheme.colorScheme.errorContainer, shape = RoundedCornerShape(16.dp)) {
-            Text(message, Modifier.fillMaxWidth().padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
-        }
-    }
 }
 
 @Composable
 private fun EmptyCard(title: String, body: String) {
     Surface(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
+            Text(voiceCloudTitleCase(body), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -433,7 +443,7 @@ private fun ReadOnlyIdentityField(label: String, value: String) {
         value = value,
         onValueChange = {},
         readOnly = true,
-        label = { Text(label) },
+        label = { Text(voiceCloudTitleCase(label)) },
         modifier = Modifier.fillMaxWidth(),
     )
 }
@@ -451,7 +461,7 @@ private fun PersonCard(person: PersonSummary, subtitle: String? = null, trailing
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(person.displayName.ifBlank { person.username.ifBlank { "VoiceCloud member" } }, style = MaterialTheme.typography.titleMedium)
-                if (person.username.isNotBlank()) Text("@${person.username}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (person.username.isNotBlank()) Text(voiceCloudTitleCase("@${person.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 subtitle?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
             trailing?.invoke()
@@ -464,7 +474,7 @@ private fun MetricCard(value: String, label: String, modifier: Modifier = Modifi
     Surface(modifier = modifier, color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(18.dp)) {
         Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -527,6 +537,7 @@ private fun ReplayAudioControls(url: String) {
         }
     }
     val player = playerResult.getOrNull()
+    VoiceCloudToastEffect(error ?: if (player == null) "Replay Playback Is Unavailable" else null, null)
     player?.let { mediaPlayer ->
         DisposableEffect(mediaPlayer) {
             onDispose { runCatching { mediaPlayer.release() } }
@@ -535,12 +546,11 @@ private fun ReplayAudioControls(url: String) {
 
     Surface(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(22.dp)) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Audio replay", style = MaterialTheme.typography.titleMedium)
+            Text(voiceCloudTitleCase("Audio Replay"), style = MaterialTheme.typography.titleMedium)
             if (player == null) {
-                Text("Replay playback is unavailable.", color = MaterialTheme.colorScheme.error)
+                Text(voiceCloudTitleCase("Replay Unavailable"), color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 if (!prepared && error == null) LinearProgressIndicator(Modifier.fillMaxWidth())
-                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 Button(
                     onClick = {
                         if (!prepared) return@Button
@@ -555,23 +565,11 @@ private fun ReplayAudioControls(url: String) {
                     },
                     enabled = prepared && error == null,
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text(if (playing) "Pause replay" else "Play replay") }
+                ) { Text(voiceCloudTitleCase(if (playing) "Pause replay" else "Play replay")) }
             }
         }
     }
 }
-
-private data class SelectedMedia(val bytes: ByteArray, val fileName: String, val mimeType: String)
-
-private fun readSelectedMedia(context: Context, uri: Uri): SelectedMedia? = runCatching {
-    val resolver = context.contentResolver
-    val mime = resolver.getType(uri).orEmpty().ifBlank { "image/*" }
-    val name = resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
-        if (cursor.moveToFirst()) cursor.getString(0) else null
-    }.orEmpty().ifBlank { "voicecloud-image" }
-    val bytes = resolver.openInputStream(uri)?.use { it.readBytes() } ?: return@runCatching null
-    SelectedMedia(bytes = bytes, fileName = name, mimeType = mime)
-}.getOrNull()
 
 private fun replayStatusLabel(replay: ReplayItem): String {
     val parts = mutableListOf<String>()

@@ -16,6 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import app.voicecloud.core.model.MobileConfig
+import app.voicecloud.core.designsystem.theme.PortalTheme
+import app.voicecloud.core.designsystem.theme.VoiceCloudTheme
 import app.voicecloud.feature.auth.model.FirebaseClientConfig
 import app.voicecloud.feature.auth.model.VoiceCloudRole
 import app.voicecloud.feature.auth.ui.*
@@ -108,8 +110,6 @@ object VoiceCloudRoutes {
     const val ActivityHistory = "me/activity"
     const val ProfileVisitors = "me/visitors"
     const val BlockedUsers = "me/blocked"
-    const val HelpPages = "me/help"
-    const val HelpPage = "me/help/{slug}"
 
     // PH09 preferences, security, safety, CMS and support graph.
     const val Settings = "settings"
@@ -137,12 +137,24 @@ object VoiceCloudRoutes {
     const val CreatorCmsContent = "creator/content/{slug}"
     const val CreatorContactSupport = "creator/support/contact"
 
+    // PH11 Creator Live Rooms & Schedule graph.
+    const val CreatorLive = "creator/live"
+    const val CreatorRoomCreate = "creator/live/rooms/create"
+    const val CreatorRoomManage = "creator/live/rooms/{roomId}"
+    const val CreatorRoomSettings = "creator/live/rooms/{roomId}/settings"
+    const val CreatorLiveConsole = "creator/live/rooms/{roomId}/console"
+    const val CreatorScheduleCreate = "creator/live/schedules/create"
+    const val CreatorScheduleEdit = "creator/live/schedules/{scheduleId}/edit"
+
     fun creatorCmsContent(slug: String): String = "creator/content/${Uri.encode(slug.trim())}"
+    fun creatorRoom(id: String): String = "creator/live/rooms/${Uri.encode(id.trim())}"
+    fun creatorRoomSettings(id: String): String = "creator/live/rooms/${Uri.encode(id.trim())}/settings"
+    fun creatorConsole(id: String): String = "creator/live/rooms/${Uri.encode(id.trim())}/console"
+    fun creatorSchedule(id: String): String = "creator/live/schedules/${Uri.encode(id.trim())}/edit"
 
     fun economySection(section: app.voicecloud.feature.economy.model.EconomySection): String = "economy/${section.name}"
 
     fun replay(id: String): String = "replays/${Uri.encode(id.trim())}"
-    fun helpPage(slug: String): String = "me/help/${Uri.encode(slug.trim())}"
     fun cmsContent(slug: String): String = "content/${Uri.encode(slug.trim())}"
     fun securitySession(id: String): String = "security/sessions/${Uri.encode(id.trim())}"
     fun securityDevice(id: String): String = "security/devices/${Uri.encode(id.trim())}"
@@ -385,6 +397,7 @@ fun VoiceCloudNavHost(
                     creatorName = authState.user?.displayName.orEmpty(),
                     onLoad = creatorViewModel::loadDashboard,
                     onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onLive = { open(VoiceCloudRoutes.CreatorLive) },
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
@@ -401,6 +414,7 @@ fun VoiceCloudNavHost(
                     onLoad = creatorViewModel::loadProfile,
                     onSave = creatorViewModel::saveProfile,
                     onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onLive = { open(VoiceCloudRoutes.CreatorLive) },
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
@@ -417,6 +431,7 @@ fun VoiceCloudNavHost(
                     onLoad = creatorViewModel::loadSettings,
                     onSave = creatorViewModel::saveSettings,
                     onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onLive = { open(VoiceCloudRoutes.CreatorLive) },
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
@@ -434,6 +449,7 @@ fun VoiceCloudNavHost(
                     onOpenPage = { open(VoiceCloudRoutes.creatorCmsContent(it)) },
                     onContact = { open(VoiceCloudRoutes.CreatorContactSupport) },
                     onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onLive = { open(VoiceCloudRoutes.CreatorLive) },
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
@@ -466,6 +482,124 @@ fun VoiceCloudNavHost(
                     onSubmit = creatorViewModel::contact,
                     onBack = { navController.popBackStack() },
                 )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorLive) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                CreatorLiveStudioScreen(
+                    state = hostingState,
+                    onLoad = { hostingViewModel.loadCreatorStudio(authState.user?.id) },
+                    onCreateRoom = { open(VoiceCloudRoutes.CreatorRoomCreate) },
+                    onScheduleRoom = { open(VoiceCloudRoutes.CreatorScheduleCreate) },
+                    onRoom = { open(VoiceCloudRoutes.creatorRoom(it)) },
+                    onSchedule = { open(VoiceCloudRoutes.creatorSchedule(it)) },
+                    onStartScheduled = { schedule -> hostingViewModel.startScheduled(schedule) { room -> open(VoiceCloudRoutes.creatorConsole(room.id)) } },
+                    onDashboard = { open(VoiceCloudRoutes.CreatorDashboard) },
+                    onLive = { open(VoiceCloudRoutes.CreatorLive) },
+                    onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
+                    onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
+                    onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorRoomCreate) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = true) {
+                RoomEditorScreen(
+                    state = hostingState, roomId = null, onLoad = {},
+                    onSave = { input -> hostingViewModel.createRoom(input) { room -> open(VoiceCloudRoutes.creatorRoom(room.id)) } },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorRoomSettings) { entry ->
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+                VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = true) {
+                    RoomEditorScreen(
+                        state = hostingState, roomId = roomId, onLoad = hostingViewModel::loadRoom,
+                        onSave = { input -> hostingViewModel.updateRoom(roomId, input) { navController.popBackStack() } },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorRoomManage) { entry ->
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+                VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = true) {
+                    HostRoomManageScreen(
+                        state = hostingState, roomId = roomId, onLoad = { hostingViewModel.loadRoom(roomId) },
+                        onSettings = { open(VoiceCloudRoutes.creatorRoomSettings(roomId)) },
+                        onStart = { hostingViewModel.startRoom(roomId) { open(VoiceCloudRoutes.creatorConsole(it.id)) } },
+                        onOpenConsole = { open(VoiceCloudRoutes.creatorConsole(roomId)) },
+                        onPause = { hostingViewModel.pauseRoom(roomId) },
+                        onResume = { hostingViewModel.resumeRoom(roomId) },
+                        onEnd = { hostingViewModel.endRoom(roomId) },
+                        onDelete = { hostingViewModel.deleteRoom(roomId) { navController.popBackStack() } },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorScheduleCreate) {
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = true) {
+                ScheduleEditorScreen(
+                    state = hostingState, scheduleId = null, onLoad = {},
+                    onSave = { input -> hostingViewModel.createSchedule(input) { navController.popBackStack() } },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorScheduleEdit) { entry ->
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                val scheduleId = Uri.decode(entry.arguments?.getString("scheduleId").orEmpty())
+                VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = true) {
+                    ScheduleEditorScreen(
+                        state = hostingState, scheduleId = scheduleId, onLoad = hostingViewModel::loadSchedule,
+                        onSave = { input -> hostingViewModel.updateSchedule(scheduleId, input) },
+                        onDelete = { hostingViewModel.deleteSchedule(scheduleId) { navController.popBackStack() } },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+            }
+        }
+        composable(VoiceCloudRoutes.CreatorLiveConsole) { entry ->
+            if (authState.user?.normalizedRole != VoiceCloudRole.CREATOR) {
+                LaunchedEffect(authState.user?.role) { open(VoiceCloudRoutes.Restricted) }
+            } else {
+                val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+                VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = true) {
+                    HostLiveConsoleScreen(
+                        state = hostingState, roomId = roomId, viewerId = authState.user?.id,
+                        onEnter = { hostingViewModel.enterHostConsole(roomId) },
+                        onLeave = { hostingViewModel.leaveHostConsole(roomId) },
+                        onMicrophone = hostingViewModel::setMicrophoneEnabled,
+                        onPause = { hostingViewModel.pauseRoom(roomId) },
+                        onResume = { hostingViewModel.resumeRoom(roomId) },
+                        onEnd = { hostingViewModel.endRoom(roomId) { navController.popBackStack() } },
+                        onApprove = { hostingViewModel.approve(roomId, it) },
+                        onReject = { hostingViewModel.reject(roomId, it) },
+                        onInviteSpeaker = { hostingViewModel.inviteSpeaker(roomId, it) },
+                        onRemoveSpeaker = { hostingViewModel.removeSpeaker(roomId, it) },
+                        onMuteSpeaker = { userId, muted -> hostingViewModel.muteSpeaker(roomId, userId, muted) },
+                        onSearchInvite = hostingViewModel::searchInviteCandidates,
+                        onInviteParticipant = { hostingViewModel.inviteParticipant(roomId, it) },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
             }
         }
 
@@ -679,16 +813,14 @@ fun VoiceCloudNavHost(
                 onLoad = vm::loadMyProfile,
                 onFollowers = { open(VoiceCloudRoutes.Followers) },
                 onFollowing = { open(VoiceCloudRoutes.Following) },
-                onEconomySection = { sectionName ->
-                    if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade)
-                    else runCatching { EconomySection.valueOf(sectionName) }.getOrNull()?.let { open(VoiceCloudRoutes.economySection(it)) }
-                },
+                onEconomy = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Economy) },
                 onEditProfile = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.EditProfile) },
                 onProfileTools = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.ProfileTools) },
                 onSettings = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Settings) },
-                onSecurity = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.Security) },
                 onSafety = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.SafetyCenter) },
-                onHelpPages = { open(VoiceCloudRoutes.HelpCenter) },
+                onHelp = { open(VoiceCloudRoutes.HelpCenter) },
+                onContactSupport = { open(VoiceCloudRoutes.ContactSupport) },
+                onAbout = { open(VoiceCloudRoutes.About) },
                 canSwitchToCreator = authState.user?.normalizedRole == VoiceCloudRole.CREATOR,
                 onSwitchToCreator = authViewModel::switchToCreatorPortal,
                 onUpgrade = { open(VoiceCloudRoutes.GuestUpgrade) },
@@ -958,15 +1090,10 @@ fun VoiceCloudNavHost(
         // PH09 — Preferences, security, safety, CMS and support.
         composable(VoiceCloudRoutes.Settings) {
             SettingsOverviewScreen(
-                onProfile = { open(VoiceCloudRoutes.EditProfile) },
                 onNotifications = { open(VoiceCloudRoutes.NotificationSettings) },
                 onPrivacy = { open(VoiceCloudRoutes.PrivacySettings) },
                 onVoiceAppearance = { open(VoiceCloudRoutes.VoiceAppearance) },
                 onSecurity = { open(VoiceCloudRoutes.Security) },
-                onHelp = { open(VoiceCloudRoutes.HelpCenter) },
-                onSafety = { open(VoiceCloudRoutes.SafetyCenter) },
-                onContact = { open(VoiceCloudRoutes.ContactSupport) },
-                onAbout = { open(VoiceCloudRoutes.About) },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -1047,7 +1174,6 @@ fun VoiceCloudNavHost(
                 state = settingsState,
                 onLoad = settingsViewModel::loadCmsPages,
                 onPage = { open(VoiceCloudRoutes.cmsContent(it)) },
-                onContact = { open(VoiceCloudRoutes.ContactSupport) },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -1066,8 +1192,6 @@ fun VoiceCloudNavHost(
                 onLoad = settingsViewModel::loadCmsPages,
                 onReport = { open(VoiceCloudRoutes.Report) },
                 onBlocked = { open(VoiceCloudRoutes.BlockedUsers) },
-                onPrivacy = { open(VoiceCloudRoutes.PrivacySettings) },
-                onCommunities = { open(VoiceCloudRoutes.Communities) },
                 onPage = { open(VoiceCloudRoutes.cmsContent(it)) },
                 onBack = { navController.popBackStack() },
             )
@@ -1117,7 +1241,6 @@ fun VoiceCloudNavHost(
         composable(VoiceCloudRoutes.About) {
             AboutScreen(
                 versionName = app.voicecloud.android.BuildConfig.VERSION_NAME,
-                onHelp = { open(VoiceCloudRoutes.HelpCenter) },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -1126,11 +1249,9 @@ fun VoiceCloudNavHost(
             ProfileToolsScreen(
                 state = profileState,
                 onLoad = { profileViewModel.loadHub() },
-                onEditProfile = { open(VoiceCloudRoutes.EditProfile) },
                 onReplays = { open(VoiceCloudRoutes.ReplayLibrary) },
                 onActivity = { open(VoiceCloudRoutes.ActivityHistory) },
                 onVisitors = { open(VoiceCloudRoutes.ProfileVisitors) },
-                onBlockedUsers = { open(VoiceCloudRoutes.BlockedUsers) },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -1181,23 +1302,6 @@ fun VoiceCloudNavHost(
             )
         }
 
-        composable(VoiceCloudRoutes.HelpPages) {
-            HelpPagesScreen(
-                state = profileState,
-                onLoad = { profileViewModel.loadHelpPages() },
-                onOpen = { open(VoiceCloudRoutes.helpPage(it)) },
-                onBack = { navController.popBackStack() },
-            )
-        }
-        composable(VoiceCloudRoutes.HelpPage) { entry ->
-            val slug = Uri.decode(entry.arguments?.getString("slug").orEmpty())
-            HelpPageScreen(
-                state = profileState,
-                slug = slug,
-                onLoad = { profileViewModel.loadHelpPage(it) },
-                onBack = { navController.popBackStack() },
-            )
-        }
 
         composable(VoiceCloudRoutes.Notifications) {
             NotificationsScreen(

@@ -1,5 +1,6 @@
 package app.voicecloud.feature.discovery.ui
 
+import app.voicecloud.core.network.toVoiceCloudUserMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.voicecloud.feature.discovery.data.DiscoveryRepository
@@ -167,8 +168,5 @@ class DiscoveryViewModel @Inject constructor(
         }
     }
 
-    private fun readableError(error: Exception): String = when {
-        error.message.isNullOrBlank() -> "VoiceCloud could not load this content."
-        else -> error.message!!
-    }
+    private fun readableError(error: Exception): String = error.toVoiceCloudUserMessage("VoiceCloud Couldn’t Load This Content. Try Again.")
 }

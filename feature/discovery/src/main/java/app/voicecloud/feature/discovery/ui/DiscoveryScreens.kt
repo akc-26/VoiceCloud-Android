@@ -23,11 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.CommonColors
@@ -80,7 +83,7 @@ private fun ConsumerScaffold(
                                 modifier = Modifier.size(metrics.bottomIconSize),
                             )
                         },
-                        label = { Text(item.label, maxLines = 1, softWrap = false) },
+                        label = { Text(voiceCloudTitleCase(item.label), maxLines = 1, softWrap = false) },
                     )
                 }
             }
@@ -104,8 +107,8 @@ private fun ScreenHeader(title: String, subtitle: String? = null, action: (@Comp
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.headlineMedium)
-            if (!subtitle.isNullOrBlank()) Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium)
+            if (!subtitle.isNullOrBlank()) Text(voiceCloudTitleCase(subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         action?.invoke()
     }
@@ -157,34 +160,22 @@ private fun RowScope.HomeShortcut(label: String, iconRes: Int, onClick: () -> Un
                     modifier = Modifier.padding(7.dp).size(20.dp),
                 )
             }
-            Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+            Text(voiceCloudTitleCase(label), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
         }
     }
 }
 
 @Composable
 private fun StatusBlock(state: DiscoveryUiState, onRetry: (() -> Unit)? = null) {
-    when {
-        state.loading -> Box(Modifier.fillMaxWidth().padding(28.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-        state.error != null -> Card(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(state.error, color = MaterialTheme.colorScheme.error)
-                if (onRetry != null) OutlinedButton(onClick = onRetry) { Text("Try again") }
-            }
-        }
-        state.notice != null -> Text(
-            state.notice,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
-            color = ConsumerColors.SapphireDeep,
-        )
-    }
+    VoiceCloudToastEffect(state.error, state.notice)
+    if (state.loading) Box(Modifier.fillMaxWidth().padding(28.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
 }
 
 @Composable
 private fun SectionTitle(title: String, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-        if (actionLabel != null && onAction != null) TextButton(onClick = onAction) { Text(actionLabel) }
+        Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+        if (actionLabel != null && onAction != null) TextButton(onClick = onAction) { Text(voiceCloudTitleCase(actionLabel)) }
     }
 }
 
@@ -217,9 +208,9 @@ private fun UserCard(
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(user.displayName.ifBlank { user.username }, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    if (user.isVerified) Text("  ✓", color = ConsumerColors.Sapphire)
+                    if (user.isVerified) Text(voiceCloudTitleCase("  ✓"), color = ConsumerColors.Sapphire)
                 }
-                Text("@${user.username}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                Text(voiceCloudTitleCase("@${user.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 val descriptor = when {
                     user.role?.uppercase() == "CREATOR" -> "Creator"
                     user.isOnline -> "Online now"
@@ -229,7 +220,7 @@ private fun UserCard(
                 Text(descriptor, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
             }
             if (actionLabel != null && onAction != null) {
-                OutlinedButton(enabled = actionEnabled, onClick = onAction) { Text(actionLabel) }
+                OutlinedButton(enabled = actionEnabled, onClick = onAction) { Text(voiceCloudTitleCase(actionLabel)) }
             }
         }
     }
@@ -242,15 +233,15 @@ private fun RoomCard(room: VoiceCloudRoom, onOpen: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(9.dp).clip(CircleShape).background(if (room.isLive) CommonColors.Error else MaterialTheme.colorScheme.outline))
                 Spacer(Modifier.width(8.dp))
-                Text(if (room.isLive) "LIVE NOW" else room.status.ifBlank { "ROOM" }, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                Text(voiceCloudTitleCase(if (room.isLive) "LIVE NOW" else room.status.ifBlank { "ROOM" }), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.weight(1f))
-                if (room.isLocked) Text("Locked", style = MaterialTheme.typography.labelLarge)
+                if (room.isLocked) Text(voiceCloudTitleCase("Locked"), style = MaterialTheme.typography.labelLarge)
             }
             Text(room.title.ifBlank { "${VoiceCloudBrand.name} Room" }, style = MaterialTheme.typography.titleLarge)
             if (!room.description.isNullOrBlank()) Text(room.description, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("${room.listenerCount} listening", style = MaterialTheme.typography.bodyMedium)
-                Text("${room.speakerCount} speakers", style = MaterialTheme.typography.bodyMedium)
+                Text(voiceCloudTitleCase("${room.listenerCount} Listening"), style = MaterialTheme.typography.bodyMedium)
+                Text(voiceCloudTitleCase("${room.speakerCount} Speakers"), style = MaterialTheme.typography.bodyMedium)
                 if (room.category.isNotBlank()) Text(room.category, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -261,9 +252,9 @@ private fun RoomCard(room: VoiceCloudRoom, onOpen: () -> Unit) {
 private fun EmptyBlock(title: String, body: String) {
     Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(6.dp))
-            Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(body), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -271,7 +262,7 @@ private fun EmptyBlock(title: String, body: String) {
 @Composable
 private fun CompactPeopleRow(users: List<VoiceCloudUser>, onProfile: (String) -> Unit) {
     if (users.isEmpty()) {
-        Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Text("Nothing to show right now.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Text(voiceCloudTitleCase("Nothing To Show Right Now."), color = MaterialTheme.colorScheme.onSurfaceVariant) }
         return
     }
     LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -285,26 +276,26 @@ private fun CompactUserCard(user: VoiceCloudUser, onProfile: (String) -> Unit) {
         Column(Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
             UserAvatar(user, 52)
             Text(user.displayName.ifBlank { user.username }, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
-            Text(if (user.isOnline) "Active now" else "@${user.username}", maxLines = 1, color = if (user.isOnline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+            Text(if (user.isOnline) voiceCloudTitleCase("Active now") else "@${user.username}", maxLines = 1, color = if (user.isOnline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
         }
     }
 }
 
 @Composable
 private fun SearchCompactRowUsers(users: List<VoiceCloudUser>, keyPrefix: String, onProfile: (String) -> Unit, searched: Boolean, emptyLabel: String) {
-    if (users.isEmpty()) { Text(if (searched) emptyLabel else "No profiles available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant); return }
+    if (users.isEmpty()) { Text(voiceCloudTitleCase(if (searched) emptyLabel else "No profiles available right now."), color = MaterialTheme.colorScheme.onSurfaceVariant); return }
     LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) { items(users, key = { "$keyPrefix:${it.id}" }) { CompactUserCard(it, onProfile) } }
 }
 
 @Composable
 private fun SearchCompactRowRooms(rooms: List<VoiceCloudRoom>, onRoom: (String) -> Unit, searched: Boolean) {
-    if (rooms.isEmpty()) { Text(if (searched) "No rooms found" else "No live rooms available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant); return }
+    if (rooms.isEmpty()) { Text(voiceCloudTitleCase(if (searched) "No rooms found" else "No live rooms available right now."), color = MaterialTheme.colorScheme.onSurfaceVariant); return }
     LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         items(rooms, key = { it.id }) { room ->
             ElevatedCard(onClick = { onRoom(room.id) }, modifier = Modifier.width(230.dp), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(room.title.ifBlank { "VoiceCloud room" }, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text("${room.listenerCount} listening · ${room.category.ifBlank { "Live" }}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                    Text(voiceCloudTitleCase("${room.listenerCount} Listening · ${room.category.ifBlank { "Live" }}"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -313,7 +304,7 @@ private fun SearchCompactRowRooms(rooms: List<VoiceCloudRoom>, onRoom: (String) 
 
 @Composable
 private fun SearchCompactRowCommunities(communities: List<CommunitySearchItem>, onCommunity: (String) -> Unit, searched: Boolean) {
-    if (communities.isEmpty()) { Text(if (searched) "No communities found" else "No communities available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant); return }
+    if (communities.isEmpty()) { Text(voiceCloudTitleCase(if (searched) "No communities found" else "No communities available right now."), color = MaterialTheme.colorScheme.onSurfaceVariant); return }
     LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) { items(communities, key = { it.id }) { CommunityCompactCard(it, onCommunity) } }
 }
 
@@ -322,7 +313,7 @@ private fun CommunityCompactCard(community: CommunitySearchItem, onCommunity: (S
     ElevatedCard(onClick = { onCommunity(community.handle.ifBlank { community.id }) }, modifier = Modifier.width(220.dp), shape = RoundedCornerShape(18.dp)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Text(community.name, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text("@${community.handle} · ${community.memberCount} members", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+            Text(voiceCloudTitleCase("@${community.handle} · ${community.memberCount} Members"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
         }
     }
 }
@@ -364,7 +355,7 @@ fun HomeScreen(
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                        Text("Live conversations happening now", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                        Text(voiceCloudTitleCase("Live Conversations Happening Now"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     }
                     IconButton(onClick = onNotifications) { Icon(painterResource(R.drawable.vc_icon_bell), contentDescription = "Notifications") }
                 }
@@ -373,15 +364,15 @@ fun HomeScreen(
             if (isGuest) item {
                 Card(Modifier.fillMaxWidth().padding(horizontal = 20.dp), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
                     Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("Save your profile and connections", modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-                        TextButton(onClick = onUpgrade) { Text("Upgrade") }
+                        Text(voiceCloudTitleCase("Save Your Profile And Connections"), modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
+                        TextButton(onClick = onUpgrade) { Text(voiceCloudTitleCase("Upgrade")) }
                     }
                 }
             }
             item {
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 2.dp)) {
                     SectionTitle("Live now", "View all", onRooms)
-                    Text("Tap a room to enter the live experience directly.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(voiceCloudTitleCase("Tap A Room To Enter The Live Experience Directly."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             if (state.home.rooms.isEmpty() && !state.loading) item { Box(Modifier.padding(horizontal = 20.dp)) { EmptyBlock("No live rooms", "Check again soon.") } }
@@ -442,7 +433,7 @@ fun ExploreScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     SectionTitle("Browse topics")
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(categories, key = { it }) { category -> AssistChip(onClick = onRooms, label = { Text(category) }) }
+                        items(categories, key = { it }) { category -> AssistChip(onClick = onRooms, label = { Text(voiceCloudTitleCase(category)) }) }
                     }
                 }
             }
@@ -547,7 +538,7 @@ fun SearchScreen(
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    placeholder = { Text("Search VoiceCloud") },
+                    placeholder = { Text(voiceCloudTitleCase("Search VoiceCloud")) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     leadingIcon = { Icon(painterResource(R.drawable.vc_icon_search), contentDescription = null) },
@@ -561,7 +552,7 @@ fun SearchScreen(
             }
             item {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    tabs.forEach { tab -> FilterChip(selected = selectedTab == tab, onClick = { selectedTab = tab }, label = { Text(tab, maxLines = 1) }) }
+                    tabs.forEach { tab -> FilterChip(selected = selectedTab == tab, onClick = { selectedTab = tab }, label = { Text(voiceCloudTitleCase(tab), maxLines = 1) }) }
                 }
             }
             item { StatusBlock(state) }
@@ -572,7 +563,7 @@ fun SearchScreen(
                 if (hasQuery && allEmpty && !state.loading && !communitiesLoading) {
                     item {
                         Box(Modifier.fillParentMaxHeight(.55f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text("No results found for “${state.search.query}”.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(voiceCloudTitleCase("No Results Found For “${state.search.query}”."), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 } else {
@@ -595,7 +586,7 @@ fun SearchScreen(
                 if (empty && !state.loading && !communitiesLoading) {
                     item {
                         Box(Modifier.fillParentMaxHeight(.55f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text(if (hasQuery) "No ${selectedTab.lowercase()} found for “${state.search.query}”." else "No ${selectedTab.lowercase()} available right now.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(voiceCloudTitleCase(if (hasQuery) "No ${selectedTab.lowercase()} found for “${state.search.query}”." else "No ${selectedTab.lowercase()} available right now."), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 } else when (selectedTab) {
@@ -638,18 +629,18 @@ fun PublicProfileScreen(
                         UserAvatar(profile.asUser(), 72)
                         Spacer(Modifier.height(12.dp))
                         Text(profile.displayName.ifBlank { profile.username }, color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
-                        Text("@${profile.username}", color = ConsumerColors.SapphireDeep)
-                        if (profile.isVerified) Text("Verified ${VoiceCloudBrand.name} profile", color = ConsumerColors.SapphireDeep)
+                        Text(voiceCloudTitleCase("@${profile.username}"), color = ConsumerColors.SapphireDeep)
+                        if (profile.isVerified) Text(voiceCloudTitleCase("Verified ${VoiceCloudBrand.name} Profile"), color = ConsumerColors.SapphireDeep)
                         Spacer(Modifier.height(12.dp))
                         Text(profile.bio ?: profile.statusMessage ?: "${VoiceCloudBrand.name} member", color = ConsumerColors.Text, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(14.dp))
-                        if (isSelf) Button(onClick = onMyProfile) { Text("My profile") }
+                        if (isSelf) Button(onClick = onMyProfile) { Text(voiceCloudTitleCase("My Profile")) }
                         else {
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(enabled = !state.mutationBusy, onClick = onFollow) { Text(if (profile.relationship?.isFollowing == true) "Following" else "Follow") }
-                                OutlinedButton(enabled = !state.mutationBusy, onClick = { onMessage(profile.id) }) { Text("Message") }
+                                Button(enabled = !state.mutationBusy, onClick = onFollow) { Text(voiceCloudTitleCase(if (profile.relationship?.isFollowing == true) "Following" else "Follow")) }
+                                OutlinedButton(enabled = !state.mutationBusy, onClick = { onMessage(profile.id) }) { Text(voiceCloudTitleCase("Message")) }
                             }
-                            TextButton(onClick = { onReport(profile.id, profile.displayName.ifBlank { "@${profile.username}" }) }) { Text("Report profile") }
+                            TextButton(onClick = { onReport(profile.id, profile.displayName.ifBlank { "@${profile.username}" }) }) { Text(voiceCloudTitleCase("Report Profile")) }
                         }
                     }
                 }
@@ -664,11 +655,11 @@ fun PublicProfileScreen(
             }
             item {
                 Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("About", style = MaterialTheme.typography.titleLarge)
-                    if (!profile.country.isNullOrBlank()) Text("Country · ${profile.country}")
-                    if (!profile.preferredLanguage.isNullOrBlank()) Text("Language · ${profile.preferredLanguage}")
+                    Text(voiceCloudTitleCase("About"), style = MaterialTheme.typography.titleLarge)
+                    if (!profile.country.isNullOrBlank()) Text(voiceCloudTitleCase("Country · ${profile.country}"))
+                    if (!profile.preferredLanguage.isNullOrBlank()) Text(voiceCloudTitleCase("Language · ${profile.preferredLanguage}"))
                     val interests = profile.interests.orEmpty().ifEmpty { profile.customTags.orEmpty() }
-                    if (interests.isNotEmpty()) Text("Interests · ${interests.joinToString(" · ")}")
+                    if (interests.isNotEmpty()) Text(voiceCloudTitleCase("Interests · ${interests.joinToString(" · ")}"))
                 }
             }
         }
@@ -688,13 +679,14 @@ fun MyProfileScreen(
     onLoad: () -> Unit,
     onFollowers: () -> Unit,
     onFollowing: () -> Unit,
-    onEconomySection: (String) -> Unit,
+    onEconomy: () -> Unit,
     onEditProfile: () -> Unit,
     onProfileTools: () -> Unit,
     onSettings: () -> Unit,
-    onSecurity: () -> Unit,
     onSafety: () -> Unit,
-    onHelpPages: () -> Unit,
+    onHelp: () -> Unit,
+    onContactSupport: () -> Unit,
+    onAbout: () -> Unit,
     canSwitchToCreator: Boolean,
     onSwitchToCreator: () -> Unit,
     onUpgrade: () -> Unit,
@@ -707,60 +699,93 @@ fun MyProfileScreen(
 ) {
     LaunchedEffect(Unit) { onLoad() }
     val profile = state.myProfile
-    val economy = listOf(
-        "WALLET" to "Wallet",
-        "VIP" to "VIP",
-        "STORE" to "Store",
-        "GIFTS" to "Gifts",
-        "TASKS" to "Tasks",
-        "ACHIEVEMENTS" to "Achievements",
-        "PROGRESSION" to "XP & Check-in",
-        "RANKINGS" to "Rankings",
-        "TICKETS" to "Tickets",
-        "REFERRALS" to "Referrals",
-    )
     ConsumerScaffold("profile", onHome, onExplore, onSearch, onFriends, onMe) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { ScreenHeader("My Profile", "Your ${VoiceCloudBrand.name} identity, activity and account tools.") }
+        LazyColumn(
+            Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            item { ScreenHeader("My Profile") }
             item { StatusBlock(state, onLoad) }
             if (profile != null) {
                 item {
-                    ElevatedCard(shape = RoundedCornerShape(24.dp)) {
+                    ElevatedCard(shape = RoundedCornerShape(28.dp), modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            UserAvatar(profile.asUser(), 72)
+                            UserAvatar(profile.asUser(), 78)
                             Spacer(Modifier.height(10.dp))
-                            Text(profile.displayName.ifBlank { profile.username }, style = MaterialTheme.typography.headlineMedium)
-                            Text("@${profile.username}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            profile.bio?.takeIf { it.isNotBlank() }?.let { Text(it, modifier = Modifier.padding(top = 10.dp)) }
+                            Text(profile.displayName.ifBlank { profile.username }, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            if (profile.username.isNotBlank()) Text(voiceCloudTitleCase("@${profile.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            profile.bio?.takeIf { it.isNotBlank() }?.let {
+                                Spacer(Modifier.height(8.dp))
+                                Text(it, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Spacer(Modifier.height(14.dp))
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                ProfileMetricAction("${profile.stats?.followersCount ?: profile.followersCount}", "Followers", onFollowers, Modifier.weight(1f))
+                                ProfileMetricAction("${profile.stats?.followingCount ?: profile.followingCount}", "Following", onFollowing, Modifier.weight(1f))
+                            }
                         }
                     }
                 }
+
+                item { SectionTitle("Account") }
                 item {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedButton(onClick = onFollowers, modifier = Modifier.weight(1f)) { Text("${profile.stats?.followersCount ?: profile.followersCount}\nFollowers") }
-                        OutlinedButton(onClick = onFollowing, modifier = Modifier.weight(1f)) { Text("${profile.stats?.followingCount ?: profile.followingCount}\nFollowing") }
+                        ProfileHubTile("Edit Profile", "Photo & Bio", onEditProfile, Modifier.weight(1f))
+                        ProfileHubTile("Settings", "Privacy & Security", onSettings, Modifier.weight(1f))
                     }
                 }
-                item { Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) { Text("Edit profile") } }
-                item { OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth()) { Text("Settings") } }
-                item { OutlinedButton(onClick = onSecurity, modifier = Modifier.fillMaxWidth()) { Text("Security & devices") } }
-                item { OutlinedButton(onClick = onSafety, modifier = Modifier.fillMaxWidth()) { Text("Safety Center") } }
-                item { OutlinedButton(onClick = onProfileTools, modifier = Modifier.fillMaxWidth()) { Text("Replays, activity & privacy") } }
-                item { SectionTitle("Economy & progression") }
-                items(economy, key = { it.first }) { (key, label) ->
-                    ElevatedCard(onClick = { onEconomySection(key) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(label, modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-                            Text("›", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+
+                item { SectionTitle("Your VoiceCloud") }
+                item {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ProfileHubTile("Activity & Replays", "Rooms & Visitors", onProfileTools, Modifier.weight(1f))
+                        ProfileHubTile("Wallet & Rewards", "VIP, Gifts & Store", onEconomy, Modifier.weight(1f))
+                    }
+                }
+
+                item { SectionTitle("Safety & Support") }
+                item { ProfileHubTile("Safety Center", "Reports & Blocked Users", onSafety, Modifier.fillMaxWidth()) }
+                item {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ProfileHubTile("Help & Legal", "FAQ & Policies", onHelp, Modifier.weight(1f))
+                        ProfileHubTile("Contact Support", "Send A Message", onContactSupport, Modifier.weight(1f))
+                    }
+                }
+                item { ProfileHubTile("About VoiceCloud", "App & Version", onAbout, Modifier.fillMaxWidth()) }
+
+                if (canSwitchToCreator) {
+                    item {
+                        Button(onClick = onSwitchToCreator, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                            Text(voiceCloudTitleCase("Switch To Creator"))
                         }
                     }
                 }
-                item { SectionTitle("Support & information") }
-                item { OutlinedButton(onClick = onHelpPages, modifier = Modifier.fillMaxWidth()) { Text("Help, terms & information") } }
-                if (canSwitchToCreator) item { Button(onClick = onSwitchToCreator, modifier = Modifier.fillMaxWidth()) { Text("Switch to Creator") } }
             }
-            if (isGuest) item { Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade guest account") } }
-            item { OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Sign out") } }
+            if (isGuest) {
+                item { Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Upgrade Guest Account")) } }
+            }
+            item { OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Sign Out")) } }
+        }
+    }
+}
+
+@Composable
+private fun ProfileMetricAction(value: String, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    OutlinedCard(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(18.dp)) {
+        Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun ProfileHubTile(title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    ElevatedCard(onClick = onClick, modifier = modifier.heightIn(min = 92.dp), shape = RoundedCornerShape(20.dp)) {
+        Column(Modifier.fillMaxSize().padding(14.dp), verticalArrangement = Arrangement.SpaceBetween) {
+            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -787,8 +812,8 @@ fun SocialListScreen(
                     value = search,
                     onValueChange = { search = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Search ${mode}") },
-                    trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } },
+                    label = { Text(voiceCloudTitleCase("Search ${mode}")) },
+                    trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text(voiceCloudTitleCase("Search")) } },
                 )
             }
             item { StatusBlock(state) }
@@ -831,7 +856,7 @@ fun FriendsScreen(
             item { StatusBlock(state, onLoad) }
             item {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    tabs.forEach { tab -> FilterChip(selected == tab, { selected = tab }, label = { Text(if (tab == "Requests" && state.pending.incoming.isNotEmpty()) "$tab (${state.pending.incoming.size})" else tab) }) }
+                    tabs.forEach { tab -> FilterChip(selected == tab, { selected = tab }, label = { Text(voiceCloudTitleCase(if (tab == "Requests" && state.pending.incoming.isNotEmpty()) "$tab (${state.pending.incoming.size})" else tab)) }) }
                 }
             }
             when (selected) {
@@ -843,15 +868,15 @@ fun FriendsScreen(
                 }
                 "Requests" -> {
                     item { SectionTitle("Incoming") }
-                    if (state.pending.incoming.isEmpty() && !state.loading) item { Text("No incoming requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    if (state.pending.incoming.isEmpty() && !state.loading) item { Text(voiceCloudTitleCase("No Incoming Requests."), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     itemsIndexed(state.pending.incoming.distinctBy { it.id }, key = { i, r -> "friend-in:${r.id}:$i" }) { _, request ->
                         request.sender?.let { user ->
                             UserCard(user, { onProfile(user.username) }, "Accept", !state.mutationBusy) { onAccept(request.id) }
-                            TextButton(enabled = !state.mutationBusy, onClick = { onReject(request.id) }) { Text("Decline") }
+                            TextButton(enabled = !state.mutationBusy, onClick = { onReject(request.id) }) { Text(voiceCloudTitleCase("Decline")) }
                         }
                     }
                     item { SectionTitle("Sent") }
-                    if (state.pending.outgoing.isEmpty() && !state.loading) item { Text("No pending sent requests.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    if (state.pending.outgoing.isEmpty() && !state.loading) item { Text(voiceCloudTitleCase("No Pending Sent Requests."), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     itemsIndexed(state.pending.outgoing.distinctBy { it.id }, key = { i, r -> "friend-out:${r.id}:$i" }) { _, request ->
                         request.receiver?.let { user -> UserCard(user, { onProfile(user.username) }, "Cancel", !state.mutationBusy) { onCancel(request.id) } }
                     }

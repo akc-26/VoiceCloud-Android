@@ -35,13 +35,13 @@ class CreatorViewModel @Inject constructor(private val repository: CreatorReposi
 
     fun loadProfile() = load { _state.value = _state.value.copy(profile = repository.profile()) }
 
-    fun saveProfile(bio: String?, country: String?, interests: List<String>) = save("Creator profile updated.") {
+    fun saveProfile(bio: String?, country: String?, interests: List<String>) = save("Creator Profile Updated.", "We Couldn’t Update Your Creator Profile. Try Again.") {
         _state.value = _state.value.copy(profile = repository.updateProfile(bio, country, interests))
     }
 
     fun loadSettings() = load { _state.value = _state.value.copy(settings = repository.settings()) }
 
-    fun saveSettings(value: CreatorSettings) = save("Creator settings updated.") {
+    fun saveSettings(value: CreatorSettings) = save("Creator Settings Updated.", "We Couldn’t Save Your Creator Settings. Try Again.") {
         _state.value = _state.value.copy(settings = repository.updateSettings(value))
     }
 
@@ -49,7 +49,7 @@ class CreatorViewModel @Inject constructor(private val repository: CreatorReposi
 
     fun loadCmsPage(slug: String) = load { _state.value = _state.value.copy(cmsPage = repository.cmsPage(slug)) }
 
-    fun contact(name: String, email: String, phone: String?, description: String) = save("Your message was sent to VoiceCloud support.") {
+    fun contact(name: String, email: String, phone: String?, description: String) = save("Your Message Was Sent To VoiceCloud Support.", "We Couldn’t Send Your Message. Check The Details And Try Again.") {
         repository.contact(name, email, phone, description)
     }
 
@@ -68,31 +68,35 @@ class CreatorViewModel @Inject constructor(private val repository: CreatorReposi
         }
     }
 
-    private fun save(notice: String, block: suspend () -> Unit) {
+    private fun save(notice: String, fallback: String, block: suspend () -> Unit) {
         viewModelScope.launch {
             _state.value = _state.value.copy(saving = true, error = null, notice = null)
             try {
                 block()
                 _state.value = _state.value.copy(notice = notice)
-            } catch (error: Throwable) { handle(error) }
+            } catch (error: Throwable) { handle(error, fallback) }
             finally { _state.value = _state.value.copy(saving = false) }
         }
     }
 
-    private suspend fun handle(error: Throwable) {
+    private suspend fun handle(error: Throwable, fallback: String = "We Couldn’t Complete This Creator Request. Try Again.") {
         if (error is HttpException && error.code() in setOf(401, 403, 503)) {
-            _events.send(CreatorEvent.AuthFailure(error.code(), safeMessage(error)))
+            _events.send(CreatorEvent.AuthFailure(error.code(), safeMessage(error, fallback)))
             return
         }
-        _state.value = _state.value.copy(error = safeMessage(error))
+        _state.value = _state.value.copy(error = safeMessage(error, fallback))
     }
 
-    private fun safeMessage(error: Throwable): String {
+    private fun safeMessage(error: Throwable, fallback: String): String {
         val message = error.message.orEmpty().trim()
-        val unsafe = listOf("sql", "postgres", "typeorm", "constraint", "stack trace", "exception at", "relation ", "column ")
+        val unsafe = listOf("sql", "postgres", "typeorm", "constraint", "stack trace", "exception at", "relation ", "column ", "http 4", "http 5")
         return when {
-            error is HttpException -> "VoiceCloud could not complete the Creator request (HTTP ${error.code()})."
-            message.isBlank() || unsafe.any { message.contains(it, ignoreCase = true) } -> "VoiceCloud could not complete the Creator request."
+            error is HttpException && error.code() == 401 -> "Your Session Has Expired. Sign In Again."
+            error is HttpException && error.code() == 403 -> "This Creator Action Isn’t Available For Your Account."
+            error is HttpException && error.code() == 429 -> "Too Many Requests. Try Again In A Moment."
+            error is HttpException && error.code() >= 500 -> "VoiceCloud Is Temporarily Unavailable. Try Again Soon."
+            error is HttpException -> fallback
+            message.isBlank() || unsafe.any { message.contains(it, ignoreCase = true) } -> fallback
             else -> message
         }
     }

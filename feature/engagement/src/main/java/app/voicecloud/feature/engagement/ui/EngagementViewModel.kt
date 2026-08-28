@@ -1,5 +1,6 @@
 package app.voicecloud.feature.engagement.ui
 
+import app.voicecloud.core.network.toVoiceCloudUserMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.voicecloud.core.realtime.RealtimeConnectionState
@@ -271,7 +272,7 @@ class EngagementViewModel @Inject constructor(
         }
     }
 
-    private fun readable(error: Exception): String = error.message?.takeIf { it.isNotBlank() } ?: "VoiceCloud could not complete this request."
+    private fun readable(error: Exception): String = error.toVoiceCloudUserMessage("VoiceCloud Couldn’t Complete This Request. Try Again.")
 
     override fun onCleared() {
         repository.stopNotificationRealtime()

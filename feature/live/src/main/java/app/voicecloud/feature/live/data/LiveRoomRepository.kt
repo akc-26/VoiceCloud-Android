@@ -75,7 +75,8 @@ class LiveRoomRepository @Inject constructor(private val api: LiveRoomApi) {
     }
 
     private fun sanitizeMessage(raw: String, fallback: String): String {
-        val compact = raw.replace(Regex("[{}\\\"\\[\\]]"), " ").replace(Regex("\\s+"), " ").trim()
-        return compact.takeIf { it.length in 4..220 } ?: fallback
+        val compact = raw.replace(Regex("""[{}"\[\]]"""), " ").replace(Regex("""\s+"""), " ").trim()
+        val technical = listOf("http ", "sql", "postgres", "typeorm", "constraint", "relation ", "column ", "stack trace", "exception", "retrofit", "okhttp", "secret", "credential")
+        return compact.takeIf { it.length in 4..160 && technical.none { marker -> compact.contains(marker, ignoreCase = true) } } ?: fallback
     }
 }

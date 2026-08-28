@@ -86,14 +86,14 @@ class CreatorRepository @Inject constructor(private val api: CreatorApi) {
         val cleanName = name.trim()
         val cleanEmail = email.trim().lowercase()
         val cleanDescription = description.trim()
-        require(cleanName.isNotBlank()) { "Enter your name." }
-        require('@' in cleanEmail) { "Enter a valid email address." }
-        require(cleanDescription.isNotBlank()) { "Enter your message." }
+        require(cleanName.length >= 2) { "Enter Your Name." }
+        require('@' in cleanEmail) { "Enter A Valid Email Address." }
+        require(cleanDescription.length >= 10) { "Enter At Least 10 Characters In Your Message." }
         api.contact(CreatorContactRequest(
-            name = cleanName,
+            name = cleanName.take(120),
             email = cleanEmail,
-            phone = phone?.trim()?.takeIf(String::isNotBlank),
-            description = cleanDescription,
+            phoneNumber = phone?.trim()?.takeIf(String::isNotBlank)?.take(40),
+            message = cleanDescription.take(4000),
         ))
     }
 

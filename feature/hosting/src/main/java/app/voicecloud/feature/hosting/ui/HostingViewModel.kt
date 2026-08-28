@@ -48,6 +48,26 @@ class HostingViewModel @Inject constructor(
 
     fun setViewer(id: String?) { viewerId = id?.trim()?.takeIf(String::isNotBlank) }
 
+    fun loadCreatorStudio(creatorId: String? = viewerId) {
+        setViewer(creatorId)
+        viewModelScope.launch {
+            mutateLoading(true)
+            try {
+                val rooms = repository.rooms()
+                val schedules = viewerId?.let { repository.schedules(it) }.orEmpty()
+                mutableState.value = mutableState.value.copy(
+                    loading = false,
+                    eligibilityChecked = true,
+                    rooms = rooms,
+                    schedules = schedules,
+                    error = null,
+                )
+            } catch (error: Throwable) {
+                fail(error, "Your Creator Rooms Couldn’t Be Loaded. Try Again.")
+            }
+        }
+    }
+
     fun loadStudio() {
         viewModelScope.launch {
             mutateLoading(true)

@@ -1,5 +1,6 @@
 package app.voicecloud.feature.profile.ui
 
+import app.voicecloud.core.network.toVoiceCloudUserMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.voicecloud.feature.profile.data.ProfileRepository
@@ -10,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -169,13 +169,5 @@ class ProfileViewModel @Inject constructor(
         mutableState.value = mutableState.value.copy(mutating = false, error = message(error, fallback))
     }
 
-    private fun message(error: Throwable, fallback: String): String {
-        val status = (error as? HttpException)?.code()
-        return when (status) {
-            401 -> "Your session has expired. Please sign in again."
-            403 -> "This action is not available for your account."
-            404 -> fallback
-            else -> error.message?.takeIf { it.isNotBlank() && !it.contains("http", ignoreCase = true) } ?: fallback
-        }
-    }
+    private fun message(error: Throwable, fallback: String): String = error.toVoiceCloudUserMessage(fallback)
 }

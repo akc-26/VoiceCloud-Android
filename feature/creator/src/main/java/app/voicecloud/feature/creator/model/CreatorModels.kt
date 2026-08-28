@@ -60,8 +60,8 @@ data class CreatorCmsPage(
 data class CreatorContactRequest(
     val name: String,
     val email: String,
-    val phone: String? = null,
-    val description: String,
+    val phoneNumber: String? = null,
+    val message: String,
 )
 
 @Immutable
@@ -80,7 +80,7 @@ data class CreatorUiState(
     val notice: String? = null,
 )
 
-enum class CreatorPortalSection { DASHBOARD, PROFILE, SETTINGS, HELP }
+enum class CreatorPortalSection { DASHBOARD, LIVE, PROFILE, SETTINGS, HELP }
 
 sealed interface CreatorEvent {
     data class AuthFailure(val httpStatus: Int, val message: String? = null) : CreatorEvent

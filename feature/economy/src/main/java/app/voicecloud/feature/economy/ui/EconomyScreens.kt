@@ -21,30 +21,55 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.feature.economy.billing.PaymentRail
 import app.voicecloud.feature.economy.model.*
 
-/** Legacy/deep-link hub. My Profile now exposes these modules directly. */
+/** Compact visual economy hub for wallet, membership, rewards and progression. */
 @Composable
 fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
-    Scaffold(topBar = { VoiceCloudPageTopBar("Economy & progression", onBack = onBack) }) { padding ->
+    Scaffold(topBar = { VoiceCloudPageTopBar("Wallet & Rewards", onBack = onBack) }) { padding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            item { Text("Wallet, rewards and progression", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold) }
-            itemsIndexed(economyProfileOrder) { _, section -> EconomyNavigationCard(section, onOpen) }
+            item {
+                ElevatedCard(shape = RoundedCornerShape(24.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(58.dp)) {
+                            Box(contentAlignment = Alignment.Center) { Text(voiceCloudTitleCase("✦"), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary) }
+                        }
+                        Spacer(Modifier.width(14.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(voiceCloudTitleCase("Your VoiceCloud"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text(voiceCloudTitleCase("Wallet, Rewards & Progress"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+            itemsIndexed(economyProfileOrder.chunked(2)) { _, row ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    row.forEach { section ->
+                        Box(Modifier.weight(1f)) { EconomyNavigationCard(section, onOpen) }
+                    }
+                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
         }
     }
 }
 
 @Composable
 fun EconomyNavigationCard(section: EconomySection, onOpen: (EconomySection) -> Unit) {
-    ElevatedCard(onClick = { onOpen(section) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(section.label, fontWeight = FontWeight.SemiBold)
-            Text(section.subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+    ElevatedCard(onClick = { onOpen(section) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+            Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.primaryContainer) {
+                Text(section.glyph(), modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            }
+            Text(voiceCloudTitleCase(section.label), fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(voiceCloudTitleCase(section.subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -71,28 +96,23 @@ fun EconomySectionScreen(
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
     val openHostedCheckout: (String) -> Unit = remember(context) {
-        { url ->
-            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
-        }
+        { url -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) } }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner, section) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) onPaymentResume()
-        }
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) onPaymentResume() }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(section) { onLoad() }
+    VoiceCloudToastEffect(state.error, state.notice)
     Scaffold(topBar = { VoiceCloudPageTopBar(section.label, section.subtitle, onBack) }) { padding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             if (state.loading) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
-            state.error?.let { message -> item { EconomyMessage(message, true, onLoad) } }
-            state.notice?.let { message -> item { EconomyMessage(message, false, null) } }
             if (section == EconomySection.WALLET || section == EconomySection.VIP) item {
                 PaymentRailCard(
                     rail = paymentRail,
@@ -102,19 +122,18 @@ fun EconomySectionScreen(
                 )
             }
             if (section == EconomySection.RANKINGS) item {
-                Text("Agency ranking is unavailable until the backend Agency subsystem exists.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(voiceCloudTitleCase("Live Rankings Appear When Ranking Data Is Available"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
             if (section == EconomySection.PROGRESSION) item {
-                Button(enabled = !state.busy, onClick = onClaimCheckIn, modifier = Modifier.fillMaxWidth()) { Text("Claim daily check-in") }
+                Button(enabled = !state.busy, onClick = onClaimCheckIn, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Claim Daily Check-In")) }
             }
             if (!state.loading && state.error == null) {
                 val sections = payloadSections(state.payload)
                 if (sections.isEmpty()) item { EconomyEmpty(section) }
                 sections.forEach { data ->
-                    item { Text(data.first, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold) }
-                    if (data.second.isEmpty()) item { Text("No information available yet.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    if (sections.size > 1) item { Text(voiceCloudTitleCase(data.first), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold) }
                     itemsIndexed(data.second, key = { index, item -> "${section.name}:${data.first}:$index:${item.stableId()}" }) { _, item ->
-                        EconomyDataCard(
+                        EconomyVisualCard(
                             section = section,
                             group = data.first,
                             item = item,
@@ -124,12 +143,8 @@ fun EconomySectionScreen(
                             onEquip = onEquip,
                             onUnequip = onUnequip,
                             onBuyTicket = onBuyTicket,
-                            onBuyWalletCredits = { packageId, productId ->
-                                if (activity != null) onBuyWalletCredits(activity, packageId, productId, openHostedCheckout)
-                            },
-                            onBuyVip = { tierId, productId, cycle ->
-                                if (activity != null) onBuyVip(activity, tierId, productId, cycle, openHostedCheckout)
-                            },
+                            onBuyWalletCredits = { packageId, productId -> if (activity != null) onBuyWalletCredits(activity, packageId, productId, openHostedCheckout) },
+                            onBuyVip = { tierId, productId, cycle -> if (activity != null) onBuyVip(activity, tierId, productId, cycle, openHostedCheckout) },
                         )
                     }
                 }
@@ -139,27 +154,18 @@ fun EconomySectionScreen(
 }
 
 @Composable
-private fun EconomyMessage(message: String, error: Boolean, retry: (() -> Unit)?) {
-    Card(colors = CardDefaults.cardColors(containerColor = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer)) {
-        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(message, modifier = Modifier.weight(1f), color = if (error) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer)
-            if (retry != null) TextButton(onClick = retry) { Text("Retry") }
-        }
-    }
-}
-
-@Composable
 private fun EconomyEmpty(section: EconomySection) {
-    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("No ${section.label.lowercase()} information yet", fontWeight = FontWeight.SemiBold)
-            Text("VoiceCloud will show server-authorized information here when it is available.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
+        Column(Modifier.padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Text(section.glyph(), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+            Text(voiceCloudTitleCase("Nothing Here Yet"), fontWeight = FontWeight.SemiBold)
+            Text(voiceCloudTitleCase("New ${section.label} Activity Will Appear Here"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
 
 @Composable
-private fun EconomyDataCard(
+private fun EconomyVisualCard(
     section: EconomySection,
     group: String,
     item: Map<String, Any?>,
@@ -172,60 +178,57 @@ private fun EconomyDataCard(
     onBuyWalletCredits: (String, String) -> Unit,
     onBuyVip: (String, String, String?) -> Unit,
 ) {
-    val title = item.text("title", "name", "label", "username", "roomTitle", "code").ifBlank { "Details" }
+    val title = item.text("title", "name", "label", "username", "roomTitle", "code").ifBlank { voiceCloudTitleCase(group.ifBlank { section.label }) }
     val id = item.text("id", "itemId", "taskId", "roomId", "scheduledRoomId")
-    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            item.entries
-                .filter { (key, value) -> key !in setOf("id", "itemId", "taskId", "roomId", "scheduledRoomId", "title", "name", "label") && value.isDisplayScalar() }
-                .take(8)
-                .forEach { (key, value) ->
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(key.toString().humanize(), modifier = Modifier.weight(.42f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(value.displayValue(), modifier = Modifier.weight(.58f), style = MaterialTheme.typography.bodyMedium)
+    val hero = item.firstDisplayValue("balance", "availableBalance", "coinBalance", "coins", "amount", "price", "reward", "rewardAmount", "xp", "points", "level", "rank", "streak", "progress", "total")
+    val details = item.conciseDetails()
+    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
+        Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.primaryContainer) {
+                    Text(section.glyph(), modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                }
+                Spacer(Modifier.width(12.dp))
+                Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+            if (hero != null) Text(hero, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (details.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    details.take(2).forEach { detail ->
+                        Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+                            Text(detail, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
                     }
                 }
+            }
             val normalizedGroup = group.lowercase()
             if (section == EconomySection.WALLET && normalizedGroup.contains("package")) {
                 val packageId = item.text("packageId", "id")
                 val productId = item.text("googlePlayProductId", "googleProductId", "productId")
-                if (packageId.isNotBlank()) {
-                    Button(
-                        enabled = !busy,
-                        onClick = { onBuyWalletCredits(packageId, productId) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Add credits") }
-                }
+                if (packageId.isNotBlank()) Button(enabled = !busy, onClick = { onBuyWalletCredits(packageId, productId) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Add Credits")) }
             }
             if (section == EconomySection.VIP && (normalizedGroup.contains("plan") || normalizedGroup.contains("catalog") || normalizedGroup.contains("tier"))) {
                 val tierId = item.text("tierId", "planId", "id")
                 val productId = item.text("googlePlayProductId", "googlePlaySubscriptionProductId", "androidProductId", "productId")
                 val cycle = item.text("cycle", "billingCycle", "period").takeIf { it.isNotBlank() }
-                if (tierId.isNotBlank()) {
-                    Button(
-                        enabled = !busy,
-                        onClick = { onBuyVip(tierId, productId, cycle) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Choose VIP") }
-                }
+                if (tierId.isNotBlank()) Button(enabled = !busy, onClick = { onBuyVip(tierId, productId, cycle) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Choose VIP")) }
             }
             if (id.isNotBlank()) {
                 when (section) {
                     EconomySection.TASKS -> if (item.actionable("claimable", "canClaim") || item.text("status").uppercase() in setOf("COMPLETED", "CLAIMABLE")) {
-                        Button(enabled = !busy, onClick = { onClaimTask(id) }) { Text("Claim reward") }
+                        Button(enabled = !busy, onClick = { onClaimTask(id) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Claim Reward")) }
                     }
                     EconomySection.STORE -> {
                         val owned = item.actionable("owned", "isOwned", "purchased")
                         val equipped = item.actionable("equipped", "isEquipped")
                         when {
-                            equipped -> OutlinedButton(enabled = !busy, onClick = { onUnequip(id) }) { Text("Unequip") }
-                            owned -> OutlinedButton(enabled = !busy, onClick = { onEquip(id) }) { Text("Equip") }
-                            else -> Button(enabled = !busy, onClick = { onBuyItem(id) }) { Text("Purchase") }
+                            equipped -> OutlinedButton(enabled = !busy, onClick = { onUnequip(id) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Unequip")) }
+                            owned -> OutlinedButton(enabled = !busy, onClick = { onEquip(id) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Equip")) }
+                            else -> Button(enabled = !busy, onClick = { onBuyItem(id) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Purchase")) }
                         }
                     }
                     EconomySection.TICKETS -> if (item.actionable("canPurchase", "availableForPurchase")) {
-                        Button(enabled = !busy, onClick = { onBuyTicket(id) }) { Text("Buy ticket") }
+                        Button(enabled = !busy, onClick = { onBuyTicket(id) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Buy Ticket")) }
                     }
                     else -> Unit
                 }
@@ -235,31 +238,41 @@ private fun EconomyDataCard(
 }
 
 @Composable
-private fun PaymentRailCard(
-    rail: PaymentRail,
-    section: EconomySection,
-    busy: Boolean,
-    onRestore: () -> Unit,
-) {
-    Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(
-                if (rail == PaymentRail.HOSTED_GATEWAY) "Secure payment gateway" else "Google Play billing",
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                if (rail == PaymentRail.HOSTED_GATEWAY)
-                    "VoiceCloud uses the active payment gateway configured by Admin. Payment details stay with the provider and credits/membership update only after server verification."
-                else
-                    "Google Play purchase authority is verified by VoiceCloud before ${if (section == EconomySection.WALLET) "wallet credits" else "VIP access"} are applied.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
-            )
-            if (rail == PaymentRail.GOOGLE_PLAY) {
-                TextButton(enabled = !busy, onClick = onRestore) { Text("Restore purchases") }
+private fun PaymentRailCard(rail: PaymentRail, section: EconomySection, busy: Boolean, onRestore: () -> Unit) {
+    Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
+        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(voiceCloudTitleCase(if (rail == PaymentRail.HOSTED_GATEWAY) "Secure Payment" else "Google Play Billing"), fontWeight = FontWeight.SemiBold)
+                Text(voiceCloudTitleCase(if (section == EconomySection.WALLET) "Verified Wallet Credits" else "Verified VIP Access"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
+            if (rail == PaymentRail.GOOGLE_PLAY) TextButton(enabled = !busy, onClick = onRestore) { Text(voiceCloudTitleCase("Restore")) }
         }
     }
+}
+
+private fun EconomySection.glyph(): String = when (this) {
+    EconomySection.WALLET -> "◈"
+    EconomySection.VIP -> "VIP"
+    EconomySection.STORE -> "✦"
+    EconomySection.GIFTS -> "♥"
+    EconomySection.TASKS -> "✓"
+    EconomySection.ACHIEVEMENTS -> "★"
+    EconomySection.PROGRESSION -> "XP"
+    EconomySection.RANKINGS -> "#"
+    EconomySection.TICKETS -> "◇"
+    EconomySection.REFERRALS -> "+1"
+}
+
+private fun Map<String, Any?>.firstDisplayValue(vararg keys: String): String? = keys.firstNotNullOfOrNull { key ->
+    this[key]?.takeIf { it.isDisplayScalar() }?.displayValue()?.takeIf { it.isNotBlank() && it != "—" }
+}
+
+private fun Map<String, Any?>.conciseDetails(): List<String> {
+    val preferred = listOf("status", "currency", "category", "type", "cycle", "billingCycle", "period", "level", "streak", "code")
+    return preferred.mapNotNull { key ->
+        val value = this[key]?.takeIf { it.isDisplayScalar() }?.displayValue()?.takeIf { it.isNotBlank() && it != "—" } ?: return@mapNotNull null
+        "${key.humanize()}: $value"
+    }.distinct().take(2)
 }
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {

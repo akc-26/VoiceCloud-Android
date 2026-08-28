@@ -1,5 +1,6 @@
 package app.voicecloud.feature.live.ui
 
+import app.voicecloud.core.network.toVoiceCloudUserMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.voicecloud.core.realtime.RealtimeConnectionState
@@ -479,7 +480,7 @@ class LiveRoomViewModel @Inject constructor(
         }
     }
 
-    private fun readable(error: Throwable): String = error.message?.takeIf { it.isNotBlank() } ?: "The app could not complete this action."
+    private fun readable(error: Throwable): String = error.toVoiceCloudUserMessage("This Room Action Couldn’t Be Completed. Try Again.", unavailable = "Live Room Services Are Temporarily Unavailable. Try Again Soon.")
 
     override fun onCleared() {
         invalidateSession()

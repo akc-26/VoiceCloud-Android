@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
@@ -58,15 +60,8 @@ private fun HostPage(
 
 @Composable
 private fun HostingStatus(state: HostingUiState) {
-    when {
-        state.loading -> Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-        state.error != null -> Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
-            Text(state.error, Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
-        }
-        state.notice != null -> Card(colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
-            Text(state.notice, Modifier.padding(14.dp), color = ConsumerColors.Text)
-        }
-    }
+    VoiceCloudToastEffect(state.error, state.notice)
+    if (state.loading) Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
 }
 
 @Composable
@@ -88,26 +83,26 @@ fun HostStudioScreen(
             if (!approved) {
                 Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Host access", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(voiceCloudTitleCase("Host Access"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(state.eligibility?.reasons?.firstOrNull() ?: "An approved Host profile is required before you can create or broadcast rooms.")
-                        state.eligibility?.reasons.orEmpty().drop(1).take(3).forEach { Text("• $it", style = MaterialTheme.typography.bodySmall) }
+                        state.eligibility?.reasons.orEmpty().drop(1).take(3).forEach { Text(voiceCloudTitleCase("• $it"), style = MaterialTheme.typography.bodySmall) }
                         state.eligibility?.let { eligibility ->
                             if (eligibility.applicationsEnabled && eligibility.eligible) {
-                                Text("Your account currently meets the Host eligibility requirements.", color = ConsumerColors.SapphireDeep)
+                                Text(voiceCloudTitleCase("Your Account Currently Meets The Host Eligibility Requirements."), color = ConsumerColors.SapphireDeep)
                             }
                         }
                     }
                 }
             } else {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(onClick = onCreateRoom, modifier = Modifier.weight(1f)) { Text("Create room", maxLines = 1) }
-                    OutlinedButton(onClick = onScheduleRoom, modifier = Modifier.weight(1f)) { Text("Schedule", maxLines = 1) }
+                    Button(onClick = onCreateRoom, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Create Room"), maxLines = 1) }
+                    OutlinedButton(onClick = onScheduleRoom, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Schedule"), maxLines = 1) }
                 }
-                Text("My rooms", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                if (state.rooms.isEmpty() && !state.loading) Text("No rooms yet. Create your first room when you are ready to host.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(voiceCloudTitleCase("My Rooms"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                if (state.rooms.isEmpty() && !state.loading) Text(voiceCloudTitleCase("No Rooms Yet. Create Your First Room When You Are Ready To Host."), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.rooms.forEach { room -> HostRoomCard(room, { onRoom(room.id) }) }
-                Text("Scheduled", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                if (state.schedules.isEmpty() && !state.loading) Text("No upcoming rooms.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(voiceCloudTitleCase("Scheduled"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                if (state.schedules.isEmpty() && !state.loading) Text(voiceCloudTitleCase("No Upcoming Rooms."), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.schedules.forEach { schedule ->
                     Card(Modifier.fillMaxWidth().clickable { onSchedule(schedule.id) }) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -115,9 +110,9 @@ fun HostStudioScreen(
                             Text(formatSchedule(schedule.scheduledStartTime, schedule.timeZone), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Text(schedule.visibility, style = MaterialTheme.typography.labelMedium)
-                                if (schedule.isPremium) Text("Ticketed", style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
+                                if (schedule.isPremium) Text(voiceCloudTitleCase("Ticketed"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
                             }
-                            Button(onClick = { onStartScheduled(schedule) }) { Text("Start room") }
+                            Button(onClick = { onStartScheduled(schedule) }) { Text(voiceCloudTitleCase("Start Room")) }
                         }
                     }
                 }
@@ -134,9 +129,9 @@ private fun HostRoomCard(room: HostRoom, onOpen: () -> Unit) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(room.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(room.category + " · " + room.status.replaceFirstChar { it.uppercase() }, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (room.isPremium || room.isTicketRequired) Text("Ticket access enabled", style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
+                if (room.isPremium || room.isTicketRequired) Text(voiceCloudTitleCase("Ticket Access Enabled"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
             }
-            Text("Open", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.SemiBold)
+            Text(voiceCloudTitleCase("Open"), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -163,16 +158,16 @@ fun RoomEditorScreen(
     var price by rememberSaveable(roomId, existing?.id) { mutableStateOf(existing?.ticketPriceAmount?.toString()?.takeIf { it != "null" } ?: "0") }
     HostPage(if (roomId == null) "Create Room" else "Room Settings", "Room access and ticket settings stay server-authoritative.", onBack) {
         HostingStatus(state)
-        OutlinedTextField(title, { title = it }, label = { Text("Room title") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(description, { description = it }, label = { Text("Description") }, minLines = 3, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(category, { category = it }, label = { Text("Category") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Room Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 3, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(category, { category = it }, label = { Text(voiceCloudTitleCase("Category")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         SwitchLine("Private room", privateRoom) { privateRoom = it; if (it) inviteOnly = true }
         SwitchLine("Lock room entry", locked) { locked = it }
         SwitchLine("Invite only", inviteOnly) { inviteOnly = it }
         SwitchLine("Subscribers only", subscriberOnly) { subscriberOnly = it }
         SwitchLine("Verified listeners only", verifiedOnly) { verifiedOnly = it }
         SwitchLine("Ticketed / premium access", ticketed) { ticketed = it }
-        if (ticketed) OutlinedTextField(price, { price = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text("Ticket price") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        if (ticketed) OutlinedTextField(price, { price = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text(voiceCloudTitleCase("Ticket Price")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         Button(
             enabled = title.trim().length >= 3 && !state.loading,
             onClick = {
@@ -194,7 +189,7 @@ fun RoomEditorScreen(
                 ))
             },
             modifier = Modifier.fillMaxWidth(),
-        ) { Text(if (roomId == null) "Create room" else "Save settings") }
+        ) { Text(voiceCloudTitleCase(if (roomId == null) "Create room" else "Save settings")) }
         Spacer(Modifier.height(24.dp))
     }
 }
@@ -202,7 +197,7 @@ fun RoomEditorScreen(
 @Composable
 private fun SwitchLine(label: String, checked: Boolean, onChecked: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, Modifier.weight(1f))
+        Text(voiceCloudTitleCase(label), Modifier.weight(1f))
         Switch(checked, onCheckedChange = onChecked)
     }
 }
@@ -235,8 +230,8 @@ fun ScheduleEditorScreen(
     val context = LocalContext.current
     HostPage(if (scheduleId == null) "Schedule Room" else "Edit Schedule", "Times are shown in your device time zone (${zone.id}).", onBack) {
         HostingStatus(state)
-        OutlinedTextField(title, { title = it }, label = { Text("Title") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(description, { description = it }, label = { Text("Description") }, minLines = 2, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 2, modifier = Modifier.fillMaxWidth())
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(
                 onClick = {
@@ -250,15 +245,15 @@ fun ScheduleEditorScreen(
                 modifier = Modifier.weight(1f)
             ) { Text(time.format(DateTimeFormatter.ofPattern("hh:mm a")), maxLines = 1) }
         }
-        OutlinedTextField(duration, { duration = it.filter(Char::isDigit) }, label = { Text("Duration (minutes)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(duration, { duration = it.filter(Char::isDigit) }, label = { Text(voiceCloudTitleCase("Duration (Minutes)")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         SwitchLine("Private schedule", privateRoom) { privateRoom = it; if (it) inviteOnly = true }
         SwitchLine("Invite only", inviteOnly) { inviteOnly = it }
         SwitchLine("Ticketed / premium", ticketed) { ticketed = it }
-        if (ticketed) OutlinedTextField(price, { price = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text("Ticket price") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        if (ticketed) OutlinedTextField(price, { price = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text(voiceCloudTitleCase("Ticket Price")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         val localDateTime = LocalDateTime.of(date, time)
         val offset = localDateTime.atZone(zone).toOffsetDateTime()
         val future = offset.isAfter(OffsetDateTime.now(zone))
-        if (!future) Text("Choose a future date and time.", color = MaterialTheme.colorScheme.error)
+        if (!future) Text(voiceCloudTitleCase("Choose A Future Date & Time"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         Button(
             enabled = title.trim().length >= 3 && future && !state.loading,
             onClick = {
@@ -278,8 +273,8 @@ fun ScheduleEditorScreen(
                     clubId = existing?.clubId,
                 ))
             }, modifier = Modifier.fillMaxWidth()
-        ) { Text(if (scheduleId == null) "Schedule room" else "Save schedule") }
-        if (onDelete != null) OutlinedButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) { Text("Delete schedule") }
+        ) { Text(voiceCloudTitleCase(if (scheduleId == null) "Schedule room" else "Save schedule")) }
+        if (onDelete != null) OutlinedButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Delete Schedule")) }
         Spacer(Modifier.height(24.dp))
     }
 }
@@ -292,7 +287,7 @@ fun HostRoomManageScreen(
     onSettings: () -> Unit,
     onStart: () -> Unit,
     onOpenConsole: () -> Unit,
-    onInteractive: () -> Unit,
+    onInteractive: (() -> Unit)? = null,
     onPause: () -> Unit,
     onResume: () -> Unit,
     onEnd: () -> Unit,
@@ -307,28 +302,28 @@ fun HostRoomManageScreen(
             Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(room.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text("${room.status.replaceFirstChar { it.uppercase() }} · ${room.participantCount} participants")
-                    if (room.isPrivate || room.isInviteOnly) Text("Restricted access", color = ConsumerColors.SapphireDeep)
-                    if (room.isTicketRequired || room.isPremium) Text("Ticket access enabled", color = ConsumerColors.SapphireDeep)
+                    Text(voiceCloudTitleCase("${room.status.replaceFirstChar { it.uppercase() }} · ${room.participantCount} Participants"))
+                    if (room.isPrivate || room.isInviteOnly) Text(voiceCloudTitleCase("Restricted Access"), color = ConsumerColors.SapphireDeep)
+                    if (room.isTicketRequired || room.isPremium) Text(voiceCloudTitleCase("Ticket Access Enabled"), color = ConsumerColors.SapphireDeep)
                 }
             }
-            OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth()) { Text("Room settings") }
+            OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Room Settings")) }
             when {
                 room.status.equals("paused", true) -> {
-                    Button(onClick = onResume, modifier = Modifier.fillMaxWidth()) { Text("Resume room") }
-                    OutlinedButton(onClick = onEnd, modifier = Modifier.fillMaxWidth()) { Text("End room") }
+                    Button(onClick = onResume, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Resume Room")) }
+                    OutlinedButton(onClick = onEnd, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("End Room")) }
                 }
                 room.isLive || room.status.equals("live", true) -> {
-                    Button(onClick = onOpenConsole, modifier = Modifier.fillMaxWidth()) { Text("Open host console") }
-                    OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text("Polls & quiz") }
+                    Button(onClick = onOpenConsole, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Open Host Console")) }
+                    if (onInteractive != null) OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Polls & Quiz")) }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) { Text("Pause") }
-                        OutlinedButton(onClick = onEnd, modifier = Modifier.weight(1f)) { Text("End") }
+                        OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Pause")) }
+                        OutlinedButton(onClick = onEnd, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("End")) }
                     }
                 }
-                else -> Button(onClick = onStart, modifier = Modifier.fillMaxWidth()) { Text("Start room") }
+                else -> Button(onClick = onStart, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Start Room")) }
             }
-            OutlinedButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) { Text("Delete room") }
+            OutlinedButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Delete Room")) }
         }
         Spacer(Modifier.height(24.dp))
     }
@@ -352,7 +347,7 @@ fun HostLiveConsoleScreen(
     onMuteSpeaker: (String, Boolean) -> Unit,
     onSearchInvite: (String) -> Unit,
     onInviteParticipant: (String) -> Unit,
-    onInteractive: () -> Unit,
+    onInteractive: (() -> Unit)? = null,
     onBack: () -> Unit,
 ) {
     LaunchedEffect(roomId) { onEnter() }
@@ -368,9 +363,10 @@ fun HostLiveConsoleScreen(
     val stage = state.stage
     HostPage("Host Console", room?.title ?: "Live room", onBack) {
         HostingStatus(state)
+        VoiceCloudToastEffect(if (permissionDenied) "Microphone Permission Is Required To Speak" else null, null)
         Card(Modifier.fillMaxWidth().background(ConsumerBrushes.Hero)) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(if (state.rtcConnected) "Live audio connected" else "Connecting live audio…", fontWeight = FontWeight.Bold)
+                Text(voiceCloudTitleCase(if (state.rtcConnected) "Live audio connected" else "Connecting live audio…"), fontWeight = FontWeight.Bold)
                 Button(
                     enabled = state.rtcConnected && !state.microphoneBusy,
                     onClick = {
@@ -379,36 +375,36 @@ fun HostLiveConsoleScreen(
                         else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text(if (state.microphoneEnabled) "Mute microphone" else "Go on mic") }
-                if (permissionDenied) Text("Microphone permission is required to speak. You can still host and listen without it.", color = MaterialTheme.colorScheme.error)
+                ) { Text(voiceCloudTitleCase(if (state.microphoneEnabled) "Mute microphone" else "Go on mic")) }
+                if (permissionDenied) Text(voiceCloudTitleCase("You Can Still Host And Listen Without Microphone Access"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) { Text("Pause") }
-                    OutlinedButton(onClick = onResume, modifier = Modifier.weight(1f)) { Text("Resume") }
-                    OutlinedButton(onClick = onEnd, modifier = Modifier.weight(1f)) { Text("End") }
+                    OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Pause")) }
+                    OutlinedButton(onClick = onResume, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Resume")) }
+                    OutlinedButton(onClick = onEnd, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("End")) }
                 }
-                OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text("Polls & quiz") }
+                if (onInteractive != null) OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Polls & Quiz")) }
             }
         }
-        Text("Raised hands", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        if (state.stage?.handQueue.isNullOrEmpty()) Text("No raised hands right now.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(voiceCloudTitleCase("Raised Hands"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        if (state.stage?.handQueue.isNullOrEmpty()) Text(voiceCloudTitleCase("No Raised Hands Right Now."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         stage?.handQueue.orEmpty().forEach { hand ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(stageName(hand.userId, stage, viewerId), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                TextButton(onClick = { onReject(hand.userId) }) { Text("Reject") }
-                Button(onClick = { onApprove(hand.userId) }) { Text("Approve") }
+                TextButton(onClick = { onReject(hand.userId) }) { Text(voiceCloudTitleCase("Reject")) }
+                Button(onClick = { onApprove(hand.userId) }) { Text(voiceCloudTitleCase("Approve")) }
             }
         }
-        Text("Speakers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(voiceCloudTitleCase("Speakers"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         stage?.speakers.orEmpty().forEach { speaker ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(speaker.username ?: stageName(speaker.userId, stage, viewerId), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (speaker.userId != viewerId) {
-                    TextButton(onClick = { onMuteSpeaker(speaker.userId, !speaker.isMuted) }) { Text(if (speaker.isMuted) "Unmute" else "Mute") }
-                    TextButton(onClick = { onRemoveSpeaker(speaker.userId) }) { Text("Remove") }
+                    TextButton(onClick = { onMuteSpeaker(speaker.userId, !speaker.isMuted) }) { Text(voiceCloudTitleCase(if (speaker.isMuted) "Unmute" else "Mute")) }
+                    TextButton(onClick = { onRemoveSpeaker(speaker.userId) }) { Text(voiceCloudTitleCase("Remove")) }
                 }
             }
         }
-        Text("Audience", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(voiceCloudTitleCase("Audience"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         val currentSpeakers = stage?.speakers.orEmpty()
         stage?.participants.orEmpty()
             .filter { participant -> currentSpeakers.none { speaker -> speaker.userId == participant.userId } }
@@ -416,21 +412,21 @@ fun HostLiveConsoleScreen(
             .forEach { participant ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(participant.username ?: "Listener", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (participant.userId != viewerId) TextButton(onClick = { onInviteSpeaker(participant.userId) }) { Text("Invite to stage") }
+                if (participant.userId != viewerId) TextButton(onClick = { onInviteSpeaker(participant.userId) }) { Text(voiceCloudTitleCase("Invite To Stage")) }
             }
         }
-        Text("Invite participant", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(voiceCloudTitleCase("Invite Participant"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         OutlinedTextField(
-            inviteQuery, { inviteQuery = it; onSearchInvite(it) }, label = { Text("Search people") },
+            inviteQuery, { inviteQuery = it; onSearchInvite(it) }, label = { Text(voiceCloudTitleCase("Search People")) },
             singleLine = true, modifier = Modifier.fillMaxWidth()
         )
         state.inviteCandidates.take(6).forEach { candidate ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(candidate.displayName.ifBlank { candidate.username }, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                    Text("@${candidate.username}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(voiceCloudTitleCase("@${candidate.username}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Button(onClick = { onInviteParticipant(candidate.id) }) { Text("Invite") }
+                Button(onClick = { onInviteParticipant(candidate.id) }) { Text(voiceCloudTitleCase("Invite")) }
             }
         }
         Spacer(Modifier.height(30.dp))
@@ -468,49 +464,49 @@ fun PollsQuizScreen(
     var correct by rememberSaveable { mutableStateOf("1") }
     HostPage("Polls & Quiz", "Create live interactions without leaving the room.", onBack) {
         HostingStatus(state)
-        Text("Polls", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        OutlinedTextField(pollTitle, { pollTitle = it }, label = { Text("Poll question") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(pollOptions, { pollOptions = it }, label = { Text("Options, separated by commas") }, modifier = Modifier.fillMaxWidth())
+        Text(voiceCloudTitleCase("Polls"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        OutlinedTextField(pollTitle, { pollTitle = it }, label = { Text(voiceCloudTitleCase("Poll Question")) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(pollOptions, { pollOptions = it }, label = { Text(voiceCloudTitleCase("Options, Separated By Commas")) }, modifier = Modifier.fillMaxWidth())
         val parsedPollOptions = pollOptions.split(',').map(String::trim).filter(String::isNotBlank).distinct()
         Button(
             onClick = { onCreatePoll(CreatePollBody(roomId, pollTitle.trim(), options = parsedPollOptions, durationSeconds = 60)); pollTitle = ""; pollOptions = "" },
             enabled = pollTitle.trim().isNotBlank() && parsedPollOptions.size >= 2,
-        ) { Text("Create poll") }
+        ) { Text(voiceCloudTitleCase("Create Poll")) }
         state.polls.forEach { poll ->
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(poll.title, fontWeight = FontWeight.Bold)
-                    Text(poll.status, style = MaterialTheme.typography.labelMedium)
+                    Text(voiceCloudTitleCase(poll.status), style = MaterialTheme.typography.labelMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (!poll.status.equals("ACTIVE", true)) TextButton(onClick = { onStartPoll(poll.id) }) { Text("Start") }
-                        else TextButton(onClick = { onStopPoll(poll.id) }) { Text("Stop") }
-                        TextButton(onClick = { onDeletePoll(poll.id) }) { Text("Delete") }
+                        if (!poll.status.equals("ACTIVE", true)) TextButton(onClick = { onStartPoll(poll.id) }) { Text(voiceCloudTitleCase("Start")) }
+                        else TextButton(onClick = { onStopPoll(poll.id) }) { Text(voiceCloudTitleCase("Stop")) }
+                        TextButton(onClick = { onDeletePoll(poll.id) }) { Text(voiceCloudTitleCase("Delete")) }
                     }
                 }
             }
         }
         HorizontalDivider()
-        Text("Quiz", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(voiceCloudTitleCase("Quiz"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         val active = state.activeQuiz
         if (active != null) {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(active.title, fontWeight = FontWeight.Bold)
-                    Text("${active.status} · Round ${active.currentRound ?: 0}/${active.totalRounds}")
+                    Text(voiceCloudTitleCase("${active.status} · Round ${active.currentRound ?: 0}/${active.totalRounds}"))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (!active.status.equals("ACTIVE", true)) Button(onClick = { onStartQuiz(active.id) }) { Text("Start") }
+                        if (!active.status.equals("ACTIVE", true)) Button(onClick = { onStartQuiz(active.id) }) { Text(voiceCloudTitleCase("Start")) }
                         else {
-                            OutlinedButton(onClick = { onNextQuiz(active.id) }) { Text("Next round") }
-                            OutlinedButton(onClick = { onStopQuiz(active.id) }) { Text("Stop") }
+                            OutlinedButton(onClick = { onNextQuiz(active.id) }) { Text(voiceCloudTitleCase("Next Round")) }
+                            OutlinedButton(onClick = { onStopQuiz(active.id) }) { Text(voiceCloudTitleCase("Stop")) }
                         }
                     }
                 }
             }
         } else {
-            OutlinedTextField(quizTitle, { quizTitle = it }, label = { Text("Quiz title") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(question, { question = it }, label = { Text("Question") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(quizOptions, { quizOptions = it }, label = { Text("Options, separated by commas") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(correct, { correct = it.filter(Char::isDigit) }, label = { Text("Correct option number") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(quizTitle, { quizTitle = it }, label = { Text(voiceCloudTitleCase("Quiz Title")) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(question, { question = it }, label = { Text(voiceCloudTitleCase("Question")) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(quizOptions, { quizOptions = it }, label = { Text(voiceCloudTitleCase("Options, Separated By Commas")) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(correct, { correct = it.filter(Char::isDigit) }, label = { Text(voiceCloudTitleCase("Correct Option Number")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
             val opts = quizOptions.split(',').map(String::trim).filter(String::isNotBlank)
             val correctIndex = (correct.toIntOrNull() ?: 1) - 1
             Button(
@@ -518,7 +514,7 @@ fun PollsQuizScreen(
                 onClick = {
                     onCreateQuiz(CreateQuizBody(roomId, quizTitle.trim(), totalRounds = 1, questions = listOf(QuizQuestionInput(1, question.trim(), opts, correctIndex))))
                 },
-            ) { Text("Create quiz") }
+            ) { Text(voiceCloudTitleCase("Create Quiz")) }
         }
         Spacer(Modifier.height(30.dp))
     }

@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.component.VoiceCloudTopBarIconAction
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
@@ -80,25 +82,17 @@ private fun adaptivePagePadding(): PaddingValues {
 
 @Composable
 private fun Feedback(state: EngagementUiState, retry: (() -> Unit)? = null) {
-    when {
-        state.loading -> Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-        state.error != null -> Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(state.error, color = MaterialTheme.colorScheme.error)
-                if (retry != null) OutlinedButton(onClick = retry) { Text("Try again") }
-            }
-        }
-        state.notice != null -> Text(state.notice, color = ConsumerColors.SapphireDeep, modifier = Modifier.fillMaxWidth())
-    }
+    VoiceCloudToastEffect(state.error, state.notice)
+    if (state.loading) Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
 }
 
 @Composable
 private fun Empty(title: String, body: String) {
     Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(title, fontWeight = FontWeight.Bold)
+            Text(voiceCloudTitleCase(title), fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(6.dp))
-            Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase(body), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -123,7 +117,7 @@ private fun RowScope.QuickAction(label: String, iconRes: Int, onClick: () -> Uni
                     modifier = Modifier.padding(6.dp).size(18.dp),
                 )
             }
-            Text(label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+            Text(voiceCloudTitleCase(label), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
         }
     }
 }
@@ -174,11 +168,11 @@ fun CommunitiesScreen(
                     Box(Modifier.fillMaxWidth().background(ConsumerBrushes.Hero).padding(20.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                Text("Build your circle", color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
-                                Text("Create a place for your audience.", color = ConsumerColors.Text, style = MaterialTheme.typography.bodyMedium)
+                                Text(voiceCloudTitleCase("Build Your Circle"), color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+                                Text(voiceCloudTitleCase("Create A Place For Your Audience."), color = ConsumerColors.Text, style = MaterialTheme.typography.bodyMedium)
                             }
                             FilledIconButton(onClick = onCreate, modifier = Modifier.size(52.dp)) {
-                                Text("+", fontSize = 27.sp, fontWeight = FontWeight.Medium)
+                                Text(voiceCloudTitleCase("+"), fontSize = 27.sp, fontWeight = FontWeight.Medium)
                             }
                         }
                     }
@@ -199,12 +193,12 @@ fun CommunitiesScreen(
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(community.name.ifBlank { "Community" }, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                if (community.isVerified) Text("✓", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                                if (community.isVerified) Text(voiceCloudTitleCase("✓"), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
                             }
-                            Text("@${community.handle} · ${community.memberCount} members", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(voiceCloudTitleCase("@${community.handle} · ${community.memberCount} Members"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             if (community.description.isNotBlank()) Text(community.description, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
                         }
-                        Text("›", fontSize = 24.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(voiceCloudTitleCase("›"), fontSize = 24.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -257,7 +251,7 @@ fun CommunityDetailScreen(
                                 Spacer(Modifier.width(14.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(community.name, style = MaterialTheme.typography.titleLarge)
-                                    Text("${community.category} · ${community.visibility.lowercase().replaceFirstChar(Char::uppercase)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(voiceCloudTitleCase("${community.category} · ${community.visibility.lowercase().replaceFirstChar(Char::uppercase)}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                             if (community.description.isNotBlank()) Text(community.description, maxLines = 4, overflow = TextOverflow.Ellipsis)
@@ -272,32 +266,32 @@ fun CommunityDetailScreen(
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         if (isGuest) {
-                            Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade to join") }
+                            Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Upgrade To Join")) }
                         } else if (membership?.member == true) {
-                            if (canManage) Button(onClick = onManage, modifier = Modifier.fillMaxWidth()) { Text("Manage community") }
-                            if (membership.role?.uppercase() != "OWNER") OutlinedButton(onClick = onLeave, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text("Leave community") }
+                            if (canManage) Button(onClick = onManage, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Manage Community")) }
+                            if (membership.role?.uppercase() != "OWNER") OutlinedButton(onClick = onLeave, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Leave Community")) }
                         } else {
-                            if (isPrivate) OutlinedTextField(inviteCode, { inviteCode = it }, modifier = Modifier.fillMaxWidth(), placeholder = { Text("Invitation code") }, singleLine = true, shape = RoundedCornerShape(18.dp))
-                            Button(onClick = { onJoin(inviteCode.ifBlank { null }) }, enabled = !state.mutationBusy && (!isPrivate || inviteCode.isNotBlank()), modifier = Modifier.fillMaxWidth()) { Text(if (isPrivate) "Join with code" else "Join community") }
+                            if (isPrivate) OutlinedTextField(inviteCode, { inviteCode = it }, modifier = Modifier.fillMaxWidth(), placeholder = { Text(voiceCloudTitleCase("Invitation Code")) }, singleLine = true, shape = RoundedCornerShape(18.dp))
+                            Button(onClick = { onJoin(inviteCode.ifBlank { null }) }, enabled = !state.mutationBusy && (!isPrivate || inviteCode.isNotBlank()), modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(if (isPrivate) "Join with code" else "Join community")) }
                         }
                     }
                 }
                 if (!isPrivate || membership?.member == true) {
                     item {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            OutlinedButton(onClick = onMembers, modifier = Modifier.weight(1f)) { Text("Members", maxLines = 1, softWrap = false) }
-                            OutlinedButton(onClick = onEvents, modifier = Modifier.weight(1f)) { Text("Events", maxLines = 1, softWrap = false) }
+                            OutlinedButton(onClick = onMembers, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Members"), maxLines = 1, softWrap = false) }
+                            OutlinedButton(onClick = onEvents, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Events"), maxLines = 1, softWrap = false) }
                         }
                     }
                     if (community.rules.isNotEmpty()) item {
                         ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
                             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("Community rules", fontWeight = FontWeight.Bold)
-                                community.rules.take(4).forEachIndexed { index, rule -> Text("${index + 1}. $rule", style = MaterialTheme.typography.bodyMedium) }
+                                Text(voiceCloudTitleCase("Community Rules"), fontWeight = FontWeight.Bold)
+                                community.rules.take(4).forEachIndexed { index, rule -> Text(voiceCloudTitleCase("${index + 1}. $rule"), style = MaterialTheme.typography.bodyMedium) }
                             }
                         }
                     }
-                    if (state.communityEvents.isNotEmpty()) item { Text("Upcoming", style = MaterialTheme.typography.titleLarge) }
+                    if (state.communityEvents.isNotEmpty()) item { Text(voiceCloudTitleCase("Upcoming"), style = MaterialTheme.typography.titleLarge) }
                     itemsIndexed(state.communityEvents.take(3).distinctBy { it.id }, key = { i, event -> "community-event:${event.id}:$i" }) { _, event -> EventCard(event, onClick = onEvents) }
                 } else item { Empty("Private community", "Join to continue.") }
             }
@@ -309,7 +303,7 @@ fun CommunityDetailScreen(
 private fun CommunityStat(value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontWeight = FontWeight.Bold, color = ConsumerColors.SapphireDeep)
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -344,42 +338,42 @@ fun CommunityEditorScreen(
                     }
                     Spacer(Modifier.width(14.dp))
                     Column {
-                        Text("Start a community", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
-                        Text("Name it. Shape it. Grow it.", style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.Text)
+                        Text(voiceCloudTitleCase("Start A Community"), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                        Text(voiceCloudTitleCase("Name It. Shape It. Grow It."), style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.Text)
                     }
                 }
             }
         }
-        item { Text("Basics", style = MaterialTheme.typography.titleMedium, color = ConsumerColors.SapphireDeep) }
-        item { OutlinedTextField(name, { name = it }, Modifier.fillMaxWidth(), label = { Text("Community name") }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
-        item { OutlinedTextField(handle, { handle = it }, Modifier.fillMaxWidth(), label = { Text("Handle") }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
-        item { OutlinedTextField(description, { description = it }, Modifier.fillMaxWidth(), label = { Text("Description") }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
-        item { OutlinedTextField(category, { category = it }, Modifier.fillMaxWidth(), label = { Text("Category") }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
-        item { OutlinedTextField(rules, { rules = it }, Modifier.fillMaxWidth(), label = { Text("Rules · one per line") }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
+        item { Text(voiceCloudTitleCase("Basics"), style = MaterialTheme.typography.titleMedium, color = ConsumerColors.SapphireDeep) }
+        item { OutlinedTextField(name, { name = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Community Name")) }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(handle, { handle = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Handle")) }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(description, { description = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Description")) }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(category, { category = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Category")) }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(rules, { rules = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Rules · One Per Line")) }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { Text("Private community", fontWeight = FontWeight.Bold); Text("Requires the secure invitation code to join.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                Column(Modifier.weight(1f)) { Text(voiceCloudTitleCase("Private Community"), fontWeight = FontWeight.Bold); Text(voiceCloudTitleCase("Requires The Secure Invitation Code To Join."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 Switch(checked = privateCommunity, onCheckedChange = { privateCommunity = it })
             }
         }
         if (existing != null && privateCommunity && onRotateInvite != null) item {
-            OutlinedButton(onClick = onRotateInvite, modifier = Modifier.fillMaxWidth(), enabled = !state.mutationBusy) { Text("Rotate invitation code") }
+            OutlinedButton(onClick = onRotateInvite, modifier = Modifier.fillMaxWidth(), enabled = !state.mutationBusy) { Text(voiceCloudTitleCase("Rotate Invitation Code")) }
         }
         if (!state.inviteCode.isNullOrBlank()) item {
             Card(colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft), modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp)) { Text("Current one-time shareable invitation code", fontWeight = FontWeight.Bold); Text(state.inviteCode, fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                Column(Modifier.padding(16.dp)) { Text(voiceCloudTitleCase("Current One-Time Shareable Invitation Code"), fontWeight = FontWeight.Bold); Text(state.inviteCode, fontSize = 20.sp, fontWeight = FontWeight.Bold) }
             }
         }
-        if (existing != null && onMembers != null) item { OutlinedButton(onClick = onMembers, modifier = Modifier.fillMaxWidth()) { Text("Manage members and roles") } }
+        if (existing != null && onMembers != null) item { OutlinedButton(onClick = onMembers, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Manage Members And Roles")) } }
         if (existing != null && onDelete != null) item {
-            OutlinedButton(onClick = onDelete, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text("Delete community", color = MaterialTheme.colorScheme.error) }
+            OutlinedButton(onClick = onDelete, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Delete Community"), color = MaterialTheme.colorScheme.error) }
         }
         item {
             Button(
                 onClick = { onSubmit(CommunityInput(name = name, handle = handle, description = description, category = category, rules = rules.lines(), visibility = if (privateCommunity) "PRIVATE" else "PUBLIC")) },
                 enabled = name.isNotBlank() && handle.isNotBlank() && !state.mutationBusy,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(if (existing == null) "Create community" else "Save changes") }
+            ) { Text(voiceCloudTitleCase(if (existing == null) "Create community" else "Save changes")) }
         }
     }
 }
@@ -411,17 +405,17 @@ fun CommunityMembersScreen(
             ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(memberName, fontWeight = FontWeight.Bold)
-                    Text("@${user?.username ?: member.userId.take(8)} · ${member.role}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(voiceCloudTitleCase("@${user?.username ?: member.userId.take(8)} · ${member.role}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (canManage && member.userId != viewerId && member.role.uppercase() != "OWNER") {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             val assignableRoles = if (viewerRole?.uppercase() == "OWNER") listOf("OWNER", "ADMIN", "MODERATOR", "MEMBER") else listOf("MODERATOR", "MEMBER")
                             assignableRoles.forEach { role ->
                                 TextButton(onClick = { onRole(member.userId, role) }, enabled = !state.mutationBusy) {
-                                    Text(role.lowercase().replaceFirstChar(Char::uppercase))
+                                    Text(voiceCloudTitleCase(role.lowercase().replaceFirstChar(Char::uppercase)))
                                 }
                             }
                         }
-                        TextButton(onClick = { onRemove(member.userId) }, enabled = !state.mutationBusy) { Text("Remove member", color = MaterialTheme.colorScheme.error) }
+                        TextButton(onClick = { onRemove(member.userId) }, enabled = !state.mutationBusy) { Text(voiceCloudTitleCase("Remove Member"), color = MaterialTheme.colorScheme.error) }
                     }
                 }
             }
@@ -434,11 +428,11 @@ fun CommunityMembersScreen(
 private fun EventCard(event: ScheduledEvent, onClick: () -> Unit) {
     ElevatedCard(Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(event.status, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            Text(voiceCloudTitleCase(event.status), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
             Text(event.title.ifBlank { "${VoiceCloudBrand.name} session" }, style = MaterialTheme.typography.titleLarge)
             Text(event.scheduledStartTime.replace('T', ' ').take(16) + " · ${event.timeZone}", color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (!event.description.isNullOrBlank()) Text(event.description, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text("${event.rsvpCount} reminders · ${event.durationMinutes} min · ${event.category}", style = MaterialTheme.typography.bodyMedium)
+            Text(voiceCloudTitleCase("${event.rsvpCount} Reminders · ${event.durationMinutes} Min · ${event.category}"), style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -453,7 +447,7 @@ fun EventsScreen(state: EngagementUiState, onLoad: (String) -> Unit, onOpen: (St
         onBack = onBack,
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { OutlinedTextField(search, { search = it }, Modifier.fillMaxWidth(), label = { Text("Search scheduled sessions") }, singleLine = true, trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } }) }
+        item { OutlinedTextField(search, { search = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Search Scheduled Sessions")) }, singleLine = true, trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text(voiceCloudTitleCase("Search")) } }) }
         item { Feedback(state) { onLoad(search) } }
         if (state.events.isEmpty() && !state.loading) item { Empty("No scheduled sessions", "Upcoming sessions will appear here.") }
         itemsIndexed(state.events.distinctBy { it.id }, key = { i, event -> "event:${event.id}:$i" }) { _, event -> EventCard(event) { onOpen(event.id) } }
@@ -474,9 +468,9 @@ fun EventDetailScreen(state: EngagementUiState, onLoad: () -> Unit, onReminder: 
         item { Feedback(state, onLoad) }
         if (event != null) {
             item { EventCard(event) {} }
-            item { Button(onClick = onReminder, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text("Remind me") } }
-            event.club?.let { club -> item { OutlinedButton(onClick = { onCommunity(club.handle.ifBlank { club.id }) }, modifier = Modifier.fillMaxWidth()) { Text("View ${club.name}") } } }
-            if (event.isPremium) item { Text("Premium session · ${event.ticketPriceAmount ?: 0} ${event.currency}", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            item { Button(onClick = onReminder, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Remind Me")) } }
+            event.club?.let { club -> item { OutlinedButton(onClick = { onCommunity(club.handle.ifBlank { club.id }) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("View ${club.name}")) } } }
+            if (event.isPremium) item { Text(voiceCloudTitleCase("Premium Session · ${event.ticketPriceAmount ?: 0} ${event.currency}"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
     }
 }
@@ -502,17 +496,17 @@ fun MessagesScreen(
     pendingDelete?.let { ids ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text(if (ids.size == 1) "Delete conversation?" else "Delete ${ids.size} conversations?") },
-            text = { Text("This removes the selected conversation${if (ids.size == 1) "" else "s"} from your inbox.") },
+            title = { Text(voiceCloudTitleCase(if (ids.size == 1) "Delete conversation?" else "Delete ${ids.size} conversations?")) },
+            text = { Text(voiceCloudTitleCase("This Removes The Selected Conversation${if (ids.size == 1) "" else "s"} From Your Inbox.")) },
             confirmButton = {
                 TextButton(onClick = {
                     if (ids.size == 1) onDelete(ids.first()) else onDeleteMany(ids)
                     selected = selected - ids
                     if (selected.isEmpty()) selectionMode = false
                     pendingDelete = null
-                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                }) { Text(voiceCloudTitleCase("Delete"), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(voiceCloudTitleCase("Cancel")) } },
         )
     }
 
@@ -545,10 +539,10 @@ fun MessagesScreen(
                     search,
                     { search = it },
                     Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search conversations") },
+                    placeholder = { Text(voiceCloudTitleCase("Search Conversations")) },
                     singleLine = true,
                     leadingIcon = { Icon(painterResource(R.drawable.vc_icon_search), contentDescription = null) },
-                    trailingIcon = { TextButton(onClick = { onLoad(search.trim()) }) { Text("Go") } },
+                    trailingIcon = { TextButton(onClick = { onLoad(search.trim()) }) { Text(voiceCloudTitleCase("Go")) } },
                     shape = RoundedCornerShape(20.dp),
                 )
             }
@@ -609,6 +603,7 @@ fun ConversationScreen(state: EngagementUiState, viewerId: String?, onLoad: () -
         onBack = onBack,
     ) { pageModifier ->
         Column(pageModifier) {
+        VoiceCloudToastEffect(state.error, state.notice)
         Box(Modifier.weight(1f)) {
             LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (state.loading && state.messages.isEmpty()) item { Feedback(state) }
@@ -621,18 +616,17 @@ fun ConversationScreen(state: EngagementUiState, viewerId: String?, onLoad: () -
                                 val senderName = message.sender?.displayName.orEmpty()
                                 if (!mine && senderName.isNotBlank()) Text(senderName, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                                 Text(message.content ?: "[${message.type}]")
-                                Text(message.createdAt.replace('T', ' ').take(16) + if (message.isEdited) " · edited" else "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(voiceCloudTitleCase(message.createdAt.replace('T', ' ').take(16) + if (message.isEdited) " · edited" else ""), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
                 }
             }
         }
-        if (state.error != null) Text(state.error, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = 16.dp))
         Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(draft, { draft = it }, Modifier.weight(1f), label = { Text("Message") }, maxLines = 4)
+            OutlinedTextField(draft, { draft = it }, Modifier.weight(1f), label = { Text(voiceCloudTitleCase("Message")) }, maxLines = 4)
             Spacer(Modifier.width(8.dp))
-            Button(onClick = { val value = draft.trim(); if (value.isNotEmpty()) { onSend(value); draft = "" } }, enabled = draft.isNotBlank() && !state.mutationBusy) { Text("Send") }
+            Button(onClick = { val value = draft.trim(); if (value.isNotEmpty()) { onSend(value); draft = "" } }, enabled = draft.isNotBlank() && !state.mutationBusy) { Text(voiceCloudTitleCase("Send")) }
         }
     }
 }
@@ -673,8 +667,8 @@ fun NotificationsScreen(
         if (!pushPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) item {
             Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
                 Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { Text("Enable push alerts", fontWeight = FontWeight.Bold); Text("Allow Android to show ${VoiceCloudBrand.name} messages, reminders and community notifications.", style = MaterialTheme.typography.bodyMedium) }
-                    TextButton(onClick = { permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text("Enable") }
+                    Column(Modifier.weight(1f)) { Text(voiceCloudTitleCase("Enable Push Alerts"), fontWeight = FontWeight.Bold); Text(voiceCloudTitleCase("Allow Android To Show ${VoiceCloudBrand.name} Messages, Reminders And Community Notifications."), style = MaterialTheme.typography.bodyMedium) }
+                    TextButton(onClick = { permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text(voiceCloudTitleCase("Enable")) }
                 }
             }
         }
@@ -687,10 +681,10 @@ fun NotificationsScreen(
                 }.padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Text(item.title.ifBlank { "${VoiceCloudBrand.name} notification" }, fontWeight = FontWeight.Bold)
                     Text(item.message)
-                    Text(item.type.replace('_', ' ') + " · " + item.createdAt.replace('T', ' ').take(16), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(voiceCloudTitleCase(item.type.replace('_', ' ') + " · " + item.createdAt.replace('T', ' ').take(16)), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        if (!item.isRead) TextButton(onClick = { onRead(item.id) }) { Text("Mark read") }
-                        TextButton(onClick = { onDelete(item.id) }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                        if (!item.isRead) TextButton(onClick = { onRead(item.id) }) { Text(voiceCloudTitleCase("Mark Read")) }
+                        TextButton(onClick = { onDelete(item.id) }) { Text(voiceCloudTitleCase("Delete"), color = MaterialTheme.colorScheme.error) }
                     }
                 }
             }

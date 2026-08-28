@@ -25,12 +25,10 @@ data class UserPreferences(
 )
 
 data class PrivacyPreferences(
-    val messagingPermission: String = "everyone",
-    val followPermission: String = "everyone",
-    val invitationPermission: String = "everyone",
-    val visitorPermission: String = "everyone",
-    val allowVisitorTracking: Boolean = true,
-    val anonymousVisiting: Boolean = false,
+    val showOnlineStatus: Boolean = true,
+    val showLastSeen: Boolean = true,
+    val allowDirectMessages: Boolean = true,
+    val showGifts: Boolean = true,
 )
 
 data class SafeSession(
@@ -81,6 +79,7 @@ data class CmsPageSummary(
     val title: String,
     val excerpt: String? = null,
     val category: String? = null,
+    val audience: String? = null,
     val sortOrder: Int = 0,
 )
 
@@ -121,8 +120,8 @@ data class MyReport(
 data class ContactSupportRequest(
     val name: String,
     val email: String,
-    val phone: String? = null,
-    val description: String,
+    val phoneNumber: String? = null,
+    val message: String,
 )
 
 data class MaintenanceState(

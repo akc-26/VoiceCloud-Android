@@ -2,6 +2,7 @@ package app.voicecloud.feature.creator.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CreatorModelsTest {
@@ -9,9 +10,10 @@ class CreatorModelsTest {
         assertEquals("en", CreatorSettings().language)
     }
 
-    @Test fun creatorPortalCoreDoesNotContainFinancialOrRtcSections() {
+    @Test fun creatorPortalIncludesPh11LiveWithoutFinancialSections() {
         val sections = CreatorPortalSection.entries.map { it.name }
-        assertEquals(listOf("DASHBOARD", "PROFILE", "SETTINGS", "HELP"), sections)
-        assertFalse(sections.any { it.contains("WALLET") || it.contains("LIVE") || it.contains("PAYOUT") })
+        assertEquals(listOf("DASHBOARD", "LIVE", "PROFILE", "SETTINGS", "HELP"), sections)
+        assertTrue(sections.contains("LIVE"))
+        assertFalse(sections.any { it.contains("WALLET") || it.contains("PAYOUT") || it.contains("EARNINGS") })
     }
 }

@@ -1,5 +1,7 @@
 package app.voicecloud.feature.economy.ui
 
+import app.voicecloud.core.network.toVoiceCloudPaymentMessage
+import app.voicecloud.core.network.toVoiceCloudUserMessage
 import android.app.Activity
 import app.voicecloud.feature.economy.billing.PaymentRail
 import app.voicecloud.feature.economy.billing.PlayBillingCoordinator
@@ -269,11 +271,7 @@ class EconomyViewModel @Inject constructor(
         }
     }
 
-    private fun readablePayment(error: Throwable): String = error.message
-        ?.takeIf { it.isNotBlank() && !it.contains("secret", true) && !it.contains("key", true) }
-        ?: "Secure payment is unavailable right now. Please try again."
+    private fun readablePayment(error: Throwable): String = error.toVoiceCloudPaymentMessage()
 
-    private fun readable(error: Throwable): String = error.message
-        ?.takeIf { it.isNotBlank() && !it.contains("http", ignoreCase = true) }
-        ?: "VoiceCloud could not load this section. Please try again."
+    private fun readable(error: Throwable): String = error.toVoiceCloudUserMessage("VoiceCloud Couldn’t Load This Section. Try Again.")
 }

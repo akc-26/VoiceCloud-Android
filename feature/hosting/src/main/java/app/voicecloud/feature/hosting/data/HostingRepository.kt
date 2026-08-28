@@ -118,11 +118,17 @@ class HostingRepository @Inject constructor(
         } else error.message.orEmpty()
         val normalized = raw.lowercase()
         return when {
-            "approved host" in normalized || "host verification" in normalized -> "An approved Host profile is required for this action."
-            "not found" in normalized -> "The requested item is no longer available."
-            "forbidden" in normalized || "permission" in normalized -> "You do not have permission to perform this action."
-            "rtc" in normalized || "livekit" in normalized || "provider" in normalized -> "Live audio is temporarily unavailable. Please try again."
-            else -> raw.replace(Regex("[{}\\\"\\[\\]]"), " ").replace(Regex("\\s+"), " ").trim().takeIf { it.length in 4..180 } ?: fallback
+            error is HttpException && error.code() == 401 -> "Your Session Has Expired. Sign In Again."
+            error is HttpException && error.code() == 403 -> "This Room Action Isn’t Available For Your Account."
+            error is HttpException && error.code() == 429 -> "Too Many Requests. Try Again In A Moment."
+            error is HttpException && error.code() >= 500 -> "Live Audio Is Temporarily Unavailable. Try Again Soon."
+            "approved host" in normalized || "host verification" in normalized -> "Host Approval Is Required For This Action."
+            "not found" in normalized -> "This Room Is No Longer Available."
+            "forbidden" in normalized || "permission" in normalized -> "This Room Action Isn’t Available For Your Account."
+            "rtc" in normalized || "livekit" in normalized || "provider" in normalized || "credential" in normalized -> "Live Audio Is Temporarily Unavailable. Try Again Soon."
+            error is HttpException -> fallback
+            listOf("sql", "postgres", "typeorm", "constraint", "exception", "stack trace", "relation ", "column ").any { it in normalized } -> fallback
+            else -> raw.replace("{", " ").replace("}", " ").replace("\"", " ").replace("[", " ").replace("]", " ").replace(Regex("\\s+"), " ").trim().takeIf { it.length in 4..160 } ?: fallback
         }
     }
 

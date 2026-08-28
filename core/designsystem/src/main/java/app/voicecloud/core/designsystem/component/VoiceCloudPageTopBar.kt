@@ -82,7 +82,7 @@ fun VoiceCloudPageTopBar(
                 }
 
                 Text(
-                    text = title,
+                    text = voiceCloudTitleCase(title),
                     modifier = Modifier
                         .align(Alignment.Center)
                         .fillMaxWidth()
@@ -99,7 +99,7 @@ fun VoiceCloudPageTopBar(
                         actions?.invoke(this)
                         if (actionLabel != null && onAction != null) {
                             TextButton(onClick = onAction, enabled = actionEnabled) {
-                                Text(actionLabel, maxLines = 1, softWrap = false)
+                                Text(voiceCloudTitleCase(actionLabel), maxLines = 1, softWrap = false)
                             }
                         }
                     }
@@ -108,7 +108,7 @@ fun VoiceCloudPageTopBar(
 
             if (!subtitle.isNullOrBlank()) {
                 Text(
-                    text = subtitle,
+                    text = voiceCloudTitleCase(subtitle),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = metrics.horizontalPadding, end = metrics.horizontalPadding, bottom = metrics.contentTopSpacing),

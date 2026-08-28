@@ -3,6 +3,7 @@ package app.voicecloud.feature.auth.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.voicecloud.core.preferences.LastPortal
+import app.voicecloud.core.network.toVoiceCloudUserMessage
 import app.voicecloud.feature.auth.data.AuthApiException
 import app.voicecloud.feature.auth.data.AuthRepository
 import app.voicecloud.feature.auth.data.CreatorRoleRequiredException
@@ -232,33 +233,50 @@ class AuthViewModel @Inject constructor(
         _events.send(AuthEvent.Navigate(screen, clear))
     }
 
+
+    private fun authApiMessage(raw: String?, status: Int?, fallback: String): String {
+        val clean = raw.orEmpty().trim()
+        val technical = listOf(
+            "http ", "sql", "postgres", "typeorm", "constraint", "relation ", "column ",
+            "stack trace", "exception", "retrofit", "okhttp", "jwt", "localhost", "127.0.0.1",
+        ).any { clean.contains(it, ignoreCase = true) }
+        return when {
+            status == 401 -> "Your Session Has Expired. Sign In Again."
+            status == 403 -> fallback
+            status == 429 -> "Too Many Requests. Try Again In A Moment."
+            status != null && status >= 500 -> fallback
+            technical || clean.isBlank() || clean.length > 160 -> fallback
+            else -> clean
+        }
+    }
+
     private fun launchOperation(authenticated: Boolean = false, block: suspend () -> Unit) {
         viewModelScope.launch {
             _state.value = _state.value.copy(busy = true, error = null, notice = null)
             try {
                 block()
             } catch (e: CreatorRoleRequiredException) {
-                _state.value = _state.value.copy(error = e.message)
+                _state.value = _state.value.copy(error = e.message ?: "Creator Access Is Required For This Action.")
             } catch (e: AuthApiException) {
                 when (e.apiError.httpStatus) {
                     403 -> {
-                        _state.value = _state.value.copy(restrictedMessage = e.apiError.message)
+                        _state.value = _state.value.copy(restrictedMessage = authApiMessage(e.apiError.message, 403, "This Account Can’t Access That Area."))
                         navigate(AuthScreen.RESTRICTED, true)
                     }
                     503 -> {
-                        _state.value = _state.value.copy(maintenanceMessage = e.apiError.message)
+                        _state.value = _state.value.copy(maintenanceMessage = authApiMessage(e.apiError.message, 503, "VoiceCloud Is Temporarily Unavailable."))
                         navigate(AuthScreen.MAINTENANCE, true)
                     }
                     401 -> if (authenticated) { repository.invalidateLocalSession(); navigate(AuthScreen.SESSION_EXPIRED, true) }
                     else -> Unit
                 }
                 if (!(authenticated && e.apiError.httpStatus == 401) && e.apiError.httpStatus != 403 && e.apiError.httpStatus != 503) {
-                    _state.value = _state.value.copy(error = e.apiError.message)
+                    _state.value = _state.value.copy(error = authApiMessage(e.apiError.message, e.apiError.httpStatus, "Check The Information You Entered And Try Again."))
                 }
             } catch (e: IllegalArgumentException) {
                 _state.value = _state.value.copy(error = e.message ?: "Check the information you entered.")
             } catch (e: Exception) {
-                _state.value = _state.value.copy(error = e.message ?: "VoiceCloud could not complete this request.")
+                _state.value = _state.value.copy(error = e.toVoiceCloudUserMessage("VoiceCloud Couldn’t Complete This Request. Try Again."))
             } finally {
                 _state.value = _state.value.copy(busy = false)
             }

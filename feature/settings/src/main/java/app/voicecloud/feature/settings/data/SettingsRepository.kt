@@ -68,23 +68,19 @@ class SettingsRepository @Inject constructor(
     suspend fun privacy(): PrivacyPreferences {
         val raw = unwrap(api.privacy(), "privacy", "settings")
         return PrivacyPreferences(
-            messagingPermission = raw.string("messagingPermission").ifBlank { "everyone" },
-            followPermission = raw.string("followPermission").ifBlank { "everyone" },
-            invitationPermission = raw.string("invitationPermission").ifBlank { "everyone" },
-            visitorPermission = raw.string("visitorPermission").ifBlank { "everyone" },
-            allowVisitorTracking = raw.bool(default = true, "allowVisitorTracking"),
-            anonymousVisiting = raw.bool(default = false, "anonymousVisiting"),
+            showOnlineStatus = raw.bool(default = true, "showOnlineStatus"),
+            showLastSeen = raw.bool(default = true, "showLastSeen"),
+            allowDirectMessages = raw.bool(default = true, "allowDirectMessages"),
+            showGifts = raw.bool(default = true, "showGifts"),
         )
     }
 
     suspend fun updatePrivacy(value: PrivacyPreferences): PrivacyPreferences {
         api.updatePrivacy(mapOf(
-            "messagingPermission" to value.messagingPermission,
-            "followPermission" to value.followPermission,
-            "invitationPermission" to value.invitationPermission,
-            "visitorPermission" to value.visitorPermission,
-            "allowVisitorTracking" to value.allowVisitorTracking,
-            "anonymousVisiting" to value.anonymousVisiting,
+            "showOnlineStatus" to value.showOnlineStatus,
+            "showLastSeen" to value.showLastSeen,
+            "allowDirectMessages" to value.allowDirectMessages,
+            "showGifts" to value.showGifts,
         ))
         return privacy()
     }
@@ -116,19 +112,21 @@ class SettingsRepository @Inject constructor(
     suspend fun devices(): List<SafeDevice> {
         val currentDeviceId = preferences.deviceId.first()
         return items(api.devices(), "devices").mapNotNull { raw -> deviceFrom(raw, currentDeviceId) }
-            .distinctBy { it.id }
+            .distinctBy { it.deviceId ?: it.id }
             .sortedWith(compareByDescending<SafeDevice> { it.isCurrent }.thenByDescending { it.lastUsedAt.orEmpty() })
     }
 
-    suspend fun device(id: String): SafeDevice {
-        require(id.isNotBlank()) { "Device is unavailable." }
-        return deviceFrom(unwrap(api.device(id), "device"), preferences.deviceId.first())
-            ?: error("Device is unavailable.")
+    suspend fun device(deviceId: String): SafeDevice {
+        val canonicalDeviceId = deviceId.trim()
+        require(canonicalDeviceId.isNotBlank()) { "Device Is Unavailable." }
+        return deviceFrom(unwrap(api.device(canonicalDeviceId), "device"), preferences.deviceId.first())
+            ?: error("Device Is Unavailable.")
     }
 
-    suspend fun revokeDevice(id: String) {
-        require(id.isNotBlank()) { "Device is unavailable." }
-        api.revokeDevice(id)
+    suspend fun revokeDevice(deviceId: String) {
+        val canonicalDeviceId = deviceId.trim()
+        require(canonicalDeviceId.isNotBlank()) { "Device Is Unavailable." }
+        api.revokeDevice(canonicalDeviceId)
     }
 
     suspend fun history(): List<LoginActivity> = items(api.history(100), "history", "activities", "items")
@@ -138,7 +136,10 @@ class SettingsRepository @Inject constructor(
 
     suspend fun cmsPages(): List<CmsPageSummary> = items(api.cmsPages(), "pages")
         .mapNotNull(::cmsSummaryFrom)
-        .filter { it.slug.isNotBlank() && it.title.isNotBlank() }
+        .filter { page ->
+            page.slug.isNotBlank() && page.title.isNotBlank() &&
+                (page.audience.isNullOrBlank() || page.audience.equals("end_user", true) || page.audience.equals("user", true) || page.audience.equals("consumer", true))
+        }
         .distinctBy { it.slug.lowercase() }
         .sortedWith(compareBy<CmsPageSummary> { it.sortOrder }.thenBy { it.title.lowercase() })
 
@@ -187,11 +188,13 @@ class SettingsRepository @Inject constructor(
         require(name.trim().isNotBlank()) { "Enter your name." }
         require(email.trim().contains('@')) { "Enter a valid email address." }
         require(description.trim().isNotBlank()) { "Enter your message." }
+        require(name.trim().length >= 2) { "Enter your full name." }
+        require(description.trim().length >= 10) { "Tell us a little more so our support team can help." }
         api.contact(ContactSupportRequest(
-            name = name.trim(),
+            name = name.trim().take(120),
             email = email.trim().lowercase(),
-            phone = phone?.trim()?.takeIf(String::isNotBlank),
-            description = description.trim(),
+            phoneNumber = phone?.trim()?.takeIf(String::isNotBlank)?.take(40),
+            message = description.trim().take(4000),
         ))
     }
 
@@ -223,11 +226,11 @@ class SettingsRepository @Inject constructor(
     }
 
     private fun deviceFrom(raw: Map<*, *>, currentDeviceId: String?): SafeDevice? {
-        val id = raw.string("id", "deviceId")
-        if (id.isBlank()) return null
-        val canonicalDeviceId = raw.string("deviceId").ifBlank { id }
+        val recordId = raw.string("id")
+        val canonicalDeviceId = raw.string("deviceId").ifBlank { recordId }
+        if (canonicalDeviceId.isBlank()) return null
         return SafeDevice(
-            id = id,
+            id = canonicalDeviceId,
             deviceId = canonicalDeviceId,
             deviceType = raw.string("deviceType", "platform").takeIf(String::isNotBlank),
             deviceName = raw.string("deviceName", "name").takeIf(String::isNotBlank),
@@ -269,6 +272,7 @@ class SettingsRepository @Inject constructor(
             title = title,
             excerpt = raw.string("excerpt", "summary", "description").takeIf(String::isNotBlank),
             category = raw.string("category", "type").takeIf(String::isNotBlank),
+            audience = raw.string("audience", "targetAudience", "portal").takeIf(String::isNotBlank),
             sortOrder = raw.int("sortOrder", "order", "position"),
         )
     }

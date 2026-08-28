@@ -10,16 +10,16 @@ data class EconomyUiState(
 )
 
 enum class EconomySection(val label: String, val subtitle: String) {
-    WALLET("Wallet", "Balance, coin packages, transactions and purchases"),
-    VIP("VIP", "Membership status and Google Play-backed plans"),
-    STORE("Store", "Catalogue, inventory and equipped items"),
-    GIFTS("Gifts", "Available gifts and gift history"),
-    TASKS("Tasks", "Tasks, progress and claimable rewards"),
-    ACHIEVEMENTS("Achievements", "Achievement progress and rewards"),
-    PROGRESSION("XP & Check-in", "XP, daily check-in and streaks"),
-    RANKINGS("Rankings", "Users, creators, hosts, rooms, gifts and VIP"),
-    TICKETS("Tickets", "Scheduled-room tickets and purchase history"),
-    REFERRALS("Referrals", "Referral code, history and rewards"),
+    WALLET("Wallet", "Balance & Transactions"),
+    VIP("VIP", "Membership & Benefits"),
+    STORE("Store", "Frames, Effects & More"),
+    GIFTS("Gifts", "Send, Receive & Celebrate"),
+    TASKS("Tasks", "Complete & Claim Rewards"),
+    ACHIEVEMENTS("Achievements", "Milestones & Rewards"),
+    PROGRESSION("XP & Check-In", "Level, Streak & Daily Reward"),
+    RANKINGS("Rankings", "Top Voices & Rooms"),
+    TICKETS("Tickets", "Upcoming Access"),
+    REFERRALS("Referrals", "Invite & Earn"),
 }
 
 val economyProfileOrder: List<EconomySection> = listOf(

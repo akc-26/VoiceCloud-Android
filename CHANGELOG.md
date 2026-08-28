@@ -1,3 +1,20 @@
+# VC-ANDROID-PH11-R02
+- Parent remains `VoiceCloud-Android-VC-ANDROID-PH10-R01` @ `999a3c310c9e40bf1a47972551050bfd5b00e54d`; PH11-R01 was not Git-frozen.
+- Corrects the R01 workstation unit-test failure after all three Kotlin compile variants passed.
+- Updates Creator unit authority to include the intentional PH11 `LIVE` section while continuing to reject financial/payout scope.
+- Makes Privacy/Contact reflection tests ignore compiler-generated JVM fields and assert only backend business fields.
+- Adds an 8/8 R02 unit-contract regression and R02 acceptance wiring.
+- PH11 production implementation remains unchanged from R01.
+- Use only `scripts\VC-ANDROID-PH11-R02-ACCEPTANCE.cmd`.
+
+# VC-ANDROID-PH11-R01
+- Parent: `VoiceCloud-Android-VC-ANDROID-PH10-R01` @ `999a3c310c9e40bf1a47972551050bfd5b00e54d`.
+- Implements Creator Live Rooms & Schedule using the existing server-authoritative Hosting/LiveKit foundation.
+- Adds Creator Live Studio, room lifecycle, Live Console/stage controls, schedule CRUD and scheduled start.
+- Implements the requested Title Case, toast/error, media crop, Privacy/Device/Contact contract, CMS audience, navigation simplification, economy visual redesign and Portal Selector corrections.
+- Adds PH11 source/backend-contract/Title Case-toast/corrections/compile/economy/preservation gates while retaining compatible inherited Gradle, device, warning, ADB and hosting authorities.
+- Use only `scripts\VC-ANDROID-PH11-R01-ACCEPTANCE.cmd`.
+
 # VC-ANDROID-PH10-R01
 - Parent: `VoiceCloud-Android-VC-ANDROID-PH09-R08` @ `10e820a005d363643bcfc5568e661de96a41dbc9`.
 - Adds isolated `:feature:creator` for Creator Portal Core, Dashboard, Profile, Settings, Creator CMS and Support.

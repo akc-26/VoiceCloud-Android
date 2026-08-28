@@ -1,3 +1,28 @@
+# VoiceCloud Android — VC-ANDROID-PH11-R02
+
+PH11 implements the locked **Creator Live Rooms & Schedule** phase on frozen PH10-R01 commit `999a3c310c9e40bf1a47972551050bfd5b00e54d` together with the requested application-wide UI/UX/runtime corrections.
+
+R02 corrects the R01 workstation unit-test authority failure. All three Kotlin compile variants already passed in R01; R02 updates stale PH10-era Creator expectations and compiler-generated JVM-field-sensitive Settings assertions without changing PH11 production behavior.
+
+## Acceptance
+Run only:
+```powershell
+scripts\VC-ANDROID-PH11-R02-ACCEPTANCE.cmd
+```
+
+Do not Git-freeze PH11 until Windows/device acceptance reaches:
+```text
+[PASS] VC-ANDROID-PH11-R02 acceptance commands completed successfully.
+```
+
+## Documentation
+- `docs/VC-ANDROID-PH11-R02-IMPLEMENTATION-REPORT.md`
+- `docs/VC-ANDROID-PH11-R02-CORRECTION-REPORT.md`
+- `docs/VC-ANDROID-PH11-R02-AUTOMATED-EVIDENCE.md`
+- `docs/VC-ANDROID-PH11-R02-MANUAL-QA.md`
+
+---
+
 # VoiceCloud Android — VC-ANDROID-PH10-R01
 
 PH10 implements the locked **Creator Portal Core, Dashboard, Profile, Settings & Support** phase on frozen PH09-R08 commit `10e820a005d363643bcfc5568e661de96a41dbc9`.
