@@ -35,3 +35,5 @@ include(":feature:discovery")
 include(":feature:engagement")
 
 include(":feature:live")
+
+include(":feature:hosting")

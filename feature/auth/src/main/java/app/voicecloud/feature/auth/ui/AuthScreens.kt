@@ -13,15 +13,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.PortalTheme
@@ -117,6 +121,7 @@ private fun Field(
     singleLine: Boolean = true,
     minLines: Int = 1,
 ) {
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -124,7 +129,17 @@ private fun Field(
         modifier = Modifier.fillMaxWidth(),
         singleLine = singleLine,
         minLines = minLines,
-        visualTransformation = if (password) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+        visualTransformation = if (password && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+        trailingIcon = if (password) {
+            {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        painter = painterResource(if (passwordVisible) R.drawable.vc_icon_visibility_off else R.drawable.vc_icon_visibility),
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                    )
+                }
+            }
+        } else null,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         shape = RoundedCornerShape(16.dp),
     )
@@ -147,43 +162,69 @@ fun PortalSelectorScreen(
     onUser: () -> Unit,
     onCreator: () -> Unit,
 ) {
-    AuthPage(
-        title = "Welcome to ${VoiceCloudBrand.name}",
-        subtitle = "Choose how you want to enter. User and Creator access share one secure account authority but remain separate experiences.",
-        state = state,
-    ) {
-        PortalChoice(
-            title = VoiceCloudBrand.name,
-            body = "Listen, discover, connect and participate with your User account.",
-            accent = MaterialTheme.colorScheme.primary,
-            onClick = onUser,
-        )
-        PortalChoice(
-            title = "Creator Studio",
-            body = "Sign in with a Creator-enabled account. Creator role is verified by the server before entry.",
-            accent = app.voicecloud.core.designsystem.theme.CreatorColors.PrimaryDark,
-            onClick = onCreator,
-        )
-        Text(
-            "${VoiceCloudBrand.name} never infers Creator access from the selected button.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
+    VoiceCloudTheme(portal = PortalTheme.User, darkTheme = false) {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()) {
+            Column(
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(24.dp))
+                Surface(shape = RoundedCornerShape(26.dp), color = MaterialTheme.colorScheme.surface) {
+                    VoiceCloudBrandMark(72.dp)
+                }
+                Spacer(Modifier.height(22.dp))
+                Text("Choose your portal", style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(6.dp))
+                Text("One account. Two experiences.", color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(28.dp))
+                Column(Modifier.fillMaxWidth().widthIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    state.error?.let { AlertBox(it, true) }
+                    state.notice?.let { AlertBox(it, false) }
+                    PortalChoice(
+                        title = "User Portal",
+                        body = "Listen · Join · Connect",
+                        iconRes = R.drawable.vc_portal_user,
+                        accent = MaterialTheme.colorScheme.primary,
+                        onClick = onUser,
+                    )
+                    PortalChoice(
+                        title = "Creator Portal",
+                        body = "Host · Create · Grow",
+                        iconRes = R.drawable.vc_portal_creator,
+                        accent = app.voicecloud.core.designsystem.theme.CreatorColors.PrimaryDark,
+                        onClick = onCreator,
+                    )
+                }
+                Spacer(Modifier.height(28.dp))
+            }
+        }
     }
 }
 
 @Composable
-private fun PortalChoice(title: String, body: String, accent: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
-    Surface(
+private fun PortalChoice(
+    title: String,
+    body: String,
+    iconRes: Int,
+    accent: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit,
+) {
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(11.dp).background(accent, RoundedCornerShape(99.dp)))
+        Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = RoundedCornerShape(18.dp), color = accent.copy(alpha = .12f)) {
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.padding(13.dp).size(30.dp),
+                )
+            }
             Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(title, style = MaterialTheme.typography.titleLarge)
                 Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
@@ -212,7 +253,7 @@ fun UserSignInScreen(
     }
     fun enabled(vararg aliases: String) = aliases.any { alias -> methods.any { it.contains(alias) } }
 
-    AuthPage("Sign in to ${VoiceCloudBrand.name}", "Continue with the account method enabled by ${VoiceCloudBrand.name}.", state) {
+    AuthPage("User Portal", "Welcome back", state) {
         if (enabled("email", "password", "username")) {
             Field(identifier, { identifier = it }, "Email or username", keyboardType = KeyboardType.Email)
             Field(password, { password = it }, "Password", password = true)
@@ -228,8 +269,8 @@ fun UserSignInScreen(
         )
         if (enabled("guest")) SecondaryButton("Continue as guest", !state.busy, onGuest)
         HorizontalDivider()
-        TextAction("Create a ${VoiceCloudBrand.name} account", onRegister)
-        TextAction("Choose another portal", onBack)
+        TextAction("Signup", onRegister)
+        SecondaryButton("Creator Portal", !state.busy, onBack)
     }
 }
 
@@ -429,8 +470,8 @@ fun CreatorSignInScreen(
     var identifier by rememberSaveableCompat("")
     var password by rememberSaveableCompat("")
     AuthPage(
-        "Creator Studio",
-        "Sign in with your Creator email. Your Creator access is verified by ${VoiceCloudBrand.name} before entry.",
+        "Creator Portal",
+        "Create. Host. Grow.",
         state,
         creator = true,
     ) {
@@ -438,9 +479,8 @@ fun CreatorSignInScreen(
         Field(password, { password = it }, "Password", password = true)
         BusyButton("Enter Creator Studio", state.busy) { onLogin(identifier, password) }
         HorizontalDivider()
-        Text("Need Creator access? Applications are reviewed by ${VoiceCloudBrand.name} before the role is granted.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        SecondaryButton("Apply for Creator Access", !state.busy, onApply)
-        TextAction("Choose another portal", onBack)
+        SecondaryButton("Creator Access", !state.busy, onApply)
+        SecondaryButton("User Portal", !state.busy, onBack)
     }
 }
 

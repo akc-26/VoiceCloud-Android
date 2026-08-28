@@ -26,7 +26,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph05"
+        versionName = "1.0.0-ph06"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         resValue("string", "vc_brand_app_name", brand("brand.name"))
@@ -134,6 +134,7 @@ dependencies {
     implementation(project(":feature:discovery"))
     implementation(project(":feature:engagement"))
     implementation(project(":feature:live"))
+    implementation(project(":feature:hosting"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
@@ -154,6 +155,7 @@ dependencies {
     androidTestImplementation(composeBom)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -1,5 +1,7 @@
 package app.voicecloud.android
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.ui.graphics.toArgb
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.voicecloud.core.designsystem.theme.CommonColors
@@ -17,6 +19,14 @@ class VoiceCloudFoundationInstrumentedTest {
             BuildConfig.APPLICATION_ID,
             androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext.packageName,
         )
+    }
+
+    @Test
+    fun ph06DeclaresMicrophonePermissionForExplicitHostPublishing() {
+        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+        val info = context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+        val permissions = info.requestedPermissions?.toSet().orEmpty()
+        assertEquals(true, Manifest.permission.RECORD_AUDIO in permissions)
     }
 
     /**

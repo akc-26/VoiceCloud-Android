@@ -25,7 +25,7 @@ ck('Home rooms deduplicate before render', 'state.home.rooms.distinctBy { it.id 
 ck('Home people deduplicate before render', 'state.home.people.distinctBy { it.id }' in SCREENS)
 ck('Home creators deduplicate before render', 'state.home.creators.distinctBy { it.id }' in SCREENS)
 ck('Explore lists use section-qualified keys', all(x in SCREENS for x in ['explore-live:', 'explore-trend:', 'explore-person:', 'explore-creator:']))
-ck('Search lists use section-qualified keys', 'search-user:' in SCREENS and 'search-room:' in SCREENS)
+ck('Search lists use section-qualified keys', all(x in SCREENS for x in ['search-person:', 'search-creator:', 'search-room:', 'search-community:']))
 ck('Social and friend lists use section-qualified keys', all(x in SCREENS for x in ['social:', 'friend-in:', 'friend:', 'friend-suggest:', 'friend-out:']))
 ck('all dynamic discovery lists deduplicate at render boundary', SCREENS.count('distinctBy { it.id }') >= 13)
 ck('consumer identity policy deduplicates API identities', '.distinctBy { it.id.ifBlank { it.username.trim().lowercase() } }' in POLICY)

@@ -184,6 +184,15 @@ class EngagementViewModel @Inject constructor(
         _state.value = _state.value.copy(conversations = repository.conversations().conversations)
     }
 
+    fun deleteConversations(ids: Set<String>) {
+        val clean = ids.filter(String::isNotBlank).toSet()
+        if (clean.isEmpty()) return
+        mutate(if (clean.size == 1) "Conversation removed." else "Conversations removed.") {
+            clean.forEach { repository.deleteConversation(it) }
+            _state.value = _state.value.copy(conversations = repository.conversations().conversations)
+        }
+    }
+
     fun startDirectConversation(recipientId: String, onReady: (Conversation) -> Unit) = mutate("Conversation ready.", keepNotice = false) {
         onReady(repository.directConversation(recipientId))
     }

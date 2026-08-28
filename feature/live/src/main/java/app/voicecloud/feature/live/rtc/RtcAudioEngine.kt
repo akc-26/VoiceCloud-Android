@@ -31,13 +31,16 @@ sealed interface RtcAudioState {
 
 interface RtcAudioEngine {
     val state: StateFlow<RtcAudioState>
+    val microphoneEnabled: StateFlow<Boolean>
     suspend fun connect(serverUrl: String, token: String)
+    suspend fun setMicrophoneEnabled(enabled: Boolean): Boolean
     fun disconnect()
 }
 
 /**
- * PH05 listener engine. It auto-subscribes to remote audio but never captures or publishes local
- * audio/video. Microphone publication belongs to the Host/Speaker phase.
+ * Shared LiveKit room engine. Connections remain receive-only by default (`audio = false`,
+ * `video = false`) so PH05 listener behavior is preserved. PH06 may explicitly publish local
+ * microphone audio only after Android runtime permission and host/speaker user intent.
  */
 @Singleton
 class LiveKitListenerEngine @Inject constructor(
@@ -46,6 +49,8 @@ class LiveKitListenerEngine @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val mutableState = MutableStateFlow<RtcAudioState>(RtcAudioState.Disconnected)
     override val state: StateFlow<RtcAudioState> = mutableState.asStateFlow()
+    private val mutableMicrophoneEnabled = MutableStateFlow(false)
+    override val microphoneEnabled: StateFlow<Boolean> = mutableMicrophoneEnabled.asStateFlow()
 
     private val generation = AtomicLong(0L)
     private val ownershipLock = Any()
@@ -56,6 +61,7 @@ class LiveKitListenerEngine @Inject constructor(
         require(serverUrl.isNotBlank() && token.isNotBlank()) { "Audio session is unavailable." }
         val (operation, previous) = beginConnectionOperation()
         cleanupOwned(previous)
+        mutableMicrophoneEnabled.value = false
         ensureCurrent(operation)
         mutableState.value = RtcAudioState.Connecting
 
@@ -106,12 +112,20 @@ class LiveKitListenerEngine @Inject constructor(
         }
     }
 
+    override suspend fun setMicrophoneEnabled(enabled: Boolean): Boolean {
+        val active = synchronized(ownershipLock) { room } ?: return false
+        val changed = active.localParticipant.setMicrophoneEnabled(enabled)
+        mutableMicrophoneEnabled.value = changed && enabled
+        return changed
+    }
+
     override fun disconnect() {
         val previous = synchronized(ownershipLock) {
             generation.incrementAndGet()
             takeOwnedConnectionLocked()
         }
         cleanupOwned(previous)
+        mutableMicrophoneEnabled.value = false
         mutableState.value = RtcAudioState.Disconnected
     }
 

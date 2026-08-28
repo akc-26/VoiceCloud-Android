@@ -22,14 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudTopBarIconAction
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
+import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
 import app.voicecloud.feature.engagement.data.EngagementRouteResolver
 import app.voicecloud.feature.engagement.model.*
 import kotlinx.coroutines.delay
@@ -42,6 +46,7 @@ private fun SecondaryPageLayout(
     actionLabel: String? = null,
     actionEnabled: Boolean = true,
     onAction: (() -> Unit)? = null,
+    actions: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(
@@ -54,11 +59,23 @@ private fun SecondaryPageLayout(
                 actionLabel = actionLabel,
                 actionEnabled = actionEnabled,
                 onAction = onAction,
+                actions = actions,
             )
         },
     ) { innerPadding ->
         content(Modifier.fillMaxSize().padding(innerPadding))
     }
+}
+
+@Composable
+private fun adaptivePagePadding(): PaddingValues {
+    val metrics = VoiceCloudPageMetrics.current()
+    return PaddingValues(
+        start = metrics.horizontalPadding,
+        top = metrics.contentTopSpacing,
+        end = metrics.horizontalPadding,
+        bottom = metrics.contentBottomSpacing,
+    )
 }
 
 @Composable
@@ -87,28 +104,36 @@ private fun Empty(title: String, body: String) {
 }
 
 @Composable
-private fun RowScope.QuickAction(label: String, glyph: String, onClick: () -> Unit) {
+private fun RowScope.QuickAction(label: String, iconRes: Int, onClick: () -> Unit) {
     ElevatedCard(
-        Modifier.weight(1f).clickable(onClick = onClick).heightIn(min = 76.dp),
+        Modifier.weight(1f).clickable(onClick = onClick).heightIn(min = 58.dp),
         shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Column(
-            Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
         ) {
-            Text(glyph, fontSize = 20.sp, color = ConsumerColors.SapphireDeep)
-            Spacer(Modifier.height(4.dp))
-            Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+            Surface(shape = RoundedCornerShape(11.dp), color = ConsumerColors.SapphireSoft) {
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = ConsumerColors.SapphireDeep,
+                    modifier = Modifier.padding(6.dp).size(18.dp),
+                )
+            }
+            Text(label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
         }
     }
 }
 
 @Composable
 fun Ph04QuickActions(onCommunities: () -> Unit, onMessages: () -> Unit, onNotifications: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        QuickAction("Communities", "◎", onCommunities)
-        QuickAction("Messages", "✉", onMessages)
-        QuickAction("Alerts", "◌", onNotifications)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        QuickAction("Communities", R.drawable.vc_icon_community, onCommunities)
+        QuickAction("Messages", R.drawable.vc_icon_message, onMessages)
+        QuickAction("Alerts", R.drawable.vc_icon_bell, onNotifications)
     }
 }
 
@@ -118,57 +143,73 @@ fun CommunitiesScreen(
     onLoad: (String) -> Unit,
     onOpen: (String) -> Unit,
     onCreate: () -> Unit,
+    onSearch: () -> Unit,
     onEvents: () -> Unit,
     onMessages: () -> Unit,
     onNotifications: () -> Unit,
     onBack: () -> Unit,
 ) {
-    var search by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(Unit) { onLoad("") }
+    val metrics = VoiceCloudPageMetrics.current()
     SecondaryPageLayout(
         title = "Communities",
-        subtitle = "Find groups built around the conversations you care about.",
         onBack = onBack,
+        actions = {
+            VoiceCloudTopBarIconAction(R.drawable.vc_icon_search, "Search communities", onClick = onSearch)
+            Spacer(Modifier.width(6.dp))
+            VoiceCloudTopBarIconAction(R.drawable.vc_icon_calendar, "Upcoming events", onClick = onEvents)
+        },
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item {
-            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Hero).padding(20.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Find your people.", color = ConsumerColors.Ink, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                    Text("Join conversations that continue beyond a single live room.", color = ConsumerColors.Text)
-                    Button(onClick = onCreate) { Text("Create community", maxLines = 1, softWrap = false) }
+        LazyColumn(
+            pageModifier,
+            contentPadding = PaddingValues(horizontal = metrics.horizontalPadding, vertical = metrics.contentTopSpacing),
+            verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
+        ) {
+            item {
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(26.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                ) {
+                    Box(Modifier.fillMaxWidth().background(ConsumerBrushes.Hero).padding(20.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                Text("Build your circle", color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+                                Text("Create a place for your audience.", color = ConsumerColors.Text, style = MaterialTheme.typography.bodyMedium)
+                            }
+                            FilledIconButton(onClick = onCreate, modifier = Modifier.size(52.dp)) {
+                                Text("+", fontSize = 27.sp, fontWeight = FontWeight.Medium)
+                            }
+                        }
+                    }
                 }
             }
-        }
-        item { Ph04QuickActions(onCommunities = { onLoad(search) }, onMessages = onMessages, onNotifications = onNotifications) }
-        item {
-            OutlinedTextField(
-                value = search,
-                onValueChange = { search = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Search communities") },
-                singleLine = true,
-                trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } },
-            )
-        }
-        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { TextButton(onClick = onEvents) { Text("Upcoming events →") } } }
-        item { Feedback(state) { onLoad(search) } }
-        if (state.communities.isEmpty() && !state.loading) item { Empty("No communities found", "Try another search or create a community.") }
-        itemsIndexed(state.communities.distinctBy { it.id }, key = { i, c -> "community:${c.id}:$i" }) { _, community ->
-            ElevatedCard(Modifier.fillMaxWidth().clickable { onOpen(community.handle.ifBlank { community.id }) }, shape = RoundedCornerShape(20.dp)) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(community.name.ifBlank { "${VoiceCloudBrand.name} community" }, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                        if (community.isVerified) Text("✓", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+            item { Ph04QuickActions(onCommunities = { onLoad("") }, onMessages = onMessages, onNotifications = onNotifications) }
+            item { Feedback(state) { onLoad("") } }
+            if (state.communities.isEmpty() && !state.loading) item { Empty("No communities", "Create the first one.") }
+            itemsIndexed(state.communities.distinctBy { it.id }, key = { i, c -> "community:${c.id}:$i" }) { _, community ->
+                ElevatedCard(Modifier.fillMaxWidth().clickable { onOpen(community.handle.ifBlank { community.id }) }, shape = RoundedCornerShape(22.dp)) {
+                    Row(Modifier.fillMaxWidth().padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Surface(shape = RoundedCornerShape(16.dp), color = ConsumerColors.SapphireSoft) {
+                            Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                                Text(community.name.firstOrNull()?.uppercaseChar()?.toString() ?: "C", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            }
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(community.name.ifBlank { "Community" }, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                if (community.isVerified) Text("✓", color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                            }
+                            Text("@${community.handle} · ${community.memberCount} members", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            if (community.description.isNotBlank()) Text(community.description, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Text("›", fontSize = 24.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Text("@${community.handle} · ${community.visibility.uppercase()}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(community.description.ifBlank { "No description yet." }, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text("${community.memberCount} members · ${community.upcomingRoomsCount} upcoming · ${community.category}", style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
     }
-}
 }
 
 @Composable
@@ -191,60 +232,85 @@ fun CommunityDetailScreen(
     val membership = state.membership
     val isPrivate = community?.visibility?.uppercase() == "PRIVATE"
     val canManage = membership?.role?.uppercase() in setOf("OWNER", "ADMIN")
+    val metrics = VoiceCloudPageMetrics.current()
     SecondaryPageLayout(
         title = community?.name ?: "Community",
-        subtitle = community?.let { "@${it.handle} · ${it.category}" },
+        subtitle = community?.handle?.takeIf { it.isNotBlank() }?.let { "@$it" },
         onBack = onBack,
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Feedback(state, onLoad) }
-        if (community != null) {
-            item {
-                ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp)) {
-                    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(community.description.ifBlank { "No community description has been added yet." })
-                        Text("${community.memberCount} members · ${community.hostCount} hosts · ${community.upcomingRoomsCount} upcoming sessions", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        if (community.rules.isNotEmpty()) {
-                            Text("Community rules", fontWeight = FontWeight.Bold)
-                            community.rules.take(6).forEachIndexed { index, rule -> Text("${index + 1}. $rule") }
+        LazyColumn(
+            pageModifier,
+            contentPadding = PaddingValues(horizontal = metrics.horizontalPadding, vertical = metrics.contentTopSpacing),
+            verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
+        ) {
+            item { Feedback(state, onLoad) }
+            if (community != null) {
+                item {
+                    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(26.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Surface(shape = RoundedCornerShape(20.dp), color = ConsumerColors.SapphireSoft) {
+                                    Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                                        Text(community.name.firstOrNull()?.uppercaseChar()?.toString() ?: "C", fontSize = 25.sp, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                                Spacer(Modifier.width(14.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(community.name, style = MaterialTheme.typography.titleLarge)
+                                    Text("${community.category} · ${community.visibility.lowercase().replaceFirstChar(Char::uppercase)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                            if (community.description.isNotBlank()) Text(community.description, maxLines = 4, overflow = TextOverflow.Ellipsis)
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                CommunityStat(community.memberCount.toString(), "Members")
+                                CommunityStat(community.hostCount.toString(), "Hosts")
+                                CommunityStat(community.upcomingRoomsCount.toString(), "Upcoming")
+                            }
                         }
                     }
                 }
-            }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (isGuest) {
-                        Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade account to join") }
-                    } else if (membership?.member == true) {
-                        if (canManage) Button(onClick = onManage, modifier = Modifier.fillMaxWidth()) { Text("Manage community · ${membership.role}") }
-                        if (membership.role?.uppercase() != "OWNER") OutlinedButton(onClick = onLeave, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text("Leave community") }
-                    } else {
-                        if (isPrivate) OutlinedTextField(inviteCode, { inviteCode = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Private invitation code") }, singleLine = true)
-                        Button(onClick = { onJoin(inviteCode.ifBlank { null }) }, enabled = !state.mutationBusy && (!isPrivate || inviteCode.isNotBlank()), modifier = Modifier.fillMaxWidth()) { Text(if (isPrivate) "Join with invitation code" else "Join community") }
-                    }
-                }
-            }
-            if (!isPrivate || membership?.member == true) {
                 item {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedButton(
-                            onClick = onMembers,
-                            modifier = Modifier.weight(1f),
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                        ) { Text("Members", maxLines = 1, softWrap = false) }
-                        OutlinedButton(
-                            onClick = onEvents,
-                            modifier = Modifier.weight(1f),
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                        ) { Text("Rooms & events", maxLines = 1, softWrap = false, fontSize = 12.sp) }
+                    Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                        if (isGuest) {
+                            Button(onClick = onUpgrade, modifier = Modifier.fillMaxWidth()) { Text("Upgrade to join") }
+                        } else if (membership?.member == true) {
+                            if (canManage) Button(onClick = onManage, modifier = Modifier.fillMaxWidth()) { Text("Manage community") }
+                            if (membership.role?.uppercase() != "OWNER") OutlinedButton(onClick = onLeave, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text("Leave community") }
+                        } else {
+                            if (isPrivate) OutlinedTextField(inviteCode, { inviteCode = it }, modifier = Modifier.fillMaxWidth(), placeholder = { Text("Invitation code") }, singleLine = true, shape = RoundedCornerShape(18.dp))
+                            Button(onClick = { onJoin(inviteCode.ifBlank { null }) }, enabled = !state.mutationBusy && (!isPrivate || inviteCode.isNotBlank()), modifier = Modifier.fillMaxWidth()) { Text(if (isPrivate) "Join with code" else "Join community") }
+                        }
                     }
                 }
-                if (state.communityEvents.isNotEmpty()) item { Text("Upcoming", style = MaterialTheme.typography.titleLarge) }
-                itemsIndexed(state.communityEvents.take(4).distinctBy { it.id }, key = { i, event -> "community-event:${event.id}:$i" }) { _, event -> EventCard(event, onClick = onEvents) }
-            } else item { Empty("Private community", "Join with the current invitation code before browsing members and scheduled sessions.") }
+                if (!isPrivate || membership?.member == true) {
+                    item {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedButton(onClick = onMembers, modifier = Modifier.weight(1f)) { Text("Members", maxLines = 1, softWrap = false) }
+                            OutlinedButton(onClick = onEvents, modifier = Modifier.weight(1f)) { Text("Events", maxLines = 1, softWrap = false) }
+                        }
+                    }
+                    if (community.rules.isNotEmpty()) item {
+                        ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
+                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text("Community rules", fontWeight = FontWeight.Bold)
+                                community.rules.take(4).forEachIndexed { index, rule -> Text("${index + 1}. $rule", style = MaterialTheme.typography.bodyMedium) }
+                            }
+                        }
+                    }
+                    if (state.communityEvents.isNotEmpty()) item { Text("Upcoming", style = MaterialTheme.typography.titleLarge) }
+                    itemsIndexed(state.communityEvents.take(3).distinctBy { it.id }, key = { i, event -> "community-event:${event.id}:$i" }) { _, event -> EventCard(event, onClick = onEvents) }
+                } else item { Empty("Private community", "Join to continue.") }
+            }
         }
     }
 }
+
+@Composable
+private fun CommunityStat(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, fontWeight = FontWeight.Bold, color = ConsumerColors.SapphireDeep)
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
 }
 
 @Composable
@@ -265,16 +331,31 @@ fun CommunityEditorScreen(
     var privateCommunity by rememberSaveable(existing?.id) { mutableStateOf(existing?.visibility?.uppercase() == "PRIVATE") }
     SecondaryPageLayout(
         title = if (existing == null) "Create Community" else "Manage Community",
-        subtitle = "Set your community details, privacy, and member experience.",
+        subtitle = if (existing == null) "Create your space" else null,
         onBack = onBack,
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Feedback(state) }
-        item { OutlinedTextField(name, { name = it }, Modifier.fillMaxWidth(), label = { Text("Name") }, singleLine = true) }
-        item { OutlinedTextField(handle, { handle = it }, Modifier.fillMaxWidth(), label = { Text("Handle") }, singleLine = true) }
-        item { OutlinedTextField(description, { description = it }, Modifier.fillMaxWidth(), label = { Text("Description") }, minLines = 3) }
-        item { OutlinedTextField(category, { category = it }, Modifier.fillMaxWidth(), label = { Text("Category") }, singleLine = true) }
-        item { OutlinedTextField(rules, { rules = it }, Modifier.fillMaxWidth(), label = { Text("Rules · one per line") }, minLines = 3) }
+        if (existing == null) item {
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Hero).padding(20.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surface.copy(alpha = .8f)) {
+                        Icon(painterResource(R.drawable.vc_icon_community), contentDescription = null, tint = ConsumerColors.SapphireDeep, modifier = Modifier.padding(12.dp).size(28.dp))
+                    }
+                    Spacer(Modifier.width(14.dp))
+                    Column {
+                        Text("Start a community", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                        Text("Name it. Shape it. Grow it.", style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.Text)
+                    }
+                }
+            }
+        }
+        item { Text("Basics", style = MaterialTheme.typography.titleMedium, color = ConsumerColors.SapphireDeep) }
+        item { OutlinedTextField(name, { name = it }, Modifier.fillMaxWidth(), label = { Text("Community name") }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(handle, { handle = it }, Modifier.fillMaxWidth(), label = { Text("Handle") }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(description, { description = it }, Modifier.fillMaxWidth(), label = { Text("Description") }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(category, { category = it }, Modifier.fillMaxWidth(), label = { Text("Category") }, singleLine = true, shape = RoundedCornerShape(18.dp)) }
+        item { OutlinedTextField(rules, { rules = it }, Modifier.fillMaxWidth(), label = { Text("Rules · one per line") }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { Text("Private community", fontWeight = FontWeight.Bold); Text("Requires the secure invitation code to join.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -319,7 +400,7 @@ fun CommunityMembersScreen(
         subtitle = state.community?.name,
         onBack = onBack,
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Feedback(state) }
         if (state.members.isEmpty() && !state.loading) item { Empty("No members", "No member identities are available.") }
         itemsIndexed(state.members.distinctBy { it.id.ifBlank { it.userId } }, key = { i, m -> "member:${m.id.ifBlank { m.userId }}:$i" }) { _, member ->
@@ -371,7 +452,7 @@ fun EventsScreen(state: EngagementUiState, onLoad: (String) -> Unit, onOpen: (St
         subtitle = "Scheduled ${VoiceCloudBrand.name} sessions and reminders.",
         onBack = onBack,
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { OutlinedTextField(search, { search = it }, Modifier.fillMaxWidth(), label = { Text("Search scheduled sessions") }, singleLine = true, trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } }) }
         item { Feedback(state) { onLoad(search) } }
         if (state.events.isEmpty() && !state.loading) item { Empty("No scheduled sessions", "Upcoming sessions will appear here.") }
@@ -389,7 +470,7 @@ fun EventDetailScreen(state: EngagementUiState, onLoad: () -> Unit, onReminder: 
         subtitle = "Scheduled session details",
         onBack = onBack,
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Feedback(state, onLoad) }
         if (event != null) {
             item { EventCard(event) {} }
@@ -402,35 +483,116 @@ fun EventDetailScreen(state: EngagementUiState, onLoad: () -> Unit, onReminder: 
 }
 
 @Composable
-fun MessagesScreen(state: EngagementUiState, onLoad: (String) -> Unit, onOpen: (String) -> Unit, onDelete: (String) -> Unit, onBack: () -> Unit) {
+fun MessagesScreen(
+    state: EngagementUiState,
+    onLoad: (String) -> Unit,
+    onOpen: (String) -> Unit,
+    onDelete: (String) -> Unit,
+    onDeleteMany: (Set<String>) -> Unit,
+    onBack: () -> Unit,
+) {
     var search by rememberSaveable { mutableStateOf("") }
+    var searchVisible by rememberSaveable { mutableStateOf(false) }
+    var selectionMode by rememberSaveable { mutableStateOf(false) }
+    var selected by remember { mutableStateOf(setOf<String>()) }
+    var pendingDelete by remember { mutableStateOf<Set<String>?>(null) }
+    val metrics = VoiceCloudPageMetrics.current()
     LaunchedEffect(Unit) { onLoad("") }
+
+    pendingDelete?.let { ids ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text(if (ids.size == 1) "Delete conversation?" else "Delete ${ids.size} conversations?") },
+            text = { Text("This removes the selected conversation${if (ids.size == 1) "" else "s"} from your inbox.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (ids.size == 1) onDelete(ids.first()) else onDeleteMany(ids)
+                    selected = selected - ids
+                    if (selected.isEmpty()) selectionMode = false
+                    pendingDelete = null
+                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } },
+        )
+    }
+
     SecondaryPageLayout(
-        title = "Messages",
-        subtitle = "Your ${VoiceCloudBrand.name} conversations, all in one place.",
-        onBack = onBack,
+        title = if (selectionMode) "${selected.size} selected" else "Messages",
+        onBack = { if (selectionMode) { selectionMode = false; selected = emptySet() } else onBack() },
+        actions = {
+            if (selectionMode) {
+                VoiceCloudTopBarIconAction(
+                    iconRes = R.drawable.vc_icon_delete,
+                    contentDescription = "Delete selected",
+                    onClick = { if (selected.isNotEmpty()) pendingDelete = selected },
+                    enabled = selected.isNotEmpty() && !state.mutationBusy,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            } else {
+                VoiceCloudTopBarIconAction(R.drawable.vc_icon_search, "Search conversations", onClick = { searchVisible = !searchVisible })
+                Spacer(Modifier.width(6.dp))
+                VoiceCloudTopBarIconAction(R.drawable.vc_icon_check_all, "Select conversations", onClick = { selectionMode = true })
+            }
+        },
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item { OutlinedTextField(search, { search = it }, Modifier.fillMaxWidth(), label = { Text("Search conversations") }, singleLine = true, trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text("Search") } }) }
-        item { Feedback(state) { onLoad(search) } }
-        if (state.conversations.isEmpty() && !state.loading) item { Empty("No conversations yet", "When you start or join a conversation it will appear here.") }
-        itemsIndexed(state.conversations.distinctBy { it.id }, key = { i, c -> "conversation:${c.id}:$i" }) { _, conversation ->
-            ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
-                Row(Modifier.fillMaxWidth().clickable { onOpen(conversation.id) }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(44.dp).clip(CircleShape).background(ConsumerColors.SapphireSoft), contentAlignment = Alignment.Center) { Text((conversation.name ?: conversation.peer?.displayName ?: "V").firstOrNull()?.uppercaseChar()?.toString() ?: "V", fontWeight = FontWeight.Bold) }
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        val title = conversation.name ?: conversation.peer?.displayName ?: conversation.peer?.username ?: conversation.type.replaceFirstChar(Char::uppercase)
-                        Text(title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(conversation.lastMessage?.content ?: "No messages yet", maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        LazyColumn(
+            pageModifier,
+            contentPadding = PaddingValues(horizontal = metrics.horizontalPadding, vertical = metrics.contentTopSpacing),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            if (searchVisible) item {
+                OutlinedTextField(
+                    search,
+                    { search = it },
+                    Modifier.fillMaxWidth(),
+                    placeholder = { Text("Search conversations") },
+                    singleLine = true,
+                    leadingIcon = { Icon(painterResource(R.drawable.vc_icon_search), contentDescription = null) },
+                    trailingIcon = { TextButton(onClick = { onLoad(search.trim()) }) { Text("Go") } },
+                    shape = RoundedCornerShape(20.dp),
+                )
+            }
+            item { Feedback(state) { onLoad(search) } }
+            if (state.conversations.isEmpty() && !state.loading) item { Empty("No conversations", "Start a new conversation.") }
+            itemsIndexed(state.conversations.distinctBy { it.id }, key = { i, c -> "conversation:${c.id}:$i" }) { _, conversation ->
+                val checked = conversation.id in selected
+                ElevatedCard(
+                    Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = if (checked) ConsumerColors.SapphireSoft else MaterialTheme.colorScheme.surface),
+                ) {
+                    Row(Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        if (selectionMode) {
+                            Checkbox(checked = checked, onCheckedChange = { isChecked -> selected = if (isChecked) selected + conversation.id else selected - conversation.id })
+                        }
+                        Row(
+                            Modifier.weight(1f).clickable {
+                                if (selectionMode) selected = if (checked) selected - conversation.id else selected + conversation.id
+                                else onOpen(conversation.id)
+                            }.padding(vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(Modifier.size(46.dp).clip(CircleShape).background(ConsumerColors.SapphireSoft), contentAlignment = Alignment.Center) {
+                                Text((conversation.name ?: conversation.peer?.displayName ?: "V").firstOrNull()?.uppercaseChar()?.toString() ?: "V", fontWeight = FontWeight.Bold, color = ConsumerColors.SapphireDeep)
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                val title = conversation.name ?: conversation.peer?.displayName ?: conversation.peer?.username ?: conversation.type.replaceFirstChar(Char::uppercase)
+                                Text(title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(conversation.lastMessage?.content ?: "No messages yet", maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                            }
+                            if (conversation.unreadCount > 0) Badge { Text(conversation.unreadCount.toString()) }
+                        }
+                        if (!selectionMode) {
+                            IconButton(onClick = { pendingDelete = setOf(conversation.id) }, enabled = !state.mutationBusy) {
+                                Icon(painterResource(R.drawable.vc_icon_delete), contentDescription = "Delete conversation", tint = MaterialTheme.colorScheme.error)
+                            }
+                        }
                     }
-                    if (conversation.unreadCount > 0) Badge { Text(conversation.unreadCount.toString()) }
                 }
-                TextButton(onClick = { onDelete(conversation.id) }, enabled = !state.mutationBusy, modifier = Modifier.align(Alignment.End)) { Text("Remove") }
             }
         }
     }
-}
 }
 
 @Composable
@@ -505,7 +667,7 @@ fun NotificationsScreen(
         actionEnabled = !state.mutationBusy,
         onAction = onReadAll,
     ) { pageModifier ->
-        LazyColumn(pageModifier, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Feedback(state, onLoad) }
         if (!pushPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) item {
             Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {

@@ -1,6 +1,13 @@
 package app.voicecloud.android.navigation
 
 import android.net.Uri
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,6 +22,7 @@ import app.voicecloud.feature.bootstrap.BootstrapRoute
 import app.voicecloud.feature.discovery.ui.*
 import app.voicecloud.feature.engagement.ui.*
 import app.voicecloud.feature.live.ui.*
+import app.voicecloud.feature.hosting.ui.*
 
 object VoiceCloudRoutes {
     const val Bootstrap = "bootstrap"
@@ -46,6 +54,7 @@ object VoiceCloudRoutes {
     const val People = "people"
     const val Creators = "creators"
     const val Search = "search"
+    const val CommunitySearch = "search/communities"
     const val MyProfile = "me"
     const val Followers = "followers"
     const val Following = "following"
@@ -69,6 +78,16 @@ object VoiceCloudRoutes {
     const val RoomPreview = "rooms/{roomId}/preview"
     const val RoomExperience = "rooms/{roomId}/live"
 
+    // PH06 host/speaker management graph.
+    const val HostStudio = "host"
+    const val HostRoomCreate = "host/rooms/create"
+    const val HostRoomManage = "host/rooms/{roomId}/manage"
+    const val HostRoomSettings = "host/rooms/{roomId}/settings"
+    const val HostLiveConsole = "host/rooms/{roomId}/console"
+    const val HostScheduleCreate = "host/schedules/create"
+    const val HostScheduleEdit = "host/schedules/{scheduleId}/edit"
+    const val HostInteractive = "host/rooms/{roomId}/interactive"
+
     fun roomPreview(id: String): String = "rooms/${Uri.encode(id.trim())}/preview"
     fun roomExperience(id: String): String = "rooms/${Uri.encode(id.trim())}/live"
 
@@ -79,6 +98,12 @@ object VoiceCloudRoutes {
     fun communityEvents(id: String): String = "communities/${Uri.encode(id.trim())}/events"
     fun event(id: String): String = "events/${Uri.encode(id.trim())}"
     fun conversation(id: String): String = "messages/${Uri.encode(id.trim())}"
+
+    fun hostRoom(id: String): String = "host/rooms/${Uri.encode(id.trim())}/manage"
+    fun hostRoomSettings(id: String): String = "host/rooms/${Uri.encode(id.trim())}/settings"
+    fun hostConsole(id: String): String = "host/rooms/${Uri.encode(id.trim())}/console"
+    fun hostSchedule(id: String): String = "host/schedules/${Uri.encode(id.trim())}/edit"
+    fun hostInteractive(id: String): String = "host/rooms/${Uri.encode(id.trim())}/interactive"
 }
 
 @Composable
@@ -92,6 +117,8 @@ fun VoiceCloudNavHost(
     val authState by authViewModel.state.collectAsStateWithLifecycle()
     val engagementViewModel: EngagementViewModel = hiltViewModel()
     val engagementState by engagementViewModel.state.collectAsStateWithLifecycle()
+    val hostingViewModel: HostingViewModel = hiltViewModel()
+    val hostingState by hostingViewModel.state.collectAsStateWithLifecycle()
     var mobileConfig by remember { mutableStateOf<MobileConfig?>(null) }
     var resetToken by remember(initialResetToken) { mutableStateOf(initialResetToken.orEmpty()) }
     var pendingExternalRoute by remember(initialNavigationRoute) { mutableStateOf(initialNavigationRoute.orEmpty()) }
@@ -125,6 +152,7 @@ fun VoiceCloudNavHost(
     }
 
     LaunchedEffect(authState.user?.id) {
+        hostingViewModel.setViewer(authState.user?.id)
         if (authState.user != null) engagementViewModel.syncPushToken()
     }
 
@@ -156,7 +184,14 @@ fun VoiceCloudNavHost(
         }
     }
 
-    NavHost(navController = navController, startDestination = VoiceCloudRoutes.Bootstrap) {
+    NavHost(
+        navController = navController,
+        startDestination = VoiceCloudRoutes.Bootstrap,
+        enterTransition = { tabEnterTransition(initialState.destination.route, targetState.destination.route) },
+        exitTransition = { tabExitTransition(initialState.destination.route, targetState.destination.route) },
+        popEnterTransition = { tabEnterTransition(initialState.destination.route, targetState.destination.route) },
+        popExitTransition = { tabExitTransition(initialState.destination.route, targetState.destination.route) },
+    ) {
         composable(VoiceCloudRoutes.Bootstrap) {
             BootstrapRoute { config ->
                 mobileConfig = config
@@ -186,7 +221,7 @@ fun VoiceCloudNavHost(
                 onGoogleToken = { token -> authViewModel.googleLogin(token) },
                 onGuest = { authViewModel.guestLogin() },
                 onForgot = { open(VoiceCloudRoutes.ForgotPassword) },
-                onBack = { open(VoiceCloudRoutes.PortalSelector) },
+                onBack = { open(VoiceCloudRoutes.CreatorSignIn) },
             )
         }
         composable(VoiceCloudRoutes.Register) {
@@ -237,7 +272,7 @@ fun VoiceCloudNavHost(
                 state = authState,
                 onLogin = { id, password -> authViewModel.login(id, password, creatorPortal = true) },
                 onApply = { open(VoiceCloudRoutes.CreatorAccess) },
-                onBack = { open(VoiceCloudRoutes.PortalSelector) },
+                onBack = { open(VoiceCloudRoutes.UserSignIn) },
             )
         }
         composable(VoiceCloudRoutes.CreatorAccess) {
@@ -278,6 +313,7 @@ fun VoiceCloudNavHost(
                 onCommunities = { open(VoiceCloudRoutes.Communities) },
                 onMessages = { open(VoiceCloudRoutes.Messages) },
                 onNotifications = { open(VoiceCloudRoutes.Notifications) },
+                onHostStudio = { if (viewer?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.HostStudio) },
             )
         }
         composable(VoiceCloudRoutes.Explore) {
@@ -363,9 +399,44 @@ fun VoiceCloudNavHost(
             val viewer = authState.user
             SearchScreen(
                 state = state,
-                onSubmit = { query -> vm.setViewer(viewer?.id, viewer?.username); vm.search(query) },
+                communities = engagementState.communities.map { community ->
+                    CommunitySearchItem(community.id, community.name, community.handle, community.memberCount)
+                },
+                communitiesLoading = engagementState.loading,
+                onSubmit = { query ->
+                    vm.setViewer(viewer?.id, viewer?.username)
+                    vm.search(query)
+                    engagementViewModel.loadCommunities(query)
+                },
                 onProfile = ::openProfile,
                 onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
+                onCommunity = { open(VoiceCloudRoutes.community(it)) },
+                onHome = { open(VoiceCloudRoutes.Home) },
+                onExplore = { open(VoiceCloudRoutes.Explore) },
+                onSearch = { open(VoiceCloudRoutes.Search) },
+                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onMe = { open(VoiceCloudRoutes.MyProfile) },
+            )
+        }
+        composable(VoiceCloudRoutes.CommunitySearch) {
+            val vm: DiscoveryViewModel = hiltViewModel()
+            val state by vm.state.collectAsStateWithLifecycle()
+            val viewer = authState.user
+            SearchScreen(
+                state = state,
+                communities = engagementState.communities.map { community ->
+                    CommunitySearchItem(community.id, community.name, community.handle, community.memberCount)
+                },
+                communitiesLoading = engagementState.loading,
+                initialTab = "Communities",
+                onSubmit = { query ->
+                    vm.setViewer(viewer?.id, viewer?.username)
+                    vm.search(query)
+                    engagementViewModel.loadCommunities(query)
+                },
+                onProfile = ::openProfile,
+                onRoom = { open(VoiceCloudRoutes.roomPreview(it)) },
+                onCommunity = { open(VoiceCloudRoutes.community(it)) },
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
@@ -459,6 +530,7 @@ fun VoiceCloudNavHost(
                 onLoad = engagementViewModel::loadCommunities,
                 onOpen = { open(VoiceCloudRoutes.community(it)) },
                 onCreate = { if (authState.user?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.CommunityCreate) },
+                onSearch = { open(VoiceCloudRoutes.CommunitySearch) },
                 onEvents = { open(VoiceCloudRoutes.Events) },
                 onMessages = { open(VoiceCloudRoutes.Messages) },
                 onNotifications = { open(VoiceCloudRoutes.Notifications) },
@@ -468,7 +540,14 @@ fun VoiceCloudNavHost(
         composable(VoiceCloudRoutes.CommunityCreate) {
             CommunityEditorScreen(
                 state = engagementState,
-                onSubmit = { input -> engagementViewModel.createCommunity(input) { created -> open(VoiceCloudRoutes.community(created.handle.ifBlank { created.id })) } },
+                onSubmit = { input ->
+                    engagementViewModel.createCommunity(input) { created ->
+                        navController.navigate(VoiceCloudRoutes.community(created.handle.ifBlank { created.id })) {
+                            launchSingleTop = true
+                            popUpTo(VoiceCloudRoutes.CommunityCreate) { inclusive = true }
+                        }
+                    }
+                },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -543,6 +622,7 @@ fun VoiceCloudNavHost(
                 onLoad = engagementViewModel::loadConversations,
                 onOpen = { open(VoiceCloudRoutes.conversation(it)) },
                 onDelete = engagementViewModel::deleteConversation,
+                onDeleteMany = engagementViewModel::deleteConversations,
                 onBack = { navController.popBackStack() },
             )
         }
@@ -557,6 +637,101 @@ fun VoiceCloudNavHost(
                 onBack = { navController.popBackStack() },
             )
         }
+        composable(VoiceCloudRoutes.HostStudio) {
+            HostStudioScreen(
+                state = hostingState,
+                onLoad = hostingViewModel::loadStudio,
+                onCreateRoom = { open(VoiceCloudRoutes.HostRoomCreate) },
+                onScheduleRoom = { open(VoiceCloudRoutes.HostScheduleCreate) },
+                onRoom = { open(VoiceCloudRoutes.hostRoom(it)) },
+                onSchedule = { open(VoiceCloudRoutes.hostSchedule(it)) },
+                onStartScheduled = { schedule -> hostingViewModel.startScheduled(schedule) { room -> open(VoiceCloudRoutes.hostConsole(room.id)) } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostRoomCreate) {
+            RoomEditorScreen(
+                state = hostingState, roomId = null, onLoad = {},
+                onSave = { input -> hostingViewModel.createRoom(input) { room -> open(VoiceCloudRoutes.hostRoom(room.id)) } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostRoomSettings) { entry ->
+            val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+            RoomEditorScreen(
+                state = hostingState, roomId = roomId, onLoad = hostingViewModel::loadRoom,
+                onSave = { input -> hostingViewModel.updateRoom(roomId, input) { navController.popBackStack() } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostRoomManage) { entry ->
+            val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+            HostRoomManageScreen(
+                state = hostingState, roomId = roomId, onLoad = { hostingViewModel.loadRoom(roomId) },
+                onSettings = { open(VoiceCloudRoutes.hostRoomSettings(roomId)) },
+                onStart = { hostingViewModel.startRoom(roomId) { open(VoiceCloudRoutes.hostConsole(it.id)) } },
+                onOpenConsole = { open(VoiceCloudRoutes.hostConsole(roomId)) },
+                onInteractive = { open(VoiceCloudRoutes.hostInteractive(roomId)) },
+                onPause = { hostingViewModel.pauseRoom(roomId) },
+                onResume = { hostingViewModel.resumeRoom(roomId) },
+                onEnd = { hostingViewModel.endRoom(roomId) },
+                onDelete = { hostingViewModel.deleteRoom(roomId) { navController.popBackStack() } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostScheduleCreate) {
+            ScheduleEditorScreen(
+                state = hostingState, scheduleId = null, onLoad = {},
+                onSave = { input -> hostingViewModel.createSchedule(input) { navController.popBackStack() } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostScheduleEdit) { entry ->
+            val scheduleId = Uri.decode(entry.arguments?.getString("scheduleId").orEmpty())
+            ScheduleEditorScreen(
+                state = hostingState, scheduleId = scheduleId, onLoad = hostingViewModel::loadSchedule,
+                onSave = { input -> hostingViewModel.updateSchedule(scheduleId, input) },
+                onDelete = { hostingViewModel.deleteSchedule(scheduleId) { navController.popBackStack() } },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostLiveConsole) { entry ->
+            val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+            HostLiveConsoleScreen(
+                state = hostingState, roomId = roomId, viewerId = authState.user?.id,
+                onEnter = { hostingViewModel.enterHostConsole(roomId) },
+                onLeave = { hostingViewModel.leaveHostConsole(roomId) },
+                onMicrophone = hostingViewModel::setMicrophoneEnabled,
+                onPause = { hostingViewModel.pauseRoom(roomId) },
+                onResume = { hostingViewModel.resumeRoom(roomId) },
+                onEnd = { hostingViewModel.endRoom(roomId) { navController.popBackStack() } },
+                onApprove = { hostingViewModel.approve(roomId, it) },
+                onReject = { hostingViewModel.reject(roomId, it) },
+                onInviteSpeaker = { hostingViewModel.inviteSpeaker(roomId, it) },
+                onRemoveSpeaker = { hostingViewModel.removeSpeaker(roomId, it) },
+                onMuteSpeaker = { userId, muted -> hostingViewModel.muteSpeaker(roomId, userId, muted) },
+                onSearchInvite = hostingViewModel::searchInviteCandidates,
+                onInviteParticipant = { hostingViewModel.inviteParticipant(roomId, it) },
+                onInteractive = { open(VoiceCloudRoutes.hostInteractive(roomId)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(VoiceCloudRoutes.HostInteractive) { entry ->
+            val roomId = Uri.decode(entry.arguments?.getString("roomId").orEmpty())
+            PollsQuizScreen(
+                state = hostingState, roomId = roomId, onLoad = { hostingViewModel.loadInteractive(roomId) },
+                onCreatePoll = hostingViewModel::createPoll,
+                onStartPoll = { hostingViewModel.startPoll(it, roomId) },
+                onStopPoll = { hostingViewModel.stopPoll(it, roomId) },
+                onDeletePoll = { hostingViewModel.deletePoll(it, roomId) },
+                onCreateQuiz = hostingViewModel::createQuiz,
+                onStartQuiz = { hostingViewModel.startQuiz(it, roomId) },
+                onNextQuiz = { hostingViewModel.nextQuizRound(it, roomId) },
+                onStopQuiz = { hostingViewModel.stopQuiz(it, roomId) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
         composable(VoiceCloudRoutes.Notifications) {
             NotificationsScreen(
                 state = engagementState,
@@ -569,6 +744,32 @@ fun VoiceCloudNavHost(
             )
         }
     }
+}
+
+
+private val consumerTabs = listOf(
+    VoiceCloudRoutes.Home, VoiceCloudRoutes.Explore, VoiceCloudRoutes.Search,
+    VoiceCloudRoutes.Friends, VoiceCloudRoutes.MyProfile,
+)
+
+private fun tabIndex(route: String?): Int = consumerTabs.indexOf(if (route == VoiceCloudRoutes.CommunitySearch) VoiceCloudRoutes.Search else route)
+
+private fun tabEnterTransition(fromRoute: String?, toRoute: String?): EnterTransition {
+    val from = tabIndex(fromRoute)
+    val to = tabIndex(toRoute)
+    if (from < 0 || to < 0 || from == to) return EnterTransition.None
+    val direction = if (to > from) 1 else -1
+    return slideInHorizontally(animationSpec = tween(190)) { fullWidth -> direction * (fullWidth / 5) } +
+        fadeIn(animationSpec = tween(145))
+}
+
+private fun tabExitTransition(fromRoute: String?, toRoute: String?): ExitTransition {
+    val from = tabIndex(fromRoute)
+    val to = tabIndex(toRoute)
+    if (from < 0 || to < 0 || from == to) return ExitTransition.None
+    val direction = if (to > from) -1 else 1
+    return slideOutHorizontally(animationSpec = tween(190)) { fullWidth -> direction * (fullWidth / 5) } +
+        fadeOut(animationSpec = tween(120))
 }
 
 private fun routeFor(screen: AuthScreen): String = when (screen) {

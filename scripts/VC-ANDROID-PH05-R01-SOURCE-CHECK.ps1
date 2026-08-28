@@ -10,12 +10,12 @@ $nav=T 'app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
 $style=T 'app/src/main/res/values/styles.xml'; $discovery=T 'feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt'; $brand=T 'branding/voicecloud-brand.properties'
 P 'PH05 live module registered' $settings.Contains('include(":feature:live")')
 P 'app consumes PH05 live module' $app.Contains('implementation(project(":feature:live"))')
-P 'PH05 version marker present' $app.Contains('versionName = "1.0.0-ph05"')
+P 'PH05 or later version marker present' $app.Contains('versionName = "1.0.0-ph0')
 foreach($endpoint in @('rtc/rooms/join','rtc/rooms/rejoin','rtc/rooms/leave','rtc/rooms/{roomId}/participants','rtc/rooms/{roomId}/raise-hand','chat/conversations/{conversationId}/messages','rooms/saved/{roomId}','room-activity/{roomId}/join','room-activity/{roomId}/leave','gifts/catalog','gifts/send')){P "endpoint $endpoint retained" $api.Contains($endpoint)}
 P 'listener auto subscribes' $rtc.Contains('autoSubscribe = true')
 P 'listener microphone capture disabled' $rtc.Contains('audio = false')
 P 'listener video capture disabled' $rtc.Contains('video = false')
-P 'PH05 does not request RECORD_AUDIO' (-not $manifest.Contains('android.permission.RECORD_AUDIO'))
+P 'PH05 listener UI does not request microphone permission' ((-not $screen.Contains('RequestPermission')) -and (-not $screen.Contains('RECORD_AUDIO')))
 P 'room preview route retained' $nav.Contains('rooms/{roomId}/preview')
 P 'live room route retained' $nav.Contains('rooms/{roomId}/live')
 P 'join lifecycle generation retained' ($vm.Contains('sessionGeneration') -and $vm.Contains('joinJob') -and $vm.Contains('rejoinJob'))
@@ -29,7 +29,7 @@ P 'speaker invitation actions retained' ($rt.Contains('stage:accept_invitation')
 P 'room pause/resume/end events retained' ($rt.Contains('room.paused') -and $rt.Contains('room.resumed') -and $rt.Contains('room.ended'))
 P 'live lazy lists use collision-safe keys' ($screen.Contains('live-person:${participant.userId}:$index') -and $screen.Contains('live-chat:${message.id}:$index') -and $screen.Contains('live-gift:${gift.id}:$index'))
 foreach($icon in @('home','explore','search','friends','profile')){P "real tab icon $icon retained" ($discovery.Contains("R.drawable.vc_nav_$icon") -and (Test-Path (Join-Path $root "core/designsystem/src/main/res/drawable/vc_nav_$icon.xml")))}
-P 'tab bar uses vector Icon painters' $discovery.Contains('Icon(painterResource(iconRes)')
+P 'tab bar uses professional vector Icon painters' ($discovery.Contains('vc_nav_home_selected') -and $discovery.Contains('painterResource(if (isSelected)'))
 P 'Android SplashScreen API installed' ($activity.Contains('installSplashScreen()') -and $style.Contains('Theme.SplashScreen'))
 P 'central temporary splash asset retained' (Test-Path (Join-Path $root 'branding/res/drawable/vc_brand_splash.xml'))
 P 'central brand app icon retained' (Test-Path (Join-Path $root 'branding/res/drawable/vc_brand_app_icon_foreground.xml'))

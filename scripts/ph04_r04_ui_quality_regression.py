@@ -31,7 +31,7 @@ ck('shared top bar uses icon-only back control', 'IconButton(' in topbar and 'Ca
 ck('shared top bar back control has accessibility label', 'contentDescription = "Back"' in topbar)
 ck('shared top bar title is centered', '.align(Alignment.Center)' in topbar and 'textAlign = TextAlign.Center' in topbar)
 ck('shared top bar title is single-line and ellipsized', 'maxLines = 1' in topbar and 'overflow = TextOverflow.Ellipsis' in topbar)
-ck('shared top bar provides stable navigation-row height', '.heightIn(min = 64.dp)' in topbar)
+ck('shared top bar provides adaptive stable navigation-row height', '.heightIn(min = metrics.topBarMinHeight)' in topbar)
 ck('shared top bar has no visible Back text label', not re.search(r'Text\s*\(\s*"(?:‹\s*)?Back"', topbar))
 ck('discovery secondary layout uses shared top bar', 'topBar = { VoiceCloudPageTopBar(' in discovery)
 ck('engagement secondary layout uses shared top bar', 'VoiceCloudPageTopBar(' in engagement and 'topBar = {' in engagement)
@@ -53,14 +53,14 @@ ck('secondary UI contains no visible text Back control', not re.search(r'Text\s*
 
 # Button / navigation text resilience.
 ck('Home shortcut is RowScope qualified', 'private fun RowScope.HomeShortcut(' in discovery)
-ck('Home shortcut keeps equal widths', 'Modifier.weight(1f).heightIn(min = 44.dp)' in discovery)
+ck('Home shortcut keeps equal widths and touch height', 'Modifier.weight(1f).heightIn(min = 64.dp)' in discovery)
 ck('Home shortcut labels are forced single-line', 'Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)' in discovery)
 ck('Home shortcut labels include Communities Messages Alerts', all(f'HomeShortcut("{x}"' in discovery for x in ['Communities','Messages','Alerts']))
 ck('PH04 QuickAction remains RowScope qualified', 'private fun RowScope.QuickAction(' in engagement)
-ck('PH04 QuickAction has minimum touch/card height', '.heightIn(min = 76.dp)' in engagement)
-ck('PH04 QuickAction labels are forced single-line', 'Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)' in engagement)
+ck('PH04 QuickAction has minimum touch/card height', '.heightIn(min = 58.dp)' in engagement)
+ck('PH04 QuickAction labels are forced single-line', 'Text(label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)' in engagement)
 ck('community Members action is single-line', 'Text("Members", maxLines = 1, softWrap = false)' in engagement)
-ck('community Rooms and events action is single-line', 'Text("Rooms & events", maxLines = 1, softWrap = false' in engagement)
+ck('community Events action is single-line', 'Text("Events", maxLines = 1, softWrap = false)' in engagement)
 
 # Website-derived consumer presentation authority. PH05 moves the exact values into the
 # single white-label properties file; the Kotlin theme must consume generated BuildConfig aliases.

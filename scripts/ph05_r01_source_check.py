@@ -24,7 +24,7 @@ notif=t('app/src/main/java/app/voicecloud/android/notifications/VoiceCloudFireba
 
 ck('PH05 live module registered', 'include(":feature:live")' in settings)
 ck('app consumes PH05 live module', 'implementation(project(":feature:live"))' in app)
-ck('PH05 version marker present', 'versionName = "1.0.0-ph05"' in app)
+ck('PH05 or later version marker present', 'versionName = "1.0.0-ph0' in app and 'versionName = "1.0.0-ph01"' not in app)
 ck('LiveKit Android 2.28.0 pinned', 'livekitAndroid = "2.28.0"' in versions and 'implementation(libs.livekit.android)' in t('feature/live/build.gradle.kts'))
 for ep in ['rooms/{roomId}', 'rtc/rooms/join', 'rtc/rooms/rejoin', 'rtc/rooms/leave', 'rtc/rooms/{roomId}/participants',
            'rtc/rooms/{roomId}/raise-hand', 'rtc/rooms/{roomId}/cancel-raise-hand', 'chat/conversations',
@@ -52,7 +52,7 @@ ck('live screen tracks app foreground/background', 'Lifecycle.Event.ON_START' in
 ck('listener engine auto subscribes', 'autoSubscribe = true' in rtc)
 ck('listener engine never captures microphone', 'audio = false' in rtc)
 ck('listener engine never captures camera', 'video = false' in rtc)
-ck('app does not request microphone permission in PH05', 'android.permission.RECORD_AUDIO' not in manifest)
+ck('PH05 listener UI does not request microphone permission', 'RequestPermission' not in screens and 'RECORD_AUDIO' not in screens)
 ck('engine has connection generation ownership', 'AtomicLong' in rtc and 'beginConnectionOperation()' in rtc and 'ownershipLock' in rtc)
 ck('engine stale connections fail by cancellation', 'CancellationException("Audio connection superseded")' in rtc)
 ck('engine cleanup only clears owned room', 'if (room === active) room = null' in rtc)
@@ -90,7 +90,7 @@ ck('gift lazy list keys are collision-safe', 'live-gift:${gift.id}:$index' in sc
 for icon in ['home','explore','search','friends','profile']:
     ck(f'tab vector icon {icon} exists', (ROOT/f'core/designsystem/src/main/res/drawable/vc_nav_{icon}.xml').exists())
     ck(f'tab {icon} uses real vector resource', f'R.drawable.vc_nav_{icon}' in discovery)
-ck('tab bar renders Icon painters instead of placeholder circles', 'Icon(painterResource(iconRes)' in discovery and '●' not in discovery and '○' not in discovery)
+ck('tab bar renders professional vector Icon painters', 'vc_nav_home_selected' in discovery and 'painterResource(if (isSelected)' in discovery and '●' not in discovery and '○' not in discovery)
 ck('splashscreen dependency pinned', 'coreSplashscreen = "1.2.0"' in versions and 'implementation(libs.androidx.core.splashscreen)' in app)
 ck('MainActivity installs Android splash screen', 'installSplashScreen()' in activity)
 ck('starting theme uses SplashScreen API', 'parent="Theme.SplashScreen"' in styles)
@@ -106,7 +106,7 @@ ck('launcher background comes from white-label authority', 'resValue("color", "v
 ck('notification channel uses white-label brand slug', 'VoiceCloudBrand.slug' in notif and '_general' in notif)
 ck('notification title/body use white-label brand name', notif.count('VoiceCloudBrand.name') >= 2)
 ck('consumer colors resolve through generated branding BuildConfig', 'VoiceCloudBrand.color(BuildConfig.CONSUMER_SAPPHIRE)' in colors)
-ck('PH06 host microphone publishing not pulled forward', 'setMicrophoneEnabled' not in (rtc+vm+screens) and 'android.permission.RECORD_AUDIO' not in manifest)
-ck('PH06 room creation/host management module not pulled forward', 'feature:host' not in settings and 'feature:rtc' not in settings)
+ck('PH05 listener remains receive-only as host publishing evolves', 'audio = false' in rtc and 'video = false' in rtc and 'setMicrophoneEnabled' not in (vm+screens))
+ck('PH05 live module remains isolated from host management', 'feature:hosting' not in t('feature/live/build.gradle.kts'))
 
 print(f'VC-ANDROID-PH05-R01 source authority: {len(checks)}/{len(checks)} PASS')

@@ -47,7 +47,7 @@ fun RoomPreviewScreen(
     LaunchedEffect(roomId) { onLoad() }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { VoiceCloudPageTopBar(title = "Room details", onBack = onBack) },
+        topBar = { VoiceCloudPageTopBar(title = "Room", onBack = onBack) },
     ) { padding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(padding),
@@ -70,7 +70,7 @@ fun RoomPreviewScreen(
                                 TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) { Text(if (state.saved) "Saved" else "Save") }
                             }
                             Text(room.title.ifBlank { "${VoiceCloudBrand.name} Room" }, style = MaterialTheme.typography.headlineMedium, color = ConsumerColors.Ink)
-                            if (!room.description.isNullOrBlank()) Text(room.description, color = ConsumerColors.Text)
+                            if (!room.description.isNullOrBlank()) Text(room.description, color = ConsumerColors.Text, maxLines = 3, overflow = TextOverflow.Ellipsis)
                             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                                 Text("${room.listenerCount} listening", style = MaterialTheme.typography.bodyMedium)
                                 Text("${room.speakerCount} speakers", style = MaterialTheme.typography.bodyMedium)
@@ -97,14 +97,7 @@ fun RoomPreviewScreen(
                         enabled = room.isJoinablePresentation() && !state.joining,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
                         shape = RoundedCornerShape(16.dp),
-                    ) { Text(if (state.joining) "Joining…" else if (room.isJoinablePresentation()) "Join as listener" else "Room is not live", maxLines = 1) }
-                }
-                item {
-                    Text(
-                        "Room access is checked securely when you join. If this room requires a ticket, subscription, invitation, verification, or community membership, ${VoiceCloudBrand.name} will show the required access state.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    ) { Text(if (state.joining) "Joining…" else if (room.isJoinablePresentation()) "Join room" else "Unavailable", maxLines = 1) }
                 }
             }
         }
@@ -168,13 +161,13 @@ fun LiveRoomScreen(
             state.accessIssue?.let { issue -> item { AccessIssueCard(issue, onBack) } }
             state.error?.let { message -> item { DarkMessageCard(message, true, onRetryAudio) } }
             state.notice?.let { message -> item { DarkMessageCard(message, false, null) } }
-            if (state.paused) item { DarkMessageCard("The host paused this room. You’ll remain connected and audio will resume automatically.", false, null) }
-            if (state.ended) item { DarkMessageCard("This room has ended. You can return to discover other live conversations.", false, onBack) }
+            if (state.paused) item { DarkMessageCard("Room paused", false, null) }
+            if (state.ended) item { DarkMessageCard("Room ended", false, onBack) }
             if (state.speakerInvitationPending) item {
                 ElevatedCard(colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.LiveSurfaceElevated), shape = RoundedCornerShape(20.dp)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("You’re invited to the stage", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
-                        Text("Accept to join the speaker stage, or decline to continue listening.", color = ConsumerColors.TextOnDarkSecondary)
+                        Text("Stage invite", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
+                        Text("Join as a speaker?", color = ConsumerColors.TextOnDarkSecondary)
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             Button(onClick = onAcceptInvitation, enabled = !state.mutationBusy) { Text("Accept") }
                             OutlinedButton(onClick = onRejectInvitation, enabled = !state.mutationBusy) { Text("Decline") }
@@ -184,18 +177,18 @@ fun LiveRoomScreen(
             }
             if (state.inRoom) {
                 item { ListenerActions(state, onToggleHand, onReaction) }
-                item { SectionHeading("People in the room", "${state.participants.size}") }
+                item { SectionHeading("People", "${state.participants.size}") }
                 itemsIndexed(state.participants.distinctBy { it.userId }, key = { index, participant -> "live-person:${participant.userId}:$index" }) { _, participant ->
                     ParticipantCard(participant, viewerId)
                 }
                 item { ReactionsStrip(state.reactions) }
-                item { SectionHeading("Room chat", null) }
+                item { SectionHeading("Chat", null) }
                 itemsIndexed(state.messages.distinctBy { it.id }, key = { index, message -> "live-chat:${message.id}:$index" }) { _, message ->
                     ChatMessageCard(message, viewerId, onMessageReaction)
                 }
                 item { ChatComposer(enabled = state.conversationId != null && !state.mutationBusy, onSend = onSendMessage) }
-                item { SectionHeading("Send a gift", "To the host") }
-                if (state.gifts.isEmpty()) item { Text("Gift catalog is unavailable right now.", color = ConsumerColors.TextOnDarkSecondary) }
+                item { SectionHeading("Gifts", null) }
+                if (state.gifts.isEmpty()) item { Text("Gifts unavailable", color = ConsumerColors.TextOnDarkSecondary) }
                 else item { GiftRow(state.gifts, state.mutationBusy, onGift) }
                 item { Spacer(Modifier.height(12.dp)); OutlinedButton(onClick = { onLeave(); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Leave room", maxLines = 1) } }
             }
@@ -206,11 +199,11 @@ fun LiveRoomScreen(
 @Composable
 private fun RoomRuntimeHeader(state: LiveRoomUiState, onRetryAudio: () -> Unit) {
     val rtcLabel = when (state.rtcState) {
-        RtcAudioState.Connected, RtcAudioState.Reconnected -> "Connected as listener"
+        RtcAudioState.Connected, RtcAudioState.Reconnected -> "Connected"
         RtcAudioState.Connecting -> "Connecting audio…"
         RtcAudioState.Reconnecting -> "Reconnecting…"
         is RtcAudioState.Failed -> "Audio interrupted"
-        RtcAudioState.Disconnected -> if (state.inRoom) "Audio disconnected" else "Preparing room"
+        RtcAudioState.Disconnected -> if (state.inRoom) "Disconnected" else "Preparing"
     }
     Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Primary).padding(18.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
