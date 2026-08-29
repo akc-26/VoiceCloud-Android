@@ -1,0 +1,572 @@
+===== ph13_r07_acceptance_wiring_regression.py =====
+[PASS] R07 source diagnostic wired
+[PASS] R07 isolated build wired
+[PASS] R07 delivery integrity wired
+[PASS] compile correction regression wired
+[PASS] product preservation regression wired
+[PASS] debug compile mandatory
+[PASS] staging compile mandatory
+[PASS] release compile mandatory
+[PASS] unit tests retained
+[PASS] lint retained
+[PASS] assemblies retained
+[PASS] device gate retained
+[PASS] verified local wrapper required
+[PASS] dependent gates do not waste time after compile failure
+[PASS] device gate waits for APK prerequisites
+[PASS] final acceptance fail-closed
+[PASS] VC-ANDROID-PH13-R07 acceptance wiring: 16/16 PASS
+
+EXIT=0
+
+===== ph13_r07_compile_correction_regression.py =====
+[PASS] Brand mark retains three cloud drawArc primitives
+[PASS] All brand drawArc calls use named color arguments
+[PASS] All brand drawArc calls use named startAngle arguments
+[PASS] All brand drawArc calls use named sweepAngle arguments
+[PASS] All brand drawArc calls use named useCenter arguments
+[PASS] All brand drawArc calls use named topLeft arguments
+[PASS] All brand drawArc calls use named size arguments
+[PASS] All brand drawArc calls pass Stroke through style=
+[PASS] Legacy positional drawArc overload misuse is absent
+[PASS] matchParentSize import is absent
+[PASS] matchParentSize invocation is absent
+[PASS] fillMaxSize import is present for speaking-ring canvas
+[PASS] speaking-ring canvas uses fillMaxSize
+[PASS] new premium Canvas lines use named strokeWidth/cap arguments
+[PASS] no positional Stroke object can bind to drawArc alpha slot
+[PASS] VC-ANDROID-PH13-R07 compile correction regression: 15/15 PASS
+
+EXIT=0
+
+===== ph13_r07_product_preservation_regression.py =====
+[PASS] PH13-R07 changes are limited to the two compiler-failing premium UI primitive files
+[PASS] APIs/repositories/ViewModels/models/navigation/security/realtime/business logic remain PH13-R06-identical
+[PASS] compile-corrected UI primitive: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudBrandMark.kt
+[PASS] compile-corrected UI primitive: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+
+EXIT=0
+
+===== ph13_r06_harness_correction_regression.py =====
+[PASS] Windows bootstrap still checksum-verifies cached Gradle ZIP
+[PASS] Windows wrapper generation uses verified local distribution URI
+[PASS] Windows bootstrap keeps generated wrapper pinned to local file URI
+[PASS] Windows bootstrap explicitly verifies local wrapper runtime
+[PASS] Unix bootstrap keeps generated wrapper pinned to local file URI
+[PASS] R06 build verifies local wrapper before compile gates
+[PASS] R06 compile gates are blocked if local wrapper bootstrap is invalid
+[PASS] R06 cleanup uses cached Gradle executable and cannot force remote wrapper fetch
+[PASS] R06 source copy excludes workstation machine artifacts
+[PASS] R06 delivery integrity distinguishes generated workstation artifacts from product drift
+[PASS] R06 delivery integrity remains hash fail-closed for tracked files
+[PASS] VC-ANDROID-PH13-R06 harness correction regression: 11/11 PASS
+
+EXIT=0
+
+===== ph13_r01_unit_contract_regression.py =====
+[PASS] PH12 Audience enum remains preserved
+[PASS] Financial navigation does not mutate core bottom-nav enum
+[PASS] PH12 plan non-paid default retained
+[PASS] PH13 financial empty/unknown defaults tested
+[PASS] PH13 payout default status unknown
+[PASS] VC-ANDROID-PH13-R01 unit contract regression: 5/5 PASS
+
+EXIT=0
+
+===== ph13_r01_source_check.py =====
+[PASS] PH13 app version declared
+[PASS] PH13 route CreatorAnalytics
+[PASS] PH13 route CreatorWallet
+[PASS] PH13 route CreatorEarnings
+[PASS] PH13 route CreatorGifts
+[PASS] PH13 route CreatorPayouts
+[PASS] PH13 route CreatorPayoutDetail
+[PASS] PH13 route CreatorNotifications
+[PASS] PH13 route CreatorVerification
+[PASS] PH13 route HostVerification
+[PASS] PH13 screen CreatorAnalyticsScreen
+[PASS] PH13 screen CreatorWalletScreen
+[PASS] PH13 screen CreatorEarningsScreen
+[PASS] PH13 screen CreatorGiftsScreen
+[PASS] PH13 screen CreatorPayoutsScreen
+[PASS] PH13 screen CreatorPayoutDetailScreen
+[PASS] Creator notifications reuse Engagement authority
+[PASS] Host verification screen implemented
+[PASS] Creator PH13 endpoint @GET("analytics")
+[PASS] Creator PH13 endpoint @GET("wallet/balance")
+[PASS] Creator PH13 endpoint @GET("wallet/summary")
+[PASS] Creator PH13 endpoint @GET("wallet/transactions")
+[PASS] Creator PH13 endpoint @GET("gifts/history")
+[PASS] Creator PH13 endpoint @GET("creator/earnings")
+[PASS] Creator PH13 endpoint @POST("creator/payout-request")
+[PASS] Creator PH13 endpoint @GET("creator/payout-requests")
+[PASS] Creator PH13 endpoint @GET("creator/payout-requests/{id}")
+[PASS] Host PH13 endpoint @POST("hosts/apply")
+[PASS] Host PH13 endpoint @GET("hosts/progression")
+[PASS] Host PH13 endpoint @GET("hosts/verification/assets")
+[PASS] Host PH13 endpoint @POST("hosts/verification/government-id")
+[PASS] Host PH13 endpoint @POST("hosts/verification/profile-photo")
+[PASS] Host PH13 endpoint @POST("hosts/verification/documents")
+[PASS] Host PH13 endpoint @PUT("hosts/verification/assets/{assetId}/replacement")
+[PASS] Payout minimum enforced
+[PASS] Payout idempotency wired
+[PASS] Verification replacement uses backend asset id
+[PASS] Verification is transient in-memory selection
+[PASS] Android stream credentials are prohibited
+[PASS] No public verification upload path introduced
+[PASS] VC-ANDROID-PH13-R01 source authority: 40/40 PASS
+
+EXIT=0
+
+===== ph13_r01_backend_contract_regression.py =====
+[PASS] GET analytics wired
+[PASS] GET wallet/balance wired
+[PASS] GET wallet/summary wired
+[PASS] GET wallet/transactions wired
+[PASS] GET gifts/history wired
+[PASS] GET creator/earnings wired
+[PASS] POST creator/payout-request wired
+[PASS] GET creator/payout-requests wired
+[PASS] GET creator/payout-requests/{id} wired
+[PASS] CreatePayoutRequest diamondAmount exact
+[PASS] CreatePayoutRequest payoutMethod exact
+[PASS] CreatePayoutRequest operationKey exact
+[PASS] No invented payout accountDetails payload
+[PASS] Payout minimum 100
+[PASS] Payout method allowlist authoritative
+[PASS] POST hosts/apply wired
+[PASS] GET hosts/progression wired
+[PASS] GET hosts/verification/assets wired
+[PASS] POST hosts/verification/government-id wired
+[PASS] POST hosts/verification/profile-photo wired
+[PASS] POST hosts/verification/documents wired
+[PASS] PUT hosts/verification/assets/{assetId}/replacement wired
+[PASS] ApplyHost DTO realName exact
+[PASS] ApplyHost DTO private government asset exact
+[PASS] ApplyHost DTO private selfie asset exact
+[PASS] ApplyHost DTO supporting assets exact
+[PASS] ApplyHost does not use deprecated public URL DTO fields
+[PASS] Verification uploads use multipart
+[PASS] Replacement sends only replacementAssetId
+[PASS] Private asset list retained after mutations
+[PASS] Stream credential GET prohibited
+[PASS] Stream credential regenerate prohibited
+[PASS] VC-ANDROID-PH13-R01 backend contract: 32/32 PASS
+
+EXIT=0
+
+===== ph13_r01_compile_surface_regression.py =====
+[PASS] no merge markers app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced braces app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced parentheses app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] Creator vertical-scroll import resolves
+[PASS] Creator phase13 callbacks match navigation
+[PASS] Creator payout route helper URI encodes
+[PASS] Hosting Retrofit multipart imports resolve
+[PASS] Hosting OkHttp multipart imports resolve
+[PASS] Hosting activity picker imports resolve
+[PASS] Hosting ViewModel callback signatures resolve
+[PASS] Host Studio verification callback matches navigation
+[PASS] No unresolved PH13 formatValue helper
+[PASS] Hosting module has Activity Compose + Retrofit
+[PASS] VC-ANDROID-PH13-R01 compile surface: 43/43 PASS
+
+EXIT=0
+
+===== ph13_r01_whitespace_regression.py =====
+[PASS] PH13 whitespace hygiene: no trailing whitespace and all text files end with a newline
+
+EXIT=0
+
+===== ph12_r01_backend_contract_regression.py =====
+[PASS] GET creator/plans wired
+[PASS] POST creator/plans wired
+[PASS] PATCH creator/plans/{id} wired
+[PASS] DELETE creator/plans/{id} wired
+[PASS] GET creator/subscribers wired
+[PASS] CreateCreatorPlan DTO field "title"
+[PASS] CreateCreatorPlan DTO field "description"
+[PASS] CreateCreatorPlan DTO field "monthlyPrice"
+[PASS] CreateCreatorPlan DTO field "yearlyPrice"
+[PASS] CreateCreatorPlan DTO field "benefits"
+[PASS] CreateCreatorPlan DTO field "visibility"
+[PASS] Update plan sends documented status
+[PASS] Plan status allowlist exact
+[PASS] Visibility allowlist exact
+[PASS] Archive uses DELETE authority
+[PASS] Subscribers status allowlist exact
+[PASS] Unknown subscriber total remains nullable
+[PASS] Direct conversations call backend type direct
+[PASS] Follow mutations use canonical users follow endpoints
+[PASS] No fabricated payment completion model
+[PASS] VC-ANDROID-PH12-R01 backend contract: 20/20 PASS
+
+EXIT=0
+
+===== ph12_r01_unit_contract_regression.py =====
+[PASS] Creator unit test expects PH12 AUDIENCE section
+[PASS] Creator unit test still forbids PH13 finance
+[PASS] Plan defaults are non-paid DRAFT
+[PASS] Subscriber total unknown state covered
+[PASS] VC-ANDROID-PH12-R01 unit contract regression: 4/4 PASS
+
+EXIT=0
+
+===== ph12_r01_compile_surface_regression.py =====
+[PASS] no merge markers app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] no merge markers feature/discovery/src/main/java/app/voicecloud/feature/discovery/data/DiscoveryRepository.kt
+[PASS] no merge markers feature/engagement/src/main/java/app/voicecloud/feature/engagement/data/EngagementRepository.kt
+[PASS] no merge markers feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] no merge markers feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementViewModel.kt
+[PASS] no direct Text literals after Title Case authority
+[PASS] Creator Dashboard callback signature matches PH12 navigation
+[PASS] LazyRow import resolves PH12 chips
+[PASS] IME send imports resolve
+[PASS] Creator dynamic conversation route URI encodes
+[PASS] PH12 creator module dependency resolves discovery
+[PASS] VC-ANDROID-PH12-R01 compile surface: 16/16 PASS
+
+EXIT=0
+
+===== ph11_r02_backend_contract_regression.py =====
+[PASS] Privacy model and PATCH contain backend field showOnlineStatus
+[PASS] Privacy model and PATCH contain backend field showLastSeen
+[PASS] Privacy model and PATCH contain backend field allowDirectMessages
+[PASS] Privacy model and PATCH contain backend field showGifts
+[PASS] Privacy no longer submits obsolete field messagingPermission
+[PASS] Privacy no longer submits obsolete field followPermission
+[PASS] Privacy no longer submits obsolete field invitationPermission
+[PASS] Privacy no longer submits obsolete field visitorPermission
+[PASS] Privacy no longer submits obsolete field allowVisitorTracking
+[PASS] Privacy no longer submits obsolete field anonymousVisiting
+[PASS] Privacy uses canonical GET/PATCH users/privacy
+[PASS] Device detail API path is canonical deviceId
+[PASS] Device revoke API path is canonical deviceId
+[PASS] Safe device canonicalizes backend deviceId before row id
+[PASS] Device list navigation passes canonical deviceId
+[PASS] Contact request uses phoneNumber field
+[PASS] Contact request uses message field
+[PASS] Contact request does not send legacy phone field
+[PASS] Contact request does not send legacy description field
+[PASS] Contact validates backend minimum message length
+[PASS] Contact posts to canonical /contact
+[PASS] Consumer CMS uses public END_USER endpoint
+[PASS] Consumer CMS applies defensive End User audience filter
+[PASS] Creator CMS uses creator audience endpoints
+[PASS] Consumer settings repository never calls creator CMS endpoint
+[PASS] VC-ANDROID-PH11-R02 backend-contract regression: 25/25 PASS
+
+EXIT=0
+
+===== ph11_r02_titlecase_toast_regression.py =====
+[PASS] central Title Case helper exists
+[PASS] central transient feedback uses Android Toast
+[PASS] toast copy passes through Title Case helper
+[PASS] no direct user-visible Compose Text string literals remain
+[PASS] transient toast feedback wired: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] transient toast feedback wired: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] transient toast feedback wired: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] transient toast feedback wired: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] transient toast feedback wired: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] transient toast feedback wired: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] transient toast feedback wired: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] transient toast feedback wired: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] transient toast feedback wired: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] feature screens do not render state.error inline as Text
+[PASS] technical HTTP/database markers are sanitized centrally
+[PASS] 400/404/409/422 settings errors use contextual fallback
+[PASS] Auth errors no longer directly expose generic exception messages
+[PASS] Voice & Appearance exact Title Case is present
+[PASS] lowercase Voice & appearance example is absent
+[PASS] VC-ANDROID-PH11-R02 Title Case/toast regression: 19/19 PASS
+
+EXIT=0
+
+===== ph11_r02_corrections_regression.py =====
+[PASS] Profile Photo crop output is 1080x1080
+[PASS] Cover Photo crop output is 1920x720
+[PASS] profile media supports zoom 1x-4x
+[PASS] profile media supports horizontal repositioning
+[PASS] profile media supports vertical repositioning
+[PASS] large originals are decoded down for safe preview rather than rejected
+[PASS] Edit Profile launches crop dialog for avatar
+[PASS] Edit Profile launches crop dialog for cover
+[PASS] Settings overview retains settings entry Notifications
+[PASS] Settings overview retains settings entry Privacy
+[PASS] Settings overview retains settings entry Voice & Appearance
+[PASS] Settings overview retains settings entry Security & Devices
+[PASS] Settings overview removes non-settings entry Help & Legal
+[PASS] Settings overview removes non-settings entry Contact Support
+[PASS] Settings overview removes non-settings entry About VoiceCloud
+[PASS] Settings overview removes non-settings entry Safety Center
+[PASS] Safety Center does not duplicate Communities navigation
+[PASS] legacy duplicate Profile Help routes are removed
+[PASS] Profile hub owns Settings
+[PASS] Profile hub owns Safety Center
+[PASS] Profile hub owns Help & Legal
+[PASS] Profile hub owns Contact Support
+[PASS] Profile hub owns About VoiceCloud
+[PASS] Profile hub owns Wallet & Rewards
+[PASS] Profile hub is grouped rather than long economy link list
+[PASS] Portal selector has focused welcome hero
+[PASS] Portal selector exposes two interactive portal cards
+[PASS] Portal selector copy is concise
+[PASS] Economy uses dedicated visual cards
+[PASS] Economy uses compact visual hub tiles
+[PASS] Economy limits raw metadata to concise details
+[PASS] Wallet retains real Add Credits action
+[PASS] VIP retains real purchase action
+[PASS] Store retains purchase/equip actions
+[PASS] VC-ANDROID-PH11-R02 requested-corrections regression: 34/34 PASS
+
+EXIT=0
+
+===== ph11_r02_compile_surface_regression.py =====
+[PASS] no merge markers: core/network/src/main/java/app/voicecloud/core/network/UserFacingErrors.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPageTopBar.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudFeedback.kt
+[PASS] no merge markers: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] Title Case import resolved: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] Title Case import resolved: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] no merge markers: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] Title Case import resolved: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] no merge markers: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] Title Case import resolved: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] no merge markers: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] Title Case import resolved: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] no merge markers: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileImageCropper.kt
+[PASS] Title Case import resolved: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileImageCropper.kt
+[PASS] no merge markers: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] Title Case import resolved: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] no merge markers: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthViewModel.kt
+[PASS] no merge markers: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] Title Case import resolved: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] no merge markers: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] Title Case import resolved: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] no merge markers: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] Title Case import resolved: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] no merge markers: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] Title Case import resolved: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] cropper compile surface resolves import android.graphics.ImageDecoder
+[PASS] cropper compile surface resolves import androidx.compose.ui.graphics.asImageBitmap
+[PASS] cropper compile surface resolves import androidx.compose.ui.layout.ContentScale
+[PASS] cropper compile surface resolves import androidx.compose.ui.unit.IntOffset
+[PASS] cropper compile surface resolves import androidx.compose.ui.unit.IntSize
+[PASS] cropper compile surface resolves import androidx.compose.ui.unit.LayoutDirection
+[PASS] cropper compile surface resolves ByteArrayOutputStream
+[PASS] Creator dynamic PH11 room/schedule routes URI encode
+[PASS] Creator Live screen callback signatures wired
+[PASS] Device route uses deviceId argument consistently
+[PASS] Settings Retrofit has Body/Path imports
+[PASS] Auth safe error extension import resolves
+[PASS] safe network mapper imports Retrofit HttpException
+[PASS] VC-ANDROID-PH11-R02 compile-surface regression: 40/40 PASS
+
+EXIT=0
+
+===== ph11_r02_compile_risk_regression.py =====
+[PASS] no direct literal Text calls remain after Title Case conversion
+[PASS] cropper caps preview decode longest edge
+[PASS] cropper never requires original source dimensions to match target
+[PASS] crop bounds are clamped before Bitmap.createBitmap
+[PASS] crop output uses explicit JPEG encoding
+[PASS] rooms and schedules are de-duplicated
+[PASS] scheduled start prevents duplicate linked room creation when link exists
+[PASS] invite search excludes self/guest and privileged admin roles
+[PASS] technical error sanitization retained: feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] technical error sanitization retained: feature/live/src/main/java/app/voicecloud/feature/live/data/LiveRoomRepository.kt
+[PASS] technical error sanitization retained: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsViewModel.kt
+[PASS] technical error sanitization retained: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileImageCropper.kt
+[PASS] no obvious malformed Title Case interpolation: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] no obvious malformed Title Case interpolation: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsViewModel.kt
+[PASS] no obvious malformed Title Case interpolation: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] VC-ANDROID-PH11-R02 compile-risk regression: 32/32 PASS
+
+EXIT=0
+
+===== ph11_r02_economy_payment_regression.py =====
+[PASS] hosted payment endpoint retained: wallet/purchase/web/initiate
+[PASS] hosted payment endpoint retained: wallet/purchase/web/complete
+[PASS] hosted payment endpoint retained: wallet/purchase/web/cancel
+[PASS] hosted payment endpoint retained: vip/checkout/web/initiate
+[PASS] hosted payment endpoint retained: vip/checkout/web/complete
+[PASS] hosted payment endpoint retained: vip/checkout/web/cancel
+[PASS] Wallet visual card still launches real credit purchase callback
+[PASS] VIP visual card still launches real VIP purchase callback
+[PASS] Hosted checkout completion remains server-authoritative
+[PASS] Google Play verification remains server-authoritative
+[PASS] Wallet consumption occurs only after server verification
+[PASS] VIP acknowledgement occurs only after server verification
+[PASS] Economy UI does not locally grant coins/VIP entitlement
+[PASS] Economy is visual card/grid based rather than raw key-value dump
+[PASS] VC-ANDROID-PH11-R02 economy/payment regression: 14/14 PASS
+
+EXIT=0
+
+===== ph09_r08_gradle_properties_authority.py =====
+[PASS] 22 frozen PH08 product/build keys preserved
+[PASS] 1 PH09-R08 controlled Gradle tooling key preserved
+[PASS] org.gradle.tooling.parallel=true is explicit for Gradle 9.5 / current Android Studio sync compatibility
+[PASS] extra org.gradle.* and systemProp.* workstation/runtime properties are non-source authority
+[PASS] unknown VOICECLOUD_/android./kotlin./kapt./ksp. keys remain fail-closed
+[PASS] gradle.properties effective authority satisfied: 23 required keys
+
+EXIT=0
+
+===== ph09_r08_compile_risk_regression.py =====
+[PASS] settings module declares Android Compose Hilt dependencies
+[PASS] Retrofit wildcard body maps are annotated
+[PASS] repository Any envelope parsers are null-safe
+[PASS] repository map helpers use explicit empty generic maps
+[PASS] Settings ViewModel StateFlow and event channel are lifecycle-safe
+[PASS] appearance viewmodel exposes stable StateFlow
+[PASS] root collects appearance with lifecycle
+[PASS] settings screens avoid experimental FlowRow dependency
+[PASS] settings screens use supported Material3 page top bar
+[PASS] settings screens import list items helper
+[PASS] context report route encodes dynamic values
+[PASS] context report route decodes arguments
+[PASS] all PH09 navigation destinations are composable
+[PASS] public profile callback signature and callsite agree
+[PASS] live room callback signature and callsite agree
+[PASS] report enums are exhaustive and type-safe
+[PASS] HTML CMS rendering is converted to plain Compose text
+[PASS] email and phone fields use keyboard options
+[PASS] Gradle tooling parallelism is explicit for current Gradle/Studio compatibility
+[PASS] no obvious Kotlin merge/conflict markers
+[PASS] device instrumentation no longer hard-codes debug application id
+[PASS] device instrumentation resolves AGP output metadata
+[PASS] device instrumentation resolves and reuses foreground Android user
+[PASS] known Kotlin 2.3 annotation-target warnings are explicit
+[PASS] PowerShell parser authority runs before Gradle compilation
+[PASS] FCM override deprecation uses the exact compiler diagnostic suppression
+[PASS] VC-ANDROID-PH09-R08 compile-risk regression: 26/26 PASS
+
+EXIT=0
+
+===== ph09_r08_warning_closure_regression.py =====
+[PASS] LiveKit ApplicationContext qualifier has explicit parameter target
+[PASS] device metadata ApplicationContext qualifier has explicit parameter target
+[PASS] Google Sign-In legacy deprecations are explicit compatibility debt
+[PASS] FCM current-token deprecation is explicit backend compatibility debt
+[PASS] FCM onNewToken override-deprecation diagnostic is explicitly suppressed
+[PASS] discovery non-null descriptor no longer uses redundant Elvis
+[PASS] engagement sender rendering no longer uses unnecessary smart-cast safe call
+[PASS] known unstrippable native library explicitly keeps debug symbols: libandroidx.graphics.path.so
+[PASS] known unstrippable native library explicitly keeps debug symbols: libdatastore_shared_counter.so
+[PASS] known unstrippable native library explicitly keeps debug symbols: liblkjingle_peerconnection_so.so
+[PASS] JNI keepDebugSymbols uses current packaging DSL
+[PASS] VC-ANDROID-PH09-R08 warning/packaging closure regression: 11/11 PASS
+
+EXIT=0
+
+===== ph09_r08_device_closure_regression.py =====
+[PASS] device gate derives Debug app identity from AGP output metadata
+[PASS] device gate derives Debug androidTest APK from AGP output metadata
+[PASS] device gate does not hard-code VoiceCloud debug target package
+[PASS] device gate resolves foreground Android user
+[PASS] foreground Android user must parse as a non-negative integer
+[PASS] app and test APK installs explicitly target the foreground user
+[PASS] app package is verified enabled for the same Android user
+[PASS] test package is verified enabled for the same Android user
+[PASS] runner is discovered dynamically from installed instrumentation
+[PASS] runner target must equal AGP-derived app applicationId
+[PASS] runner package is cross-checked with test metadata when available
+[PASS] instrumentation executes for the explicit foreground Android user
+[PASS] device gate identifies itself as Gate 7
+[PASS] stale Gate 6 instrumentation label is removed
+[PASS] target-package-not-found is a first-class rejected failure
+[PASS] instrumentation failure diagnostics include app/test package state
+[PASS] device gate still requires at least one executed test
+[PASS] no healthy device remains a distinct nonfatal code 2
+[PASS] wired/wireless candidate health and minimum API checks remain
+[PASS] APK path comes from output metadata rather than fixed filenames
+[PASS] device PowerShell interpolation braces UserId before colon
+[PASS] device PowerShell interpolation braces currentUser before colon
+[PASS] device process capture drains redirected output asynchronously
+[PASS] VC-ANDROID-PH09-R08 device/instrumentation closure regression: 23/23 PASS
+
+EXIT=0
+
+===== ph07_r03_adb_daemon_regression.py =====
+[PASS] adb devices uses captured process helper
+[PASS] normal adb stderr is informational
+[PASS] direct PowerShell adb devices invocation removed
+[PASS] no-device exit remains nonfatal code 2
+VC-ANDROID-PH07-R03 adb daemon regression: 4/4 PASS
+
+EXIT=0
+
+===== ph06_r03_hosting_compile_regression.py =====
+[PASS] reported unsafe nullable stage speaker dereference removed
+[PASS] nullable stage model remains explicit
+[PASS] speaker snapshot is null-safe
+[PASS] participant list is null-safe
+[PASS] audience filter uses non-null speaker snapshot
+[PASS] hosting UI contains no direct stage dot dereference
+[PASS] R03 acceptance runs Windows R03 source checker
+[PASS] R03 acceptance runs R03 compile regression
+[PASS] R03 acceptance retains R02 premium UI regression
+[PASS] R03 acceptance retains debug compile gate
+[PASS] R03 acceptance retains staging compile gate
+[PASS] R03 acceptance retains release compile gate
+[PASS] R03 acceptance retains tests lint assemblies and androidTest
+VC-ANDROID-PH06-R03 hosting compile regression: 13/13 PASS
+
+EXIT=0
+
+SUMMARY: 24/24 PASS

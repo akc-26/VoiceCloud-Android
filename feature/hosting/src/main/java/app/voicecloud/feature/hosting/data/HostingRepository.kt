@@ -7,6 +7,9 @@ import app.voicecloud.feature.hosting.model.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import java.time.OffsetDateTime
 import javax.inject.Inject
@@ -21,6 +24,87 @@ class HostingRepository @Inject constructor(
         val profile = runCatching { api.hostProfile() }.getOrNull()
         val eligibility = runCatching { api.hostEligibility() }.getOrNull()
         return profile to eligibility
+    }
+
+
+    suspend fun hostProgression(): HostProgression {
+        val raw = unwrap(api.hostProgression(), "progression", "data", "summary")
+        val metrics = raw.entries.mapNotNull { (key, value) ->
+            val k = key?.toString()?.trim()?.takeIf(String::isNotBlank) ?: return@mapNotNull null
+            if (k.equals("updatedAt", true) || k.equals("timestamp", true) || value is Map<*, *> || value is List<*>) return@mapNotNull null
+            HostProgressMetric(k, humanize(k), value?.toString().orEmpty())
+        }.sortedBy { it.label }
+        return HostProgression(metrics, raw.string("updatedAt", "timestamp").takeIf(String::isNotBlank))
+    }
+
+    suspend fun verificationAssets(): List<HostVerificationAsset> = items(api.verificationAssets(), "assets", "items", "data")
+        .mapNotNull(::verificationAssetFrom)
+        .distinctBy { it.id }
+
+    suspend fun applyForHost(
+        realName: String,
+        bio: String?,
+        country: String?,
+        languages: List<String>,
+        categories: List<String>,
+        experience: String?,
+    ): Pair<HostProfile?, HostEligibility?> {
+        val cleanName = realName.trim()
+        require(cleanName.isNotBlank()) { "Your real name is required for Host verification." }
+        val assets = verificationAssets()
+        fun firstAsset(vararg tokens: String) = assets.firstOrNull { asset -> tokens.any { it in asset.type.uppercase() } }?.id
+        val governmentId = firstAsset("GOVERNMENT", "IDENTITY", "ID_DOCUMENT")
+        val selfieId = firstAsset("SELFIE", "PROFILE_PHOTO", "VERIFICATION_PHOTO")
+        val supporting = assets.filter { asset -> listOf("SUPPORT", "DOCUMENT").any { it in asset.type.uppercase() } && asset.id != governmentId }.map { it.id }.distinct()
+        val body = mapOf(
+            "realName" to cleanName.take(160),
+            "governmentIdAssetId" to governmentId,
+            "selfieAssetId" to selfieId,
+            "supportingDocumentAssetIds" to supporting.takeIf(List<String>::isNotEmpty),
+            "bio" to bio?.trim()?.takeIf(String::isNotBlank),
+            "languages" to languages.map(String::trim).filter(String::isNotBlank).distinct().takeIf(List<String>::isNotEmpty),
+            "categories" to categories.map(String::trim).filter(String::isNotBlank).distinct().takeIf(List<String>::isNotEmpty),
+            "country" to country?.trim()?.takeIf(String::isNotBlank),
+            "experience" to experience?.trim()?.takeIf(String::isNotBlank),
+        ).filterValues { it != null }
+        api.applyForHost(body)
+        return hostAccess()
+    }
+
+    suspend fun uploadVerificationAsset(
+        kind: HostVerificationAssetKind,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String,
+    ): List<HostVerificationAsset> {
+        require(bytes.isNotEmpty()) { "Choose a non-empty verification file." }
+        val part = verificationPart(bytes, fileName, mimeType)
+        when (kind) {
+            HostVerificationAssetKind.GOVERNMENT_ID -> api.uploadGovernmentId(part)
+            HostVerificationAssetKind.PROFILE_PHOTO -> api.uploadProfilePhoto(part)
+            HostVerificationAssetKind.SUPPORTING_DOCUMENT -> api.uploadVerificationDocument(part)
+        }
+        return verificationAssets()
+    }
+
+    suspend fun replaceVerificationAsset(
+        assetId: String,
+        kind: HostVerificationAssetKind,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String,
+    ): List<HostVerificationAsset> {
+        require(assetId.trim().isNotBlank()) { "Verification asset is unavailable." }
+        val part = verificationPart(bytes, fileName, mimeType)
+        val uploaded = when (kind) {
+            HostVerificationAssetKind.GOVERNMENT_ID -> api.uploadGovernmentId(part)
+            HostVerificationAssetKind.PROFILE_PHOTO -> api.uploadProfilePhoto(part)
+            HostVerificationAssetKind.SUPPORTING_DOCUMENT -> api.uploadVerificationDocument(part)
+        }
+        val replacementId = findAssetId(uploaded)
+        check(replacementId.isNotBlank()) { "VoiceCloud did not return a verification asset reference." }
+        api.replaceVerificationAsset(assetId.trim(), mapOf("replacementAssetId" to replacementId))
+        return verificationAssets()
     }
 
     suspend fun rooms(): List<HostRoom> = api.myRooms(limit = 100).data.distinctBy { it.id }
@@ -111,6 +195,64 @@ class HostingRepository @Inject constructor(
     suspend fun startQuiz(id: String) = api.startQuiz(id)
     suspend fun nextQuizRound(id: String) = api.nextQuizRound(id)
     suspend fun stopQuiz(id: String) = api.stopQuiz(id)
+
+
+    private fun verificationPart(bytes: ByteArray, fileName: String, mimeType: String): MultipartBody.Part {
+        val safeName = fileName.substringAfterLast('/').substringAfterLast('\\').replace(Regex("[^A-Za-z0-9._-]"), "_").take(120).ifBlank { "verification-file" }
+        val body = bytes.toRequestBody(mimeType.ifBlank { "application/octet-stream" }.toMediaTypeOrNull())
+        // The current backend controller consumes one UploadedFile part; workstation/real-backend acceptance validates the multipart field.
+        return MultipartBody.Part.createFormData("file", safeName, body)
+    }
+
+    private fun verificationAssetFrom(raw: Map<*, *>): HostVerificationAsset? {
+        val id = raw.string("id", "assetId", "verificationAssetId")
+        if (id.isBlank()) return null
+        return HostVerificationAsset(
+            id = id,
+            type = raw.string("type", "assetType", "category").uppercase(),
+            status = raw.string("status", "verificationStatus").uppercase(),
+            fileName = raw.string("fileName", "originalName", "name").takeIf(String::isNotBlank),
+            mimeType = raw.string("mimeType", "contentType").takeIf(String::isNotBlank),
+            rejectionReason = raw.string("rejectionReason", "reason").takeIf(String::isNotBlank),
+            createdAt = raw.string("createdAt", "uploadedAt").takeIf(String::isNotBlank),
+        )
+    }
+
+    private fun findAssetId(value: Any?): String {
+        val raw = unwrap(value, "asset", "data", "verificationAsset")
+        return raw.string("id", "assetId", "verificationAssetId")
+    }
+
+    private fun unwrap(value: Any?, vararg keys: String): Map<*, *> {
+        val root = value as? Map<*, *> ?: return emptyMap<Any?, Any?>()
+        for (key in keys) (root.value(key) as? Map<*, *>)?.let { return it }
+        return root
+    }
+
+    private fun items(value: Any?, vararg keys: String): List<Map<*, *>> {
+        if (value is List<*>) return value.mapNotNull { it as? Map<*, *> }
+        val root = value as? Map<*, *> ?: return emptyList()
+        for (key in (keys.toList() + listOf("items", "data", "assets")).distinct()) {
+            val nested = root.value(key)
+            if (nested is List<*>) return nested.mapNotNull { it as? Map<*, *> }
+            if (nested is Map<*, *>) {
+                for (child in listOf("items", "data", "assets")) {
+                    val list = nested.value(child)
+                    if (list is List<*>) return list.mapNotNull { it as? Map<*, *> }
+                }
+            }
+        }
+        return emptyList()
+    }
+
+    private fun Map<*, *>.value(vararg keys: String): Any? {
+        for (key in keys) entries.firstOrNull { it.key?.toString()?.equals(key, true) == true }?.value?.let { return it }
+        return null
+    }
+    private fun Map<*, *>.string(vararg keys: String): String = value(*keys)?.toString()?.trim().orEmpty()
+    private fun humanize(value: String): String = value.replace(Regex("([a-z0-9])([A-Z])"), "$1 $2")
+        .replace('_', ' ').replace('-', ' ').trim().split(Regex("\\s+")).filter(String::isNotBlank)
+        .joinToString(" ") { it.lowercase().replaceFirstChar(Char::titlecase) }
 
     fun userFacingError(error: Throwable, fallback: String): String {
         val raw = if (error is HttpException) {

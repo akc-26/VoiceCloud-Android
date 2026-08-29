@@ -1,0 +1,20 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+acc=(ROOT/'scripts/VC-ANDROID-PH13-R10-ACCEPTANCE.cmd').read_text(encoding='utf-8')
+diag=(ROOT/'scripts/VC-ANDROID-PH13-R10-SOURCE-DIAGNOSTIC.ps1').read_text(encoding='utf-8')
+closure=(ROOT/'scripts/VC-ANDROID-PH13-R10-DEVICE-CLOSURE.ps1').read_text(encoding='utf-8')
+checks=[]
+def ck(label,cond): checks.append(bool(cond)); print(('[PASS] ' if cond else '[FAIL] ')+label)
+ck('R10 source diagnostic wired','VC-ANDROID-PH13-R10-SOURCE-DIAGNOSTIC.ps1' in acc)
+ck('R10 device closure wired','VC-ANDROID-PH13-R10-DEVICE-CLOSURE.ps1' in acc)
+ck('R10 delivery integrity wired','ph13_r10_delivery_integrity.py' in acc)
+ck('R10 product preservation regression wired','ph13_r10_product_preservation_regression.py' in diag)
+ck('R10 device-timeout regression wired','ph13_r10_device_timeout_regression.py' in diag)
+ck('R09 full UI compile-risk regression retained','ph13_r09_full_ui_compile_risk_regression.py' in diag)
+ck('R10 product preservation supersedes R09 package-level preservation','ph13_r10_product_preservation_regression.py' in diag and 'ph13_r09_product_preservation_regression.py' not in diag)
+ck('R10 acceptance does not rerun full staging/release/lint chain',all(x not in acc for x in ['compileStagingKotlin','compileReleaseKotlin','lintStaging','lintRelease']))
+ck('R10 closure has fast artifact reuse path','[FAST PATH]' in closure)
+ck('R10 closure has clean fallback debug prerequisite build','[QUICK BUILD]' in closure)
+ck('R10 final acceptance remains fail-closed','exit /b 1' in acc)
+if not all(checks): raise SystemExit(1)
+print(f'[PASS] VC-ANDROID-PH13-R10 acceptance wiring: {len(checks)}/{len(checks)} PASS')

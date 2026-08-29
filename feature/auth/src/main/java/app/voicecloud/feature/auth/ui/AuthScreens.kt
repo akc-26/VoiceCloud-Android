@@ -29,6 +29,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
+import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
+import app.voicecloud.core.designsystem.component.VoiceCloudPremiumBackdrop
+import app.voicecloud.core.designsystem.component.VoiceCloudPremiumCard
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.ConsumerColors
@@ -51,38 +58,52 @@ private fun AuthPage(
     creator: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    VoiceCloudTheme(portal = if (creator) PortalTheme.Creator else PortalTheme.User, darkTheme = creator) {
-        Box(
-            Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()
-                .padding(horizontal = 20.dp),
-        ) {
-            Column(
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 28.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Spacer(Modifier.height(12.dp))
-                VoiceCloudBrandMark(62.dp)
-                Spacer(Modifier.height(16.dp))
-                VoiceCloudToastEffect(state.error, state.notice)
-                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(7.dp))
-                Text(
-                    voiceCloudTitleCase(subtitle),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(Modifier.height(22.dp))
-                Card(
-                    Modifier.fillMaxWidth().widthIn(max = 560.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    VoiceCloudTheme(portal = if (creator) PortalTheme.Creator else PortalTheme.User, darkTheme = false) {
+        VoiceCloudPremiumBackdrop(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().imePadding().padding(horizontal = 20.dp)) {
+                Column(
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 26.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Spacer(Modifier.height(8.dp))
+                    VoiceCloudBrandMark(74.dp)
+                    Text(
+                        VoiceCloudBrand.name,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = ConsumerColors.Ink,
+                    )
+                    Text(
+                        voiceCloudTitleCase(VoiceCloudBrand.tagline),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = ConsumerColors.VioletDeep,
+                    )
+                    VoiceCloudAnimatedWaveform(
+                        Modifier.fillMaxWidth(.62f).height(42.dp),
+                        color = ConsumerColors.Sapphire,
+                        active = state.busy,
+                    )
+                    VoiceCloudToastEffect(state.error, state.notice)
+                    VoiceCloudPictogram(
+                        kind = voiceCloudVisualFor(title),
+                        size = 62.dp,
+                        dark = creator,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                    )
+                    Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = ConsumerColors.Ink)
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        voiceCloudTitleCase(subtitle),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(20.dp))
+                    VoiceCloudPremiumCard(Modifier.fillMaxWidth().widthIn(max = 560.dp)) {
                         content()
                     }
+                    Spacer(Modifier.height(28.dp))
                 }
-                Spacer(Modifier.height(28.dp))
             }
         }
     }
@@ -90,8 +111,11 @@ private fun AuthPage(
 
 @Composable
 private fun InfoCard(message: String) {
-    Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(16.dp)) {
-        Text(voiceCloudTitleCase(message), Modifier.fillMaxWidth().padding(14.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    VoiceCloudGlossCard(contentPadding = 14.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            VoiceCloudPictogram(VoiceCloudVisualKind.HELP, size = 36.dp)
+            Text(voiceCloudTitleCase(message), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
@@ -148,11 +172,14 @@ private fun Field(
 
 @Composable
 fun AuthGateScreen() {
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            VoiceCloudBrandMark(64.dp)
-            CircularProgressIndicator()
-            Text(voiceCloudTitleCase("Restoring Your Secure ${VoiceCloudBrand.name} Session…"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    VoiceCloudPremiumBackdrop(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                VoiceCloudBrandMark(84.dp)
+                Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = ConsumerColors.Ink)
+                VoiceCloudAnimatedWaveform(Modifier.width(210.dp).height(52.dp), color = ConsumerColors.Sapphire, active = true)
+                Text(voiceCloudTitleCase("Connecting voices…"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
     }
 }
@@ -164,7 +191,8 @@ fun PortalSelectorScreen(
     onCreator: () -> Unit,
 ) {
     VoiceCloudTheme(portal = PortalTheme.User, darkTheme = false) {
-        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()) {
+        VoiceCloudPremiumBackdrop(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().imePadding()) {
             VoiceCloudToastEffect(state.error, state.notice)
             Column(
                 Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 28.dp),
@@ -208,6 +236,7 @@ fun PortalSelectorScreen(
                 Spacer(Modifier.height(20.dp))
                 Text(voiceCloudTitleCase("You Can Switch Experiences Anytime"), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(20.dp))
+            }
             }
         }
     }
@@ -557,11 +586,14 @@ fun CreatorReadyScreen(state: AuthUiState, onLogout: () -> Unit, onLogoutAll: ()
 @Composable
 private fun IdentityCard(user: AuthUser?) {
     if (user == null) return
-    Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(user.displayName, style = MaterialTheme.typography.titleLarge)
-            Text(voiceCloudTitleCase("@${user.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(voiceCloudTitleCase("Role: ${user.role.uppercase()}"), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+    VoiceCloudGlossCard {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            VoiceCloudPictogram(VoiceCloudVisualKind.PROFILE, size = 52.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(user.displayName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
+                Text(voiceCloudTitleCase("@${user.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(voiceCloudTitleCase("Role: ${user.role.uppercase()}"), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

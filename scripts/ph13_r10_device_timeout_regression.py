@@ -1,0 +1,23 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+dev=(ROOT/'scripts/VC-ANDROID-DEVICE-INSTRUMENTATION.ps1').read_text(encoding='utf-8')
+closure=(ROOT/'scripts/VC-ANDROID-PH13-R10-DEVICE-CLOSURE.ps1').read_text(encoding='utf-8')
+checks=[]
+def ck(label,cond): checks.append(bool(cond)); print(('[PASS] ' if cond else '[FAIL] ')+label)
+ck('device script accepts explicit ProjectRoot for verified artifact reuse','[string]$ProjectRoot' in dev and '-ProjectRoot' in closure)
+ck('direct APK install disables incremental transport','--no-incremental' in dev)
+ck('direct APK install timeout expanded to 180 seconds',"-TimeoutSeconds 180" in dev)
+ck('exact installed APK SHA is verified after timeout','Test-InstalledApkMatches' in dev and 'Get-FileHash' in dev and 'sha256sum' in dev)
+ck('one adb transport recovery is implemented','Invoke-AdbTransportRecovery' in dev and "'reconnect'" in dev and "'wait-for-device'" in dev)
+ck('fallback separates transfer from package-manager install',"'push'" in dev and "'pm', 'install'" in dev)
+ck('fallback temp APK is removed','\'rm\', \'-f\'' in dev)
+ck('instrumentation timeout has one bounded recovery retry','Instrumentation client timed out once' in dev and '-TimeoutSeconds 300' in dev)
+ck('USB transport remains preferred over wireless adb',"Rank = $transportRank" in dev and 'Sort-Object Rank, Serial' in dev)
+ck('R10 fast path searches prior R09 acceptance workspace','VoiceCloud-PH13-R09-*' in closure)
+ck('R10 fast path verifies complete product manifest before artifact reuse','Test-ProductManifest' in closure and 'workspace product source matches the canonical R09 product manifest' in closure)
+ck('R10 fast path reuses already-built debug artifacts','[FAST PATH]' in closure and 'Test-DebugArtifacts' in closure)
+ck('R10 fallback builds only device prerequisites',"':app:assembleDebug' ':app:assembleDebugAndroidTest'" in closure)
+ck('R10 fallback keeps wrapper pinned to verified local Gradle ZIP',"distributionUrl=file\\:///" in closure)
+ck('R10 quick closure is fail-closed on device failure','throw "resilient physical-device closure failed' in closure)
+if not all(checks): raise SystemExit(1)
+print(f'[PASS] VC-ANDROID-PH13-R10 device-timeout closure regression: {len(checks)}/{len(checks)} PASS')

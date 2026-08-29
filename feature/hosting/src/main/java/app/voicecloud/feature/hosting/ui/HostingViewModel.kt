@@ -90,6 +90,52 @@ class HostingViewModel @Inject constructor(
         }
     }
 
+    fun loadVerification() = viewModelScope.launch {
+        mutableState.value = mutableState.value.copy(loading = true, error = null)
+        try {
+            val (profile, eligibility) = repository.hostAccess()
+            val progression = runCatching { repository.hostProgression() }.getOrNull()
+            val assets = runCatching { repository.verificationAssets() }.getOrDefault(emptyList())
+            mutableState.value = mutableState.value.copy(
+                loading = false, eligibilityChecked = true, hostProfile = profile, eligibility = eligibility,
+                progression = progression, verificationAssets = assets, error = null,
+            )
+        } catch (error: Throwable) { fail(error, "Host verification could not be loaded.") }
+    }
+
+    fun applyForHost(
+        realName: String, bio: String?, country: String?, languages: List<String>, categories: List<String>, experience: String?,
+    ) = viewModelScope.launch {
+        mutableState.value = mutableState.value.copy(verificationBusy = true, error = null, notice = null)
+        runCatching { repository.applyForHost(realName, bio, country, languages, categories, experience) }
+            .onSuccess { (profile, eligibility) ->
+                mutableState.value = mutableState.value.copy(verificationBusy = false, hostProfile = profile, eligibility = eligibility, notice = "Host application submitted.", error = null)
+                loadVerification()
+            }
+            .onFailure {
+                mutableState.value = mutableState.value.copy(verificationBusy = false)
+                fail(it, "Host application could not be submitted.")
+            }
+    }
+
+    fun uploadVerification(
+        kind: HostVerificationAssetKind, bytes: ByteArray, fileName: String, mimeType: String,
+    ) = viewModelScope.launch {
+        mutableState.value = mutableState.value.copy(verificationBusy = true, error = null, notice = null)
+        runCatching { repository.uploadVerificationAsset(kind, bytes, fileName, mimeType) }
+            .onSuccess { assets -> mutableState.value = mutableState.value.copy(verificationBusy = false, verificationAssets = assets, notice = "Verification file uploaded.", error = null) }
+            .onFailure { mutableState.value = mutableState.value.copy(verificationBusy = false); fail(it, "Verification file could not be uploaded.") }
+    }
+
+    fun replaceVerification(
+        assetId: String, kind: HostVerificationAssetKind, bytes: ByteArray, fileName: String, mimeType: String,
+    ) = viewModelScope.launch {
+        mutableState.value = mutableState.value.copy(verificationBusy = true, error = null, notice = null)
+        runCatching { repository.replaceVerificationAsset(assetId, kind, bytes, fileName, mimeType) }
+            .onSuccess { assets -> mutableState.value = mutableState.value.copy(verificationBusy = false, verificationAssets = assets, notice = "Verification file replaced.", error = null) }
+            .onFailure { mutableState.value = mutableState.value.copy(verificationBusy = false); fail(it, "Verification file could not be replaced.") }
+    }
+
     fun loadRoom(roomId: String) {
         viewModelScope.launch {
             mutateLoading(true)

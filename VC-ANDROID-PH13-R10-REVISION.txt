@@ -1,0 +1,3 @@
+VC-ANDROID-PH13-R10
+Parent: VC-ANDROID-PH13-R09
+Scope: acceptance/device-harness correction only. Android product/UI/API/runtime source is byte-identical to R09.

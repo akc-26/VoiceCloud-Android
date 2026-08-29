@@ -151,11 +151,33 @@ class EngagementViewModel @Inject constructor(
         _state.value = _state.value.copy(conversations = repository.conversations(search).conversations)
     }
 
+    fun loadCreatorDirectConversations(search: String = "") = load {
+        _state.value = _state.value.copy(conversations = repository.directConversations(search).conversations)
+    }
+
     fun loadConversation(id: String) = load {
         val conversation = repository.conversation(id)
         val messages = repository.messages(id).messages
         _state.value = _state.value.copy(conversation = conversation, messages = messages)
         repository.markConversationRead(id, messages.lastOrNull()?.id)
+    }
+
+    fun loadCreatorDirectConversation(id: String) = load {
+        val conversation = repository.directConversationById(id)
+        val messages = repository.messages(id).messages
+        _state.value = _state.value.copy(conversation = conversation, messages = messages)
+        repository.markConversationRead(id, messages.lastOrNull()?.id)
+    }
+
+    fun refreshCreatorDirectConversationSilently(id: String) {
+        viewModelScope.launch {
+            runCatching {
+                val conversation = repository.directConversationById(id)
+                val messages = repository.messages(id).messages
+                _state.value = _state.value.copy(conversation = conversation, messages = messages)
+                repository.markConversationRead(id, messages.lastOrNull()?.id)
+            }
+        }
     }
 
 
@@ -185,12 +207,26 @@ class EngagementViewModel @Inject constructor(
         _state.value = _state.value.copy(conversations = repository.conversations().conversations)
     }
 
+    fun deleteCreatorDirectConversation(id: String) = mutate("Conversation removed.") {
+        repository.deleteConversation(id)
+        _state.value = _state.value.copy(conversations = repository.directConversations().conversations)
+    }
+
     fun deleteConversations(ids: Set<String>) {
         val clean = ids.filter(String::isNotBlank).toSet()
         if (clean.isEmpty()) return
         mutate(if (clean.size == 1) "Conversation removed." else "Conversations removed.") {
             clean.forEach { repository.deleteConversation(it) }
             _state.value = _state.value.copy(conversations = repository.conversations().conversations)
+        }
+    }
+
+    fun deleteCreatorDirectConversations(ids: Set<String>) {
+        val clean = ids.filter(String::isNotBlank).toSet()
+        if (clean.isEmpty()) return
+        mutate(if (clean.size == 1) "Conversation removed." else "Conversations removed.") {
+            clean.forEach { repository.deleteConversation(it) }
+            _state.value = _state.value.copy(conversations = repository.directConversations().conversations)
         }
     }
 

@@ -2,6 +2,7 @@ package app.voicecloud.feature.creator.data
 
 import app.voicecloud.feature.creator.model.*
 import java.text.DecimalFormat
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -97,6 +98,250 @@ class CreatorRepository @Inject constructor(private val api: CreatorApi) {
         ))
     }
 
+    suspend fun plans(): List<CreatorPlan> = items(api.plans(), "plans", "items", "data")
+        .mapNotNull(::planFrom)
+        .distinctBy { it.id }
+
+    suspend fun createPlan(
+        title: String, description: String?, monthlyPrice: Double, yearlyPrice: Double?,
+        benefits: List<String>, visibility: String,
+    ): List<CreatorPlan> {
+        val cleanTitle = title.trim()
+        require(cleanTitle.isNotBlank()) { "Plan title is required." }
+        require(monthlyPrice >= 0) { "Monthly price cannot be negative." }
+        require(yearlyPrice == null || yearlyPrice >= 0) { "Yearly price cannot be negative." }
+        val cleanVisibility = visibility.trim().uppercase().takeIf { it in setOf("PUBLIC", "PRIVATE", "CLUB_ONLY", "LINK_ONLY") } ?: "PUBLIC"
+        api.createPlan(mapOf(
+            "title" to cleanTitle.take(120),
+            "description" to description?.trim()?.takeIf(String::isNotBlank),
+            "monthlyPrice" to monthlyPrice,
+            "yearlyPrice" to yearlyPrice,
+            "benefits" to benefits.map(String::trim).filter(String::isNotBlank).distinct(),
+            "visibility" to cleanVisibility,
+        ).filterValues { it != null })
+        return plans()
+    }
+
+    suspend fun updatePlan(
+        id: String, title: String, description: String?, monthlyPrice: Double, yearlyPrice: Double?,
+        benefits: List<String>, visibility: String, status: String,
+    ): List<CreatorPlan> {
+        require(id.isNotBlank()) { "Plan is unavailable." }
+        val cleanStatus = status.trim().uppercase().takeIf { it in setOf("DRAFT", "ACTIVE", "ARCHIVED") } ?: "DRAFT"
+        val cleanVisibility = visibility.trim().uppercase().takeIf { it in setOf("PUBLIC", "PRIVATE", "CLUB_ONLY", "LINK_ONLY") } ?: "PUBLIC"
+        api.updatePlan(id, mapOf(
+            "title" to title.trim().take(120),
+            "description" to description?.trim()?.takeIf(String::isNotBlank),
+            "monthlyPrice" to monthlyPrice.coerceAtLeast(0.0),
+            "yearlyPrice" to yearlyPrice?.coerceAtLeast(0.0),
+            "benefits" to benefits.map(String::trim).filter(String::isNotBlank).distinct(),
+            "visibility" to cleanVisibility,
+            "status" to cleanStatus,
+        ).filterValues { it != null })
+        return plans()
+    }
+
+    suspend fun archivePlan(id: String): List<CreatorPlan> {
+        require(id.isNotBlank()) { "Plan is unavailable." }
+        api.archivePlan(id)
+        return plans()
+    }
+
+    suspend fun subscribers(status: String? = null, page: Int = 1, limit: Int = 50): CreatorSubscriberPage {
+        val cleanStatus = status?.trim()?.uppercase()?.takeIf { it in setOf("ACTIVE", "CANCELLED", "EXPIRED", "PENDING") }
+        val rawValue = api.subscribers(status = cleanStatus, sortOrder = "DESC", page = page.coerceAtLeast(1), limit = limit.coerceIn(1, 100))
+        val root = rawValue as? Map<*, *> ?: emptyMap<Any?, Any?>()
+        val nested = root.map("data", "result", "subscribers").ifEmpty { root }
+        val list = items(rawValue, "subscribers", "items", "data").mapNotNull(::subscriberFrom).distinctBy { it.id.ifBlank { "${it.userId}:${it.planId}:${it.subscribedAt}" } }
+        return CreatorSubscriberPage(
+            items = list,
+            total = nested.nullableInt("total", "totalCount", "count") ?: root.nullableInt("total", "totalCount", "count"),
+            page = nested.nullableInt("page", "currentPage") ?: page.coerceAtLeast(1),
+            limit = nested.nullableInt("limit", "pageSize") ?: limit.coerceIn(1, 100),
+            totalPages = nested.nullableInt("totalPages", "pages") ?: root.nullableInt("totalPages", "pages"),
+        )
+    }
+
+
+    suspend fun analytics(): CreatorAnalytics {
+        val raw = unwrap(api.analytics(), "analytics", "data", "summary")
+        return CreatorAnalytics(
+            metrics = scalarMetrics(raw, excluded = setOf("generatedAt", "updatedAt", "timestamp", "rooms", "series", "data")),
+            generatedAt = raw.string("generatedAt", "updatedAt", "timestamp").takeIf(String::isNotBlank),
+        )
+    }
+
+    suspend fun wallet(): CreatorWallet {
+        val balanceRaw = unwrap(api.walletBalance(), "balance", "balances", "data", "wallet")
+        val summaryRaw = unwrap(api.walletSummary(), "summary", "data", "wallet")
+        val transactionsRaw = api.walletTransactions(page = 1, limit = 50)
+        return CreatorWallet(
+            balances = balanceEntries(balanceRaw),
+            summary = scalarMetrics(summaryRaw, excluded = setOf("transactions", "items", "data", "balances")),
+            transactions = items(transactionsRaw, "transactions", "items", "data")
+                .mapNotNull(::walletTransactionFrom)
+                .distinctBy { it.id },
+        )
+    }
+
+    suspend fun earnings(): CreatorEarnings {
+        val raw = unwrap(api.earnings(page = 1, limit = 50), "earnings", "summary", "data")
+        return CreatorEarnings(
+            metrics = scalarMetrics(raw, excluded = setOf("items", "data", "subscriptions", "payouts", "generatedAt", "updatedAt")),
+            generatedAt = raw.string("generatedAt", "updatedAt", "timestamp").takeIf(String::isNotBlank),
+        )
+    }
+
+    suspend fun gifts(): List<CreatorGiftRecord> = items(api.giftHistory(page = 1, limit = 50), "history", "gifts", "items", "data")
+        .mapNotNull(::giftFrom)
+        .distinctBy { it.id }
+
+    suspend fun payoutRequests(status: String? = null, page: Int = 1, limit: Int = 50): CreatorPayoutPage {
+        val cleanStatus = status?.trim()?.uppercase()?.takeIf { it in setOf("PENDING", "APPROVED", "REJECTED", "PROCESSED", "CANCELLED", "FAILED") }
+        val rawValue = api.payoutRequests(cleanStatus, "DESC", page.coerceAtLeast(1), limit.coerceIn(1, 100))
+        val root = rawValue as? Map<*, *> ?: emptyMap<Any?, Any?>()
+        val nested = root.map("data", "result", "payouts").ifEmpty { root }
+        val list = items(rawValue, "payoutRequests", "payouts", "items", "data").mapNotNull(::payoutFrom).distinctBy { it.id }
+        return CreatorPayoutPage(
+            items = list,
+            total = nested.nullableInt("total", "totalCount", "count") ?: root.nullableInt("total", "totalCount", "count"),
+            page = nested.nullableInt("page", "currentPage") ?: page.coerceAtLeast(1),
+            limit = nested.nullableInt("limit", "pageSize") ?: limit.coerceIn(1, 100),
+            totalPages = nested.nullableInt("totalPages", "pages") ?: root.nullableInt("totalPages", "pages"),
+        )
+    }
+
+    suspend fun payoutRequest(id: String): CreatorPayoutRequest {
+        require(id.trim().isNotBlank()) { "Payout request is unavailable." }
+        val raw = unwrap(api.payoutRequest(id.trim()), "payout", "payoutRequest", "data")
+        return payoutFrom(raw) ?: error("Payout request is unavailable.")
+    }
+
+    suspend fun createPayoutRequest(diamondAmount: Int, payoutMethod: String): CreatorPayoutPage {
+        require(diamondAmount >= 100) { "Payout requests require at least 100 diamonds." }
+        val method = payoutMethod.trim().uppercase()
+        require(method in setOf("BANK_TRANSFER", "PAYPAL", "STRIPE", "CRYPTO")) { "Choose a supported payout method." }
+        api.createPayoutRequest(mapOf(
+            "diamondAmount" to diamondAmount,
+            "payoutMethod" to method,
+            "operationKey" to "android-payout-${UUID.randomUUID()}",
+        ))
+        return payoutRequests()
+    }
+
+    private fun balanceEntries(raw: Map<*, *>): List<CreatorBalance> {
+        val nested = raw.map("balances")
+        val source = if (nested.isNotEmpty()) nested else raw
+        return source.entries.mapNotNull { (key, value) ->
+            val label = key?.toString()?.trim()?.takeIf(String::isNotBlank) ?: return@mapNotNull null
+            if (value !is Number && value !is String) return@mapNotNull null
+            value.toString().toDoubleOrNull() ?: return@mapNotNull null
+            CreatorBalance(label.uppercase(), displayValue(value))
+        }.filter { it.type !in setOf("ID", "USERID") }.sortedBy { it.type }
+    }
+
+    private fun walletTransactionFrom(raw: Map<*, *>): CreatorWalletTransaction? {
+        val id = raw.string("id", "transactionId")
+        if (id.isBlank()) return null
+        return CreatorWalletTransaction(
+            id = id,
+            type = raw.string("type", "transactionType").uppercase(),
+            status = raw.string("status").uppercase(),
+            amount = raw.value("amount", "value")?.let(::displayValue).orEmpty(),
+            currency = raw.string("currency", "balanceType").uppercase(),
+            description = raw.string("description", "note", "reason").takeIf(String::isNotBlank),
+            createdAt = raw.string("createdAt", "timestamp").takeIf(String::isNotBlank),
+        )
+    }
+
+    private fun giftFrom(raw: Map<*, *>): CreatorGiftRecord? {
+        val id = raw.string("id", "transactionId", "giftTransactionId")
+        if (id.isBlank()) return null
+        val gift = raw.map("gift", "giftItem")
+        val sender = raw.map("sender", "fromUser")
+        val receiver = raw.map("receiver", "recipient", "toUser")
+        val direction = raw.string("direction", "type", "transactionType").uppercase()
+        val counterparty = when {
+            "RECEIV" in direction -> sender.string("displayName", "username", "name")
+            "SENT" in direction || "SEND" in direction -> receiver.string("displayName", "username", "name")
+            else -> raw.string("counterpartyName").ifBlank { sender.string("displayName", "username") }
+        }.takeIf(String::isNotBlank)
+        return CreatorGiftRecord(
+            id = id,
+            giftName = gift.string("name", "title").ifBlank { raw.string("giftName", "name").ifBlank { "Gift" } },
+            direction = direction,
+            counterparty = counterparty,
+            quantity = raw.nullableInt("quantity", "count"),
+            amount = raw.value("amount", "diamondAmount", "coinAmount", "totalAmount")?.let(::displayValue),
+            currency = raw.string("currency", "balanceType").takeIf(String::isNotBlank),
+            createdAt = raw.string("createdAt", "timestamp", "sentAt").takeIf(String::isNotBlank),
+        )
+    }
+
+    private fun payoutFrom(raw: Map<*, *>): CreatorPayoutRequest? {
+        val id = raw.string("id", "payoutRequestId", "requestId")
+        if (id.isBlank()) return null
+        return CreatorPayoutRequest(
+            id = id,
+            diamondAmount = raw.value("diamondAmount", "diamonds", "amount")?.let(::displayValue).orEmpty(),
+            payoutMethod = raw.string("payoutMethod", "method").uppercase(),
+            status = raw.string("status").uppercase(),
+            createdAt = raw.string("createdAt", "requestedAt").takeIf(String::isNotBlank),
+            updatedAt = raw.string("updatedAt", "processedAt").takeIf(String::isNotBlank),
+            rejectionReason = raw.string("rejectionReason", "reason").takeIf(String::isNotBlank),
+        )
+    }
+
+    private fun scalarMetrics(raw: Map<*, *>, excluded: Set<String> = emptySet()): List<CreatorMetric> = raw.entries.mapNotNull { (key, value) ->
+        val rawKey = key?.toString()?.trim()?.takeIf(String::isNotBlank) ?: return@mapNotNull null
+        if (excluded.any { it.equals(rawKey, ignoreCase = true) }) return@mapNotNull null
+        if (value !is Number && value !is String && value !is Boolean) return@mapNotNull null
+        CreatorMetric(rawKey, humanize(rawKey), displayValue(value))
+    }.sortedBy { it.label }
+
+    private fun humanize(value: String): String = value
+        .replace(Regex("([a-z0-9])([A-Z])"), "$1 $2")
+        .replace('_', ' ').replace('-', ' ').trim()
+        .split(Regex("\\s+")).filter(String::isNotBlank).joinToString(" ") { it.lowercase().replaceFirstChar(Char::titlecase) }
+
+    private fun planFrom(raw: Map<*, *>): CreatorPlan? {
+        val id = raw.string("id", "planId")
+        val title = raw.string("title", "name")
+        if (id.isBlank() || title.isBlank()) return null
+        return CreatorPlan(
+            id = id, title = title,
+            description = raw.string("description").takeIf(String::isNotBlank),
+            monthlyPrice = raw.double("monthlyPrice", "monthly_price", "price"),
+            yearlyPrice = raw.nullableDouble("yearlyPrice", "yearly_price"),
+            benefits = raw.list("benefits", "perks").mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotBlank) },
+            visibility = raw.string("visibility").ifBlank { "PUBLIC" }.uppercase(),
+            status = raw.string("status").ifBlank { "DRAFT" }.uppercase(),
+            subscriberCount = raw.nullableInt("subscriberCount", "subscribersCount", "activeSubscribers"),
+            createdAt = raw.string("createdAt").takeIf(String::isNotBlank),
+            updatedAt = raw.string("updatedAt").takeIf(String::isNotBlank),
+        )
+    }
+
+    private fun subscriberFrom(raw: Map<*, *>): CreatorSubscriber? {
+        val user = raw.map("user", "subscriber")
+        val plan = raw.map("plan", "creatorPlan")
+        val userId = raw.string("userId", "subscriberId").ifBlank { user.string("id", "userId") }
+        val planId = raw.string("planId").ifBlank { plan.string("id", "planId") }
+        val id = raw.string("id", "subscriptionId")
+        if (id.isBlank() && userId.isBlank()) return null
+        return CreatorSubscriber(
+            id = id, userId = userId, planId = planId,
+            status = raw.string("status").uppercase(),
+            displayName = user.string("displayName", "name").ifBlank { user.string("username") },
+            username = user.string("username"),
+            avatarUrl = user.string("avatarUrl", "avatar").takeIf(String::isNotBlank),
+            planTitle = plan.string("title", "name").takeIf(String::isNotBlank) ?: raw.string("planTitle").takeIf(String::isNotBlank),
+            subscribedAt = raw.string("subscribedAt", "startedAt", "createdAt").takeIf(String::isNotBlank),
+            expiresAt = raw.string("expiresAt", "endDate", "currentPeriodEnd").takeIf(String::isNotBlank),
+            autoRenew = raw.nullableBool("autoRenew", "auto_renew"),
+        )
+    }
+
     private fun profileFrom(raw: Map<*, *>): CreatorProfile = CreatorProfile(
         id = raw.string("id", "userId"),
         username = raw.string("username"),
@@ -167,12 +412,15 @@ class CreatorRepository @Inject constructor(private val api: CreatorApi) {
     private fun items(value: Any?, vararg keys: String): List<Map<*, *>> {
         if (value is List<*>) return value.mapNotNull { it as? Map<*, *> }
         val root = value as? Map<*, *> ?: return emptyList()
-        for (key in keys) {
+        val candidates = (keys.toList() + listOf("items", "data", "pages", "subscribers", "plans")).distinct()
+        for (key in candidates) {
             val nested = root.value(key)
             if (nested is List<*>) return nested.mapNotNull { it as? Map<*, *> }
             if (nested is Map<*, *>) {
-                val nestedList = nested.value("items", "data", "pages")
-                if (nestedList is List<*>) return nestedList.mapNotNull { it as? Map<*, *> }
+                for (childKey in candidates) {
+                    val nestedList = nested.value(childKey)
+                    if (nestedList is List<*>) return nestedList.mapNotNull { it as? Map<*, *> }
+                }
             }
         }
         return emptyList()
@@ -189,6 +437,27 @@ class CreatorRepository @Inject constructor(private val api: CreatorApi) {
         is Number -> value.toInt()
         is String -> value.toIntOrNull() ?: 0
         else -> 0
+    }
+    private fun Map<*, *>.nullableInt(vararg keys: String): Int? = when (val value = value(*keys)) {
+        is Number -> value.toInt()
+        is String -> value.toIntOrNull()
+        else -> null
+    }
+    private fun Map<*, *>.double(vararg keys: String): Double = when (val value = value(*keys)) {
+        is Number -> value.toDouble()
+        is String -> value.toDoubleOrNull() ?: 0.0
+        else -> 0.0
+    }
+    private fun Map<*, *>.nullableDouble(vararg keys: String): Double? = when (val value = value(*keys)) {
+        is Number -> value.toDouble()
+        is String -> value.toDoubleOrNull()
+        else -> null
+    }
+    private fun Map<*, *>.nullableBool(vararg keys: String): Boolean? = when (val value = value(*keys)) {
+        is Boolean -> value
+        is Number -> value.toInt() != 0
+        is String -> when (value.trim().lowercase()) { "true", "1", "yes", "on" -> true; "false", "0", "no", "off" -> false; else -> null }
+        else -> null
     }
     private fun Map<*, *>.bool(default: Boolean, vararg keys: String): Boolean = when (val value = value(*keys)) {
         is Boolean -> value

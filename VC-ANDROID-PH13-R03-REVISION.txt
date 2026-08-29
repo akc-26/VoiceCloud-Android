@@ -1,0 +1,6 @@
+VC-ANDROID-PH13-R03
+Parent: VC-ANDROID-PH13-R02
+Correction class: acceptance harness only
+Product/Kotlin source: unchanged from PH13-R01/R02
+
+R03 executes Gradle wrapper/bootstrap, compile, tests, lint, assemblies and device instrumentation in an isolated temporary workspace. The extracted delivery tree remains immutable throughout acceptance. Gate 8 then performs strict delivery-manifest verification against the original tree.

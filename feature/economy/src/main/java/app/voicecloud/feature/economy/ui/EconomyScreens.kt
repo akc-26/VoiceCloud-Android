@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -22,9 +25,27 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
+import app.voicecloud.core.designsystem.component.VoiceCloudHeroCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
+import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.VoiceCloudPremiumCard
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
+import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.feature.economy.billing.PaymentRail
 import app.voicecloud.feature.economy.model.*
+
+private fun EconomySection.visualKind(): VoiceCloudVisualKind = when (this) {
+    EconomySection.WALLET -> VoiceCloudVisualKind.WALLET
+    EconomySection.VIP -> VoiceCloudVisualKind.VIP
+    EconomySection.GIFTS -> VoiceCloudVisualKind.GIFT
+    EconomySection.TASKS, EconomySection.ACHIEVEMENTS, EconomySection.PROGRESSION, EconomySection.RANKINGS, EconomySection.REFERRALS -> VoiceCloudVisualKind.REWARD
+    EconomySection.TICKETS -> VoiceCloudVisualKind.EVENT
+    EconomySection.STORE -> VoiceCloudVisualKind.GIFT
+}
 
 /** Compact visual economy hub for wallet, membership, rewards and progression. */
 @Composable
@@ -36,16 +57,19 @@ fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item {
-                ElevatedCard(shape = RoundedCornerShape(24.dp), modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().border(1.dp, ConsumerColors.VipGold.copy(alpha = .52f), RoundedCornerShape(28.dp)),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = ConsumerColors.LiveSurface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                ) {
                     Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(58.dp)) {
-                            Box(contentAlignment = Alignment.Center) { Text(voiceCloudTitleCase("✦"), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary) }
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(voiceCloudTitleCase("VoiceCloud wallet"), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelLarge)
+                            Text(voiceCloudTitleCase("Rewards that grow with your voice"), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
+                            Text(voiceCloudTitleCase("Wallet · Gifts · VIP · Achievements"), color = ConsumerColors.VipGold, style = MaterialTheme.typography.bodySmall)
                         }
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(voiceCloudTitleCase("Your VoiceCloud"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                            Text(voiceCloudTitleCase("Wallet, Rewards & Progress"), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
+                        VoiceCloudPictogram(VoiceCloudVisualKind.WALLET, size = 76.dp, dark = true)
                     }
                 }
             }
@@ -63,14 +87,13 @@ fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
 
 @Composable
 fun EconomyNavigationCard(section: EconomySection, onOpen: (EconomySection) -> Unit) {
-    ElevatedCard(onClick = { onOpen(section) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.primaryContainer) {
-                Text(section.glyph(), modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-            }
-            Text(voiceCloudTitleCase(section.label), fontWeight = FontWeight.Bold, maxLines = 1)
-            Text(voiceCloudTitleCase(section.subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        }
+    VoiceCloudGlossCard(
+        modifier = Modifier.fillMaxWidth().clickable { onOpen(section) },
+        contentPadding = 15.dp,
+    ) {
+        VoiceCloudPictogram(section.visualKind(), size = 54.dp)
+        Text(voiceCloudTitleCase(section.label), fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleMedium, maxLines = 1)
+        Text(voiceCloudTitleCase(section.subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -112,6 +135,20 @@ fun EconomySectionScreen(
             contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            item {
+                VoiceCloudPageHero(
+                    title = section.label,
+                    subtitle = section.subtitle,
+                    kind = section.visualKind(),
+                    badge = when (section) {
+                        EconomySection.WALLET -> "Secure & transparent"
+                        EconomySection.VIP -> "Premium experience"
+                        EconomySection.GIFTS -> "Send appreciation"
+                        EconomySection.TASKS -> "Earn rewards"
+                        else -> "VoiceCloud rewards"
+                    },
+                )
+            }
             if (state.loading) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
             if (section == EconomySection.WALLET || section == EconomySection.VIP) item {
                 PaymentRailCard(
@@ -155,13 +192,7 @@ fun EconomySectionScreen(
 
 @Composable
 private fun EconomyEmpty(section: EconomySection) {
-    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
-        Column(Modifier.padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(section.glyph(), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-            Text(voiceCloudTitleCase("Nothing Here Yet"), fontWeight = FontWeight.SemiBold)
-            Text(voiceCloudTitleCase("New ${section.label} Activity Will Appear Here"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-        }
-    }
+    VoiceCloudEmptyVisual("Nothing Here Yet", "New ${section.label} activity will appear here", Modifier.fillMaxWidth(), section.visualKind())
 }
 
 @Composable
@@ -182,16 +213,19 @@ private fun EconomyVisualCard(
     val id = item.text("id", "itemId", "taskId", "roomId", "scheduledRoomId")
     val hero = item.firstDisplayValue("balance", "availableBalance", "coinBalance", "coins", "amount", "price", "reward", "rewardAmount", "xp", "points", "level", "rank", "streak", "progress", "total")
     val details = item.conciseDetails()
-    ElevatedCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
+    ElevatedCard(
+        Modifier.fillMaxWidth().border(1.dp, ConsumerColors.Border.copy(alpha = .62f), RoundedCornerShape(22.dp)),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.Surface),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 3.dp),
+    ) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.primaryContainer) {
-                    Text(section.glyph(), modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                }
+                VoiceCloudPictogram(section.visualKind(), size = 48.dp)
                 Spacer(Modifier.width(12.dp))
                 Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
-            if (hero != null) Text(hero, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (hero != null) Text(hero, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = if (section == EconomySection.VIP || section == EconomySection.GIFTS) ConsumerColors.VioletDeep else ConsumerColors.SapphireDeep, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (details.isNotEmpty()) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     details.take(2).forEach { detail ->
@@ -239,8 +273,13 @@ private fun EconomyVisualCard(
 
 @Composable
 private fun PaymentRailCard(rail: PaymentRail, section: EconomySection, busy: Boolean, onRestore: () -> Unit) {
-    Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
-        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Card(
+        Modifier.fillMaxWidth().border(1.dp, ConsumerColors.VipGold.copy(alpha = .32f), RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = ConsumerColors.SurfaceSoft),
+    ) {
+        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            VoiceCloudPictogram(if (section == EconomySection.WALLET) VoiceCloudVisualKind.WALLET else VoiceCloudVisualKind.VIP, size = 44.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(voiceCloudTitleCase(if (rail == PaymentRail.HOSTED_GATEWAY) "Secure Payment" else "Google Play Billing"), fontWeight = FontWeight.SemiBold)
                 Text(voiceCloudTitleCase(if (section == EconomySection.WALLET) "Verified Wallet Credits" else "Verified VIP Access"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)

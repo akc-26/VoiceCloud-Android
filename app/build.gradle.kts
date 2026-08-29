@@ -26,11 +26,11 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0-ph11"
+        versionName = "1.0.0-ph13"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         resValue("string", "vc_brand_app_name", brand("brand.name"))
-        resValue("color", "vc_brand_launcher_background", brand("consumer.sapphire"))
+        resValue("color", "vc_brand_launcher_background", brand("consumer.cloud"))
         resValue("color", "vc_brand_system_surface", brand("consumer.surface"))
     }
 

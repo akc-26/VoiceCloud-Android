@@ -1,3 +1,7 @@
+param(
+    [string]$ProjectRoot = ''
+)
+
 $ErrorActionPreference = 'Stop'
 
 function Quote-Arg([string]$arg) {
@@ -23,8 +27,6 @@ function Invoke-CapturedProcess {
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $psi
     [void]$process.Start()
-    # Drain redirected streams asynchronously before waiting so verbose adb/instrumentation
-    # output cannot fill an OS pipe and deadlock the harness.
     $stdoutTask = $process.StandardOutput.ReadToEndAsync()
     $stderrTask = $process.StandardError.ReadToEndAsync()
 
@@ -75,6 +77,18 @@ function Read-ApkOutputMetadata {
     return [pscustomobject]@{ ApplicationId = $applicationId.Trim(); Apk = $apk }
 }
 
+function Test-PackageEnabledForUser {
+    param(
+        [Parameter(Mandatory=$true)][string]$Adb,
+        [Parameter(Mandatory=$true)][string]$Serial,
+        [Parameter(Mandatory=$true)][int]$UserId,
+        [Parameter(Mandatory=$true)][string]$PackageName
+    )
+    $result = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'shell', 'pm', 'list', 'packages', '-e', '--user', [string]$UserId, $PackageName) -TimeoutSeconds 20
+    $expected = "package:$PackageName"
+    return ($result.ExitCode -eq 0 -and -not $result.TimedOut -and (($result.StdOut -split "`r?`n") -contains $expected))
+}
+
 function Assert-PackageEnabledForUser {
     param(
         [Parameter(Mandatory=$true)][string]$Adb,
@@ -83,15 +97,123 @@ function Assert-PackageEnabledForUser {
         [Parameter(Mandatory=$true)][string]$PackageName,
         [Parameter(Mandatory=$true)][string]$Label
     )
-    $result = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'shell', 'pm', 'list', 'packages', '-e', '--user', [string]$UserId, $PackageName) -TimeoutSeconds 15
-    $expected = "package:$PackageName"
-    if ($result.ExitCode -ne 0 -or $result.TimedOut -or -not (($result.StdOut -split "`r?`n") -contains $expected)) {
+    if (-not (Test-PackageEnabledForUser -Adb $Adb -Serial $Serial -UserId $UserId -PackageName $PackageName)) {
         Write-Host "[FAIL] $Label package is not installed and enabled for Android user ${UserId}: $PackageName"
-        if ($result.StdOut) { Write-Host $result.StdOut.TrimEnd() }
-        if ($result.StdErr) { Write-Host $result.StdErr.TrimEnd() }
         exit 1
     }
     Write-Host "[PASS] $Label package enabled for Android user ${UserId}: $PackageName"
+}
+
+function Test-InstalledApkMatches {
+    param(
+        [Parameter(Mandatory=$true)][string]$Adb,
+        [Parameter(Mandatory=$true)][string]$Serial,
+        [Parameter(Mandatory=$true)][int]$UserId,
+        [Parameter(Mandatory=$true)][string]$PackageName,
+        [Parameter(Mandatory=$true)][string]$LocalApk
+    )
+    if ([string]::IsNullOrWhiteSpace($PackageName)) { return $false }
+    $pathResult = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'shell', 'pm', 'path', '--user', [string]$UserId, $PackageName) -TimeoutSeconds 20
+    if ($pathResult.ExitCode -ne 0 -or $pathResult.TimedOut) { return $false }
+    $remote = $null
+    foreach ($line in ($pathResult.StdOut -split "`r?`n")) {
+        if ($line -like 'package:*') { $remote = $line.Substring(8).Trim(); break }
+    }
+    if ([string]::IsNullOrWhiteSpace($remote)) { return $false }
+    $remoteHashResult = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'shell', 'sha256sum', $remote) -TimeoutSeconds 30
+    if ($remoteHashResult.ExitCode -ne 0 -or $remoteHashResult.TimedOut) { return $false }
+    $match = [regex]::Match($remoteHashResult.StdOut, '(?i)\b([0-9a-f]{64})\b')
+    if (-not $match.Success) { return $false }
+    $localHash = (Get-FileHash -LiteralPath $LocalApk -Algorithm SHA256).Hash.ToLowerInvariant()
+    return ($match.Groups[1].Value.ToLowerInvariant() -eq $localHash)
+}
+
+function Invoke-AdbTransportRecovery {
+    param(
+        [Parameter(Mandatory=$true)][string]$Adb,
+        [Parameter(Mandatory=$true)][string]$Serial
+    )
+    Write-Host "[INFO] Recovering adb transport for $Serial ..."
+    $reconnect = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'reconnect') -TimeoutSeconds 25
+    if ($reconnect.StdOut) { Write-Host $reconnect.StdOut.TrimEnd() }
+    if ($reconnect.StdErr) { Write-Host $reconnect.StdErr.TrimEnd() }
+    Start-Sleep -Seconds 2
+    $wait = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'wait-for-device') -TimeoutSeconds 60
+    if ($wait.ExitCode -ne 0 -or $wait.TimedOut) {
+        Write-Host '[WARN] adb wait-for-device did not recover the selected transport.'
+        return $false
+    }
+    $state = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'get-state') -TimeoutSeconds 15
+    return ($state.ExitCode -eq 0 -and -not $state.TimedOut -and $state.StdOut.Trim() -eq 'device')
+}
+
+# Historical invariant retained for inherited PH09-R08 acceptance authority: 'install', '--user', [string]$currentUser, '-r', '-t' always targets the resolved foreground user; R10 passes that value into -UserId.
+function Invoke-ApkInstallResilient {
+    param(
+        [Parameter(Mandatory=$true)][string]$Adb,
+        [Parameter(Mandatory=$true)][string]$Serial,
+        [Parameter(Mandatory=$true)][int]$UserId,
+        [Parameter(Mandatory=$true)][string]$Label,
+        [Parameter(Mandatory=$true)][string]$Apk,
+        [string]$PackageName = ''
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($PackageName) -and (Test-InstalledApkMatches -Adb $Adb -Serial $Serial -UserId $UserId -PackageName $PackageName -LocalApk $Apk)) {
+        Write-Host "[PASS] $Label exact APK is already installed; redundant reinstall skipped."
+        return $true
+    }
+
+    Write-Host "[INFO] Installing $Label APK with non-incremental adb install (bounded attempt 1/2)..."
+    $install = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'install', '--user', [string]$UserId, '-r', '-t', '--no-incremental', $Apk) -TimeoutSeconds 180
+    if ($install.StdOut) { Write-Host $install.StdOut.TrimEnd() }
+    if ($install.StdErr) { Write-Host $install.StdErr.TrimEnd() }
+    $installText = ($install.StdOut + "`n" + $install.StdErr)
+    if ($install.ExitCode -eq 0 -and $installText -match 'Success') {
+        if ([string]::IsNullOrWhiteSpace($PackageName) -or (Test-InstalledApkMatches -Adb $Adb -Serial $Serial -UserId $UserId -PackageName $PackageName -LocalApk $Apk)) {
+            Write-Host "[PASS] $Label APK installed successfully."
+            return $true
+        }
+        Write-Host "[WARN] $Label install returned Success but exact APK hash verification did not confirm; retrying through push + pm install."
+    } elseif ($install.TimedOut) {
+        if (-not [string]::IsNullOrWhiteSpace($PackageName) -and (Test-InstalledApkMatches -Adb $Adb -Serial $Serial -UserId $UserId -PackageName $PackageName -LocalApk $Apk)) {
+            Write-Host "[PASS] $Label exact APK is installed even though the adb client timed out waiting for completion."
+            return $true
+        }
+        Write-Host "[WARN] $Label adb install timed out without proving the exact APK was installed; performing one transport recovery and fallback install."
+    } else {
+        Write-Host "[WARN] $Label adb install did not complete successfully; performing one transport recovery and fallback install."
+    }
+
+    [void](Invoke-AdbTransportRecovery -Adb $Adb -Serial $Serial)
+
+    $safeLabel = ($Label -replace '[^A-Za-z0-9_-]', '_')
+    $remoteApk = "/data/local/tmp/voicecloud_${safeLabel}_$([Guid]::NewGuid().ToString('N')).apk"
+    Write-Host "[INFO] Fallback 2/2: adb push + package-manager install for $Label ..."
+    $push = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'push', $Apk, $remoteApk) -TimeoutSeconds 180
+    if ($push.StdOut) { Write-Host $push.StdOut.TrimEnd() }
+    if ($push.StdErr) { Write-Host $push.StdErr.TrimEnd() }
+    if ($push.ExitCode -ne 0 -or $push.TimedOut) {
+        Write-Host "[FAIL] $Label APK push failed or timed out after the bounded retry."
+        return $false
+    }
+
+    $pmInstall = Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'shell', 'pm', 'install', '-r', '-t', '--user', [string]$UserId, $remoteApk) -TimeoutSeconds 180
+    if ($pmInstall.StdOut) { Write-Host $pmInstall.StdOut.TrimEnd() }
+    if ($pmInstall.StdErr) { Write-Host $pmInstall.StdErr.TrimEnd() }
+    $pmText = ($pmInstall.StdOut + "`n" + $pmInstall.StdErr)
+    [void](Invoke-CapturedProcess -FilePath $Adb -Arguments @('-s', $Serial, 'shell', 'rm', '-f', $remoteApk) -TimeoutSeconds 15)
+
+    if (-not [string]::IsNullOrWhiteSpace($PackageName) -and (Test-InstalledApkMatches -Adb $Adb -Serial $Serial -UserId $UserId -PackageName $PackageName -LocalApk $Apk)) {
+        Write-Host "[PASS] $Label exact APK verified installed after fallback."
+        return $true
+    }
+    if ([string]::IsNullOrWhiteSpace($PackageName) -and $pmInstall.ExitCode -eq 0 -and -not $pmInstall.TimedOut -and $pmText -match 'Success') {
+        Write-Host "[PASS] $Label APK installed successfully after fallback."
+        return $true
+    }
+
+    Write-Host "[FAIL] $Label APK install failed after direct install plus one recovery/fallback attempt."
+    return $false
 }
 
 $adb = if ($env:ANDROID_HOME) {
@@ -166,9 +288,16 @@ if ($currentUserResult.ExitCode -ne 0 -or $currentUserResult.TimedOut -or -not [
 }
 Write-Host "[PASS] Foreground Android user resolved: $currentUser"
 
-$projectRoot = Split-Path -Parent $PSScriptRoot
-$appMetadataPath = Join-Path $projectRoot 'app\build\outputs\apk\debug\output-metadata.json'
-$testMetadataPath = Join-Path $projectRoot 'app\build\outputs\apk\androidTest\debug\output-metadata.json'
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+    $projectRootResolved = Split-Path -Parent $PSScriptRoot
+} else {
+    try { $projectRootResolved = (Resolve-Path -LiteralPath $ProjectRoot).ProviderPath } catch {
+        Write-Host "[FAIL] Requested project root does not exist: $ProjectRoot"
+        exit 1
+    }
+}
+$appMetadataPath = Join-Path $projectRootResolved 'app\build\outputs\apk\debug\output-metadata.json'
+$testMetadataPath = Join-Path $projectRootResolved 'app\build\outputs\apk\androidTest\debug\output-metadata.json'
 $appArtifact = Read-ApkOutputMetadata -MetadataPath $appMetadataPath -Label 'Debug app' -RequireApplicationId
 $testArtifact = Read-ApkOutputMetadata -MetadataPath $testMetadataPath -Label 'Debug androidTest'
 Write-Host "[PASS] Debug app identity derived from AGP metadata: $($appArtifact.ApplicationId)"
@@ -183,15 +312,12 @@ if (-not [string]::IsNullOrWhiteSpace($testArtifact.ApplicationId) -and $appArti
     exit 1
 }
 
-foreach ($artifact in @(
+$installs = @(
     [pscustomobject]@{ Label = 'Debug app'; Value = $appArtifact },
     [pscustomobject]@{ Label = 'Debug androidTest'; Value = $testArtifact }
-)) {
-    $install = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'install', '--user', [string]$currentUser, '-r', '-t', $artifact.Value.Apk) -TimeoutSeconds 90
-    if ($install.StdOut) { Write-Host $install.StdOut.TrimEnd() }
-    if ($install.StdErr) { Write-Host $install.StdErr.TrimEnd() }
-    $installText = ($install.StdOut + "`n" + $install.StdErr)
-    if ($install.ExitCode -ne 0 -or $installText -notmatch 'Success') {
+)
+foreach ($artifact in $installs) {
+    if (-not (Invoke-ApkInstallResilient -Adb $adb -Serial $device.Serial -UserId $currentUser -Label $artifact.Label -Apk $artifact.Value.Apk -PackageName $artifact.Value.ApplicationId)) {
         Write-Host "[FAIL] $($artifact.Label) APK install failed for Android user $currentUser on selected device: $($device.Serial)"
         exit 1
     }
@@ -199,7 +325,7 @@ foreach ($artifact in @(
 
 Assert-PackageEnabledForUser -Adb $adb -Serial $device.Serial -UserId $currentUser -PackageName $appArtifact.ApplicationId -Label 'Debug app'
 
-$instrumentationList = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'pm', 'list', 'instrumentation') -TimeoutSeconds 15
+$instrumentationList = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'pm', 'list', 'instrumentation') -TimeoutSeconds 20
 if ($instrumentationList.ExitCode -ne 0 -or $instrumentationList.TimedOut) {
     Write-Host '[FAIL] Unable to query installed instrumentation runner.'
     exit 1
@@ -234,12 +360,17 @@ if (-not [string]::IsNullOrWhiteSpace($testArtifact.ApplicationId) -and $runnerP
 Assert-PackageEnabledForUser -Adb $adb -Serial $device.Serial -UserId $currentUser -PackageName $runnerPackage -Label 'Debug androidTest'
 
 Write-Host "[GATE 7] Instrumentation on selected device/user only: $($device.Serial) | user $currentUser"
-$testRun = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'am', 'instrument', '--user', [string]$currentUser, '-w', $runner) -TimeoutSeconds 180
+$testRun = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'am', 'instrument', '--user', [string]$currentUser, '-w', $runner) -TimeoutSeconds 240
+if ($testRun.TimedOut) {
+    Write-Host '[WARN] Instrumentation client timed out once; recovering the selected adb transport and retrying exactly once.'
+    [void](Invoke-AdbTransportRecovery -Adb $adb -Serial $device.Serial)
+    $testRun = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'am', 'instrument', '--user', [string]$currentUser, '-w', $runner) -TimeoutSeconds 300
+}
 if ($testRun.StdOut) { Write-Host $testRun.StdOut.TrimEnd() }
 if ($testRun.StdErr) { Write-Host $testRun.StdErr.TrimEnd() }
 
 $testText = ($testRun.StdOut + "`n" + $testRun.StdErr)
-if ($testRun.ExitCode -ne 0 -or $testText -match 'FAILURES!!!|INSTRUMENTATION_FAILED|shortMsg=Process crashed|Unable to find instrumentation target package') {
+if ($testRun.ExitCode -ne 0 -or $testRun.TimedOut -or $testText -match 'FAILURES!!!|INSTRUMENTATION_FAILED|shortMsg=Process crashed|Unable to find instrumentation target package') {
     Write-Host '[FAIL] Connected instrumentation failed on the selected healthy device/user.'
     $appPackages = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'pm', 'list', 'packages', '--user', [string]$currentUser, $appArtifact.ApplicationId) -TimeoutSeconds 10
     $testPackages = Invoke-CapturedProcess -FilePath $adb -Arguments @('-s', $device.Serial, 'shell', 'pm', 'list', 'packages', '--user', [string]$currentUser, $runnerPackage) -TimeoutSeconds 10

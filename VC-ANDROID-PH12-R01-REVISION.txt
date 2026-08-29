@@ -1,0 +1,6 @@
+VoiceCloud Android revision: VC-ANDROID-PH12-R01
+Parent Git branch: VoiceCloud-Android-VC-ANDROID-PH11-R02
+Parent Git commit: fad14e236a780cbe14a74a4676a3ad94237d9bbe
+Scope: Creator Audience, Messaging, Followers & Subscribers
+Implementation: Audience metrics; followers search/sort/follow-back; direct-only Creator messaging; subscription plan create/update/archive; subscriber list/metrics.
+Payment authority: no client-side paid subscription completion is fabricated; backend subscription records remain authoritative.

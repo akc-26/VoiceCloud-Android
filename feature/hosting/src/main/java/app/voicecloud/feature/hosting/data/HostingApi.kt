@@ -5,6 +5,10 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.PUT
+import retrofit2.http.Multipart
+import retrofit2.http.Part
+import okhttp3.MultipartBody
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -13,6 +17,16 @@ interface HostingApi {
     @GET("search") suspend fun searchUsers(@Query("q") query: String, @Query("type") type: String = "users", @Query("page") page: Int = 1, @Query("limit") limit: Int = 12): InviteSearchResponse
     @GET("hosts/profile") suspend fun hostProfile(): HostProfile
     @GET("hosts/eligibility") suspend fun hostEligibility(): HostEligibility
+    @POST("hosts/apply") suspend fun applyForHost(@Body body: Map<String, @JvmSuppressWildcards Any?>): Any
+    @GET("hosts/progression") suspend fun hostProgression(): Any
+    @GET("hosts/verification/assets") suspend fun verificationAssets(): Any
+    @Multipart @POST("hosts/verification/government-id") suspend fun uploadGovernmentId(@Part file: MultipartBody.Part): Any
+    @Multipart @POST("hosts/verification/profile-photo") suspend fun uploadProfilePhoto(@Part file: MultipartBody.Part): Any
+    @Multipart @POST("hosts/verification/documents") suspend fun uploadVerificationDocument(@Part file: MultipartBody.Part): Any
+    @PUT("hosts/verification/assets/{assetId}/replacement") suspend fun replaceVerificationAsset(
+        @Path("assetId") assetId: String,
+        @Body body: Map<String, @JvmSuppressWildcards Any?>,
+    ): Any
 
     @GET("rooms/mine") suspend fun myRooms(@Query("page") page: Int = 1, @Query("limit") limit: Int = 100): HostRoomPage
     @GET("rooms/{roomId}") suspend fun room(@Path("roomId") roomId: String): HostRoom

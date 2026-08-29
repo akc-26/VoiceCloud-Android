@@ -1,7 +1,9 @@
 package app.voicecloud.feature.settings.ui
 
 import android.text.Html
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,16 +18,30 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudMetricTile
+import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
+import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.preferences.ThemePreference
 import app.voicecloud.feature.settings.model.*
 
 @Composable
 private fun PageScaffold(title: String, subtitle: String? = null, onBack: () -> Unit, content: @Composable (PaddingValues) -> Unit) {
-    Scaffold(topBar = { VoiceCloudPageTopBar(title = title, subtitle = subtitle, onBack = onBack) }, content = content)
+    Scaffold(
+        containerColor = ConsumerColors.Cloud,
+        topBar = { VoiceCloudPageTopBar(title = title, subtitle = subtitle, onBack = onBack) },
+        content = content,
+    )
 }
 
 @Composable
@@ -35,15 +51,31 @@ private fun Feedback(state: SettingsUiState, onRetry: (() -> Unit)? = null) {
 }
 
 @Composable
+private fun SettingsVisualHero(title: String, subtitle: String, kind: VoiceCloudVisualKind = voiceCloudVisualFor(title)) {
+    VoiceCloudPageHero(
+        title = title,
+        subtitle = subtitle,
+        kind = kind,
+        badge = "VoiceCloud · Secure & personal",
+    )
+}
+
+@Composable
 private fun NavigationCard(title: String, subtitle: String, onClick: () -> Unit) {
-    ElevatedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+    VoiceCloudGlossCard(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        contentPadding = 15.dp,
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            VoiceCloudPictogram(voiceCloudVisualFor(title), size = 48.dp)
             Column(Modifier.weight(1f)) {
-                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(3.dp))
                 Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text(voiceCloudTitleCase("›"), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+            Surface(shape = CircleShape, color = ConsumerColors.SapphireSoft) {
+                Text(voiceCloudTitleCase("›"), Modifier.padding(horizontal = 11.dp, vertical = 5.dp), style = MaterialTheme.typography.headlineSmall, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
@@ -62,6 +94,7 @@ fun SettingsOverviewScreen(
             contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            item { VoiceCloudPageHero("Your VoiceCloud, Your Way", "Personalize notifications, privacy, audio, appearance and account security without losing the premium VoiceCloud experience.", VoiceCloudVisualKind.SETTINGS, badge = "Preferences & control") }
             item { NavigationCard("Notifications", "Choose How VoiceCloud Reaches You", onNotifications) }
             item { NavigationCard("Privacy", "Control Visibility And Interactions", onPrivacy) }
             item { NavigationCard("Voice & Appearance", "Tune Audio And App Appearance", onVoiceAppearance) }
@@ -78,6 +111,7 @@ fun NotificationPreferencesScreen(state: SettingsUiState, onLoad: () -> Unit, on
     PageScaffold("Notifications", "Choose how ${VoiceCloudBrand.name} notifies you.", onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Feedback(state, onLoad)
+            SettingsVisualHero("Stay In The Conversation", "Choose the alerts that matter while keeping your VoiceCloud experience calm and intentional.", VoiceCloudVisualKind.NOTIFICATION)
             ToggleRow("Email Notifications", "Account and product messages delivered by email", value.email) { value = value.copy(email = it) }
             ToggleRow("Push Notifications", "Alerts delivered to this device", value.push) { value = value.copy(push = it) }
             ToggleRow("In-App Notifications", "Activity alerts while using VoiceCloud", value.inApp) { value = value.copy(inApp = it) }
@@ -89,10 +123,11 @@ fun NotificationPreferencesScreen(state: SettingsUiState, onLoad: () -> Unit, on
 
 @Composable
 private fun ToggleRow(title: String, subtitle: String, checked: Boolean, onChecked: (Boolean) -> Unit) {
-    ElevatedCard(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+            VoiceCloudPictogram(voiceCloudVisualFor(title), size = 42.dp)
             Column(Modifier.weight(1f)) {
-                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Switch(checked = checked, onCheckedChange = onChecked)
@@ -118,6 +153,7 @@ fun PrivacySettingsScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Privacy, On Your Terms", "Control presence, direct messages and gift visibility with clear account-level safeguards.", VoiceCloudVisualKind.SECURITY) }
             item { ToggleRow("Show Online Status", "Let Others See When You’re Online", value.showOnlineStatus) { value = value.copy(showOnlineStatus = it) } }
             item { ToggleRow("Show Last Seen", "Let Others See Your Recent Activity", value.showLastSeen) { value = value.copy(showLastSeen = it) } }
             item { ToggleRow("Allow Direct Messages", "Allow Other Members To Message You", value.allowDirectMessages) { value = value.copy(allowDirectMessages = it) } }
@@ -136,13 +172,11 @@ fun PrivacySettingsScreen(
 
 @Composable
 private fun PermissionPicker(title: String, selected: String, options: List<String>, onSelected: (String) -> Unit) {
-    ElevatedCard(Modifier.fillMaxWidth()) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                options.forEach { option ->
-                    FilterChip(selected = selected.equals(option, true), onClick = { onSelected(option) }, label = { Text(voiceCloudTitleCase(option.replaceFirstChar { it.uppercase() })) })
-                }
+    VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+        Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            options.forEach { option ->
+                FilterChip(selected = selected.equals(option, true), onClick = { onSelected(option) }, label = { Text(voiceCloudTitleCase(option.replaceFirstChar { it.uppercase() })) })
             }
         }
     }
@@ -165,9 +199,10 @@ fun VoiceAppearanceScreen(
     PageScaffold("Voice & Appearance", "Audio processing and visual preferences.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Sound & Style", "Fine-tune your audio processing and visual mode for a comfortable premium listening experience.", VoiceCloudVisualKind.AUDIO) }
             item {
-                ElevatedCard(Modifier.fillMaxWidth()) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text(voiceCloudTitleCase("Appearance"), style = MaterialTheme.typography.titleLarge)
                         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             ThemePreference.entries.forEach { option ->
@@ -206,6 +241,7 @@ fun SecurityOverviewScreen(
     PageScaffold("Security", "Review current account access. ${VoiceCloudBrand.name} never displays credential tokens here.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Protected By Design", "Review sessions, devices and recent sign-ins without exposing credentials or sensitive tokens.", VoiceCloudVisualKind.SECURITY) }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     MetricCard("${snapshot?.sessions?.size ?: 0}", "Sessions", Modifier.weight(1f))
@@ -227,7 +263,7 @@ fun SecurityOverviewScreen(
 
 @Composable
 private fun MetricCard(value: String, label: String, modifier: Modifier = Modifier) {
-    ElevatedCard(modifier) { Column(Modifier.fillMaxWidth().padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text(value, style = MaterialTheme.typography.headlineMedium); Text(label, style = MaterialTheme.typography.bodySmall) } }
+    VoiceCloudMetricTile(value = value, label = label, modifier = modifier, kind = VoiceCloudVisualKind.SECURITY)
 }
 
 @Composable
@@ -236,6 +272,7 @@ fun SessionsDevicesScreen(state: SettingsUiState, onLoad: () -> Unit, onSession:
     PageScaffold("Sessions & devices", "Only safe account-facing metadata is displayed.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Trusted Sessions & Devices", "See where your account is active and revoke access from devices you no longer use.", VoiceCloudVisualKind.SECURITY) }
             item { Text(voiceCloudTitleCase("Active Sessions"), style = MaterialTheme.typography.titleLarge) }
             val sessions = state.security?.sessions.orEmpty()
             if (!state.loading && sessions.isEmpty()) item { EmptyCard("No active sessions were returned.") }
@@ -259,7 +296,7 @@ fun SessionsDevicesScreen(state: SettingsUiState, onLoad: () -> Unit, onSession:
 }
 
 @Composable
-private fun EmptyCard(message: String) { OutlinedCard(Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(message), Modifier.padding(18.dp), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+private fun EmptyCard(message: String) { VoiceCloudEmptyVisual("Nothing Here Yet", message, Modifier.fillMaxWidth(), VoiceCloudVisualKind.SECURITY) }
 
 @Composable
 fun SessionDetailScreen(state: SettingsUiState, id: String, onLoad: () -> Unit, onRevoke: () -> Unit, onBack: () -> Unit) {
@@ -268,6 +305,7 @@ fun SessionDetailScreen(state: SettingsUiState, id: String, onLoad: () -> Unit, 
     PageScaffold("Session detail", if (session?.isCurrent == true) "Current session" else null, onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Feedback(state, onLoad)
+            SettingsVisualHero("Session Details", "Review safe session metadata and revoke access when something does not look familiar.", VoiceCloudVisualKind.SECURITY)
             session?.let {
                 DetailRows(listOf(
                     "Device" to (it.deviceName ?: it.deviceType),
@@ -291,6 +329,7 @@ fun DeviceDetailScreen(state: SettingsUiState, id: String, onLoad: () -> Unit, o
     PageScaffold("Device detail", if (device?.isCurrent == true) "Current device" else null, onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Feedback(state, onLoad)
+            SettingsVisualHero("Device Details", "Review this device’s safe account metadata and access state.", VoiceCloudVisualKind.SECURITY)
             device?.let {
                 DetailRows(listOf(
                     "Device" to (it.deviceName ?: it.model ?: it.deviceType),
@@ -312,7 +351,15 @@ fun DeviceDetailScreen(state: SettingsUiState, id: String, onLoad: () -> Unit, o
 @Composable
 private fun DetailRows(rows: List<Pair<String, String?>>) {
     rows.filter { !it.second.isNullOrBlank() }.forEach { (label, value) ->
-        ElevatedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(15.dp)) { Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant); Text(value.orEmpty(), style = MaterialTheme.typography.bodyLarge) } }
+        VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 13.dp) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                VoiceCloudPictogram(voiceCloudVisualFor(label), size = 38.dp)
+                Column(Modifier.weight(1f)) {
+                    Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(value.orEmpty(), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
     }
 }
 
@@ -322,15 +369,19 @@ fun LoginActivityScreen(state: SettingsUiState, onLoad: () -> Unit, onBack: () -
     PageScaffold("Login Activity", "Recent server-authoritative account authentication events.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Recent Sign-Ins", "A clear history of server-authoritative authentication activity for your account.", VoiceCloudVisualKind.ACTIVITY) }
             val history = state.security?.history.orEmpty()
             if (!state.loading && history.isEmpty()) item { EmptyCard("No login activity was returned.") }
             items(history, key = { it.id.ifBlank { "${it.action}:${it.createdAt}:${it.ipAddress}" } }) { item ->
-                ElevatedCard(Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(item.action.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.titleMedium)
+                VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        VoiceCloudPictogram(VoiceCloudVisualKind.ACTIVITY, size = 42.dp)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(item.action.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         val meta = listOfNotNull(item.loginMethod, item.platform, item.country, item.ipAddress).filter(String::isNotBlank)
                         if (meta.isNotEmpty()) Text(meta.joinToString(" · "), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         item.createdAt?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        }
                     }
                 }
             }
@@ -344,6 +395,7 @@ fun HelpCenterScreen(state: SettingsUiState, onLoad: () -> Unit, onPage: (String
     PageScaffold("Help & Legal", "Published content is managed by VoiceCloud Admin.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Help, Policies & Guidance", "Explore VoiceCloud support content, safety guidance and published legal information.", VoiceCloudVisualKind.HELP) }
             if (!state.loading && state.cmsPages.isEmpty()) item { EmptyCard("No published help or policy pages are available right now.") }
             items(state.cmsPages, key = { it.slug }) { page -> NavigationCard(page.title, page.excerpt ?: page.category ?: "Published information") { onPage(page.slug) } }
         }
@@ -356,6 +408,7 @@ fun CmsContentScreen(state: SettingsUiState, slug: String, onLoad: () -> Unit, o
     PageScaffold(state.cmsPage?.title ?: "Information", null, onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Feedback(state, onLoad)
+            SettingsVisualHero(state.cmsPage?.title ?: "VoiceCloud Information", "Official information published and maintained by VoiceCloud.", VoiceCloudVisualKind.HELP)
             state.cmsPage?.let { page ->
                 Text(plainText(page.content), style = MaterialTheme.typography.bodyLarge)
                 page.updatedAt?.let { Text(voiceCloudTitleCase("Updated $it"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -378,6 +431,7 @@ fun SafetyCenterScreen(
     PageScaffold("Safety Center", "Safety controls and Admin-published guidance in one place.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item { Feedback(state, onLoad) }
+            item { SettingsVisualHero("Safe Conversations", "Report concerns, manage blocked users and review community safety guidance in one trusted place.", VoiceCloudVisualKind.SECURITY) }
             item { NavigationCard("Report A Person Or Room", "Search by human-readable identity and submit a supported reason", onReport) }
             item { NavigationCard("Blocked Users", "Review and unblock accounts you have blocked", onBlocked) }
             if (safetyPages.isNotEmpty()) item { Text(voiceCloudTitleCase("Safety Guidance"), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 8.dp)) }
@@ -411,9 +465,10 @@ fun ReportScreen(
     PageScaffold("Report", "Tell Us What Happened. Internal IDs Stay Hidden.", onBack) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Feedback(state) }
+            item { SettingsVisualHero("Report With Confidence", "Choose the person or room, select a supported reason and add clear details for review.", VoiceCloudVisualKind.SECURITY) }
             item {
-                ElevatedCard(Modifier.fillMaxWidth()) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text(voiceCloudTitleCase("Reported Item"), style = MaterialTheme.typography.titleLarge)
                         if (!contextual) {
                             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -435,21 +490,34 @@ fun ReportScreen(
                 }
             }
             item {
-                ElevatedCard(Modifier.fillMaxWidth()) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(voiceCloudTitleCase("Reason"), style = MaterialTheme.typography.titleLarge)
-                        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ReportReason.entries.forEach { option -> FilterChip(selected = reason == option, onClick = { reason = option }, label = { Text(voiceCloudTitleCase(option.name.replace('_', ' ').lowercase())) }) }
+                VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        VoiceCloudPictogram(VoiceCloudVisualKind.SECURITY, size = 44.dp)
+                        Column(Modifier.weight(1f)) {
+                            Text(voiceCloudTitleCase("Reason"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
+                            Text(voiceCloudTitleCase("Select the closest reason and add helpful context."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        OutlinedTextField(value = description, onValueChange = { description = it.take(1000) }, modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp), label = { Text(voiceCloudTitleCase("Details (Optional)")) }, supportingText = { Text(voiceCloudTitleCase("${description.length}/1000")) })
-                        Button(onClick = { onSubmit(reason, description) }, enabled = !state.saving && state.reportTarget != null, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(if (state.saving) "Submitting…" else "Submit report")) }
-                        Text(voiceCloudTitleCase("Add Clear Details To Help Our Safety Team Review Your Report."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReportReason.entries.forEach { option -> FilterChip(selected = reason == option, onClick = { reason = option }, label = { Text(voiceCloudTitleCase(option.name.replace('_', ' ').lowercase())) }) }
+                    }
+                    OutlinedTextField(value = description, onValueChange = { description = it.take(1000) }, modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp), label = { Text(voiceCloudTitleCase("Details (Optional)")) }, supportingText = { Text(voiceCloudTitleCase("${description.length}/1000")) })
+                    Button(onClick = { onSubmit(reason, description) }, enabled = !state.saving && state.reportTarget != null, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(if (state.saving) "Submitting…" else "Submit report")) }
+                    Text(voiceCloudTitleCase("Add Clear Details To Help Our Safety Team Review Your Report."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             if (state.reports.isNotEmpty()) item { Text(voiceCloudTitleCase("Your Reports"), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 6.dp)) }
             items(state.reports, key = { it.id }) { report ->
-                ElevatedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(15.dp)) { Text(report.targetLabel, fontWeight = FontWeight.SemiBold); Text(voiceCloudTitleCase("${report.reason.replace('_', ' ')} · ${report.status}"), color = MaterialTheme.colorScheme.onSurfaceVariant); report.createdAt?.let { Text(it, style = MaterialTheme.typography.bodySmall) } } }
+                VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        VoiceCloudPictogram(VoiceCloudVisualKind.SECURITY, size = 42.dp)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Text(report.targetLabel, fontWeight = FontWeight.ExtraBold)
+                            Text(voiceCloudTitleCase("${report.reason.replace('_', ' ')} · ${report.status}"), color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
+                            report.createdAt?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        }
+                    }
+                }
             }
         }
     }
@@ -464,6 +532,7 @@ fun ContactSupportScreen(state: SettingsUiState, defaultName: String, defaultEma
     PageScaffold("Contact Support", "Tell Us How We Can Help.", onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Feedback(state)
+            SettingsVisualHero("We’re Here To Help", "Send a support request directly to VoiceCloud with the details our team needs to respond.", VoiceCloudVisualKind.HELP)
             OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text(voiceCloudTitleCase("Full Name")) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
             OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text(voiceCloudTitleCase("Email Address")) }, modifier = Modifier.fillMaxWidth(), singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
             OutlinedTextField(value = phone, onValueChange = { phone = it }, label = { Text(voiceCloudTitleCase("Phone (Optional)")) }, modifier = Modifier.fillMaxWidth(), singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
@@ -478,13 +547,12 @@ fun ContactSupportScreen(state: SettingsUiState, defaultName: String, defaultEma
 fun AboutScreen(versionName: String, onBack: () -> Unit) {
     PageScaffold("About ${VoiceCloudBrand.name}", "Live Voice. Real Connections.", onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            ElevatedCard(Modifier.fillMaxWidth()) {
-                Column(Modifier.fillMaxWidth().padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineMedium)
-                    Text(voiceCloudTitleCase("Android $versionName"), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(voiceCloudTitleCase("A Live Voice Community Built For Listeners And Creators."), style = MaterialTheme.typography.bodyLarge)
-                }
-            }
+            VoiceCloudPageHero(
+                title = VoiceCloudBrand.name,
+                subtitle = "A live voice community built for listeners and creators. Android $versionName",
+                kind = VoiceCloudVisualKind.AUDIO,
+                badge = "Live audio · Real connections",
+            )
         }
     }
 }

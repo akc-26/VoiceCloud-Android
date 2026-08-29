@@ -49,6 +49,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
+import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
@@ -113,7 +119,8 @@ private fun LoadingScreen() {
             VoiceCloudBrandMark(72.dp, Modifier.scale(pulse))
             Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineMedium)
             Text(voiceCloudTitleCase("Real Voices. Real Connections."), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            LinearProgressIndicator(Modifier.width(120.dp), strokeCap = StrokeCap.Round)
+            VoiceCloudAnimatedWaveform(Modifier.width(220.dp).height(54.dp), color = ConsumerColors.Sapphire, active = true)
+            LinearProgressIndicator(Modifier.width(160.dp), strokeCap = StrokeCap.Round)
         }
     }
 }
@@ -130,24 +137,18 @@ private fun MessageScreen(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Card(
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        ) {
+        VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier.padding(28.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
+                VoiceCloudPictogram(voiceCloudVisualFor(title), size = 78.dp)
                 VoiceCloudBrandMark()
-                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center, fontWeight = FontWeight.ExtraBold)
                 Text(voiceCloudTitleCase(message), color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                caption?.let {
-                    Text(voiceCloudTitleCase(it), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                }
-                action?.let {
-                    Button(onClick = onAction, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(it)) }
-                }
+                caption?.let { Text(voiceCloudTitleCase(it), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center) }
+                action?.let { Button(onClick = onAction, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(it)) } }
             }
         }
     }
@@ -187,9 +188,16 @@ private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: 
             Text(VoiceCloudBrand.name, style = MaterialTheme.typography.displaySmall)
             Text(voiceCloudTitleCase("Getting VoiceCloud Ready"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(28.dp))
-            Card(shape = RoundedCornerShape(24.dp)) {
+            VoiceCloudPageHero(
+                title = "VoiceCloud Is Ready",
+                subtitle = "Secure account access, live audio and mobile configuration are prepared for your session.",
+                kind = VoiceCloudVisualKind.AUDIO,
+                badge = "Premium live audio",
+            )
+            Spacer(Modifier.height(14.dp))
+            VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(22.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     StatusRow("Mobile configuration", "Connected")

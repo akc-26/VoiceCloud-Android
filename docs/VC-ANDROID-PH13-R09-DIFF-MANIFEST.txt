@@ -1,0 +1,40 @@
+VC-ANDROID-PH13-R09 DIFF MANIFEST
+Parent tree: VC-ANDROID-PH13-R08
+
+Changed parent files: 15
+MODIFIED  CHANGELOG.md
+MODIFIED  README.md
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPageTopBar.kt
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+MODIFIED  feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+MODIFIED  feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+MODIFIED  feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+MODIFIED  feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+MODIFIED  feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+MODIFIED  feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+MODIFIED  feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+MODIFIED  feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+MODIFIED  feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+MODIFIED  feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+
+New files: 17
+ADDED     VC-ANDROID-PH13-R09-REVISION.txt
+ADDED     contracts/VC-ANDROID-PH13-R09-PH13-R08-PARENT-CANONICAL.sha256
+ADDED     core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudVisuals.kt
+ADDED     docs/VC-ANDROID-PH13-R09-AUTOMATED-EVIDENCE.md
+ADDED     docs/VC-ANDROID-PH13-R09-DIFF-MANIFEST.txt
+ADDED     docs/VC-ANDROID-PH13-R09-IMPLEMENTATION-REPORT.md
+ADDED     docs/VC-ANDROID-PH13-R09-MANUAL-QA.md
+ADDED     docs/VC-ANDROID-PH13-R09-SCREEN-COVERAGE.md
+ADDED     docs/VC-ANDROID-PH13-R09-SOURCE-GATE-RESULTS.txt
+ADDED     docs/reference/VC-ANDROID-PH13-R09-HOME-QUALITY-REFERENCE.png
+ADDED     scripts/VC-ANDROID-PH13-R09-ACCEPTANCE.cmd
+ADDED     scripts/VC-ANDROID-PH13-R09-ISOLATED-BUILD.ps1
+ADDED     scripts/VC-ANDROID-PH13-R09-SOURCE-DIAGNOSTIC.ps1
+ADDED     scripts/ph13_r09_acceptance_wiring_regression.py
+ADDED     scripts/ph13_r09_delivery_integrity.py
+ADDED     scripts/ph13_r09_full_ui_compile_risk_regression.py
+ADDED     scripts/ph13_r09_product_preservation_regression.py
+
+Missing parent files: 0

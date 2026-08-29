@@ -1,0 +1,26 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+accept=(ROOT/'scripts/VC-ANDROID-PH13-R09-ACCEPTANCE.cmd').read_text(encoding='utf-8')
+build=(ROOT/'scripts/VC-ANDROID-PH13-R09-ISOLATED-BUILD.ps1').read_text(encoding='utf-8')
+diag=(ROOT/'scripts/VC-ANDROID-PH13-R09-SOURCE-DIAGNOSTIC.ps1')
+checks=[]
+def ck(label,cond): checks.append(bool(cond)); print(('[PASS] ' if cond else '[FAIL] ')+label)
+ck('R09 source diagnostic wired','VC-ANDROID-PH13-R09-SOURCE-DIAGNOSTIC.ps1' in accept)
+ck('R09 isolated build wired','VC-ANDROID-PH13-R09-ISOLATED-BUILD.ps1' in accept)
+ck('R09 delivery integrity wired','ph13_r09_delivery_integrity.py' in accept)
+d=diag.read_text(encoding='utf-8') if diag.exists() else ''
+ck('R09 full UI compile-risk regression wired','ph13_r09_full_ui_compile_risk_regression.py' in d)
+ck('R09 product preservation regression wired','ph13_r09_product_preservation_regression.py' in d)
+for gate,task in [('1',':app:compileDebugKotlin'),('2',':app:compileStagingKotlin'),('3',':app:compileReleaseKotlin')]: ck(f'compile gate {gate} retained',f'[GATE {gate}]' in build and task in build)
+ck('debug compile uses --continue',"@(':app:compileDebugKotlin','--continue')" in build)
+ck('staging compile uses --continue',"@(':app:compileStagingKotlin','--continue')" in build)
+ck('release compile uses --continue',"@(':app:compileReleaseKotlin','--continue')" in build)
+ck('unit tests retained','[GATE 4] Unit tests' in build and "@('test')" in build)
+ck('lint retained','[GATE 5] Lint' in build and all(x in build for x in ('lintDebug','lintStaging','lintRelease')))
+ck('assemblies retained','[GATE 6] Assemblies' in build and all(x in build for x in (':app:assembleDebug',':app:assembleStaging',':app:assembleRelease',':app:assembleDebugAndroidTest')))
+ck('device gate retained','[GATE 7] Physical-device instrumentation' in build)
+ck('verified local Gradle wrapper required',r'distributionUrl=file\:///' in build)
+ck('dependent gates stop after compile failure','if ($script:compileGatesClean)' in build)
+ck('final acceptance fail-closed','exit /b 1' in accept)
+if not all(checks): raise SystemExit(1)
+print(f'[PASS] VC-ANDROID-PH13-R09 acceptance wiring: {len(checks)}/{len(checks)} PASS')

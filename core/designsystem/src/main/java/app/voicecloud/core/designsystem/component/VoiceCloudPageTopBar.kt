@@ -1,11 +1,13 @@
 package app.voicecloud.core.designsystem.component
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
+import app.voicecloud.core.designsystem.theme.ConsumerColors
 
 /**
  * Shared secondary-page chrome for the User portal.
@@ -52,9 +55,9 @@ fun VoiceCloudPageTopBar(
     val hasTrailingAction = actions != null || (actionLabel != null && onAction != null)
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
+        color = ConsumerColors.Surface.copy(alpha = .995f),
         tonalElevation = 0.dp,
-        shadowElevation = 1.dp,
+        shadowElevation = 5.dp,
     ) {
         Column(Modifier.fillMaxWidth()) {
             Box(
@@ -81,18 +84,28 @@ fun VoiceCloudPageTopBar(
                     }
                 }
 
-                Text(
-                    text = voiceCloudTitleCase(title),
+                Row(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .fillMaxWidth()
                         .padding(horizontal = if (hasTrailingAction) 108.dp else 58.dp),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                ) {
+                    VoiceCloudPictogram(
+                        kind = voiceCloudVisualFor(title),
+                        size = 32.dp,
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                    Text(
+                        text = voiceCloudTitleCase(title),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = ConsumerColors.Ink,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
 
                 if (hasTrailingAction) {
                     Row(modifier = Modifier.align(Alignment.CenterEnd), verticalAlignment = Alignment.CenterVertically) {
@@ -119,6 +132,7 @@ fun VoiceCloudPageTopBar(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            Box(Modifier.fillMaxWidth().height(1.dp).padding(horizontal = metrics.horizontalPadding).background(ConsumerColors.VipGold.copy(alpha = .28f)))
         }
     }
 }

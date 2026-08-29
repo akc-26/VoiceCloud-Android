@@ -1,0 +1,29 @@
+VC-ANDROID-PH13-R05 PRODUCT-SOURCE DIFF VS UPLOADED VC-ANDROID-PH13-R04
+Scope: UI/UX presentation only; feature/API/business logic preserved.
+
+Changed product files:
+- app/build.gradle.kts  (+1 / -1)
+- app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt  (+9 / -9)
+- branding/res/drawable/vc_brand_app_icon_foreground.xml  (+8 / -3)
+- branding/res/drawable/vc_brand_splash.xml  (+7 / -3)
+- branding/voicecloud-brand.properties  (+64 / -64)
+- core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudBrandMark.kt  (+23 / -12)
+- core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPageTopBar.kt  (+7 / -3)
+- core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt  (new, 302 lines)
+- core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt  (+9 / -3)
+- feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt  (+50 / -34)
+- feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt  (+94 / -41)
+- feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt  (+120 / -23)
+- feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt  (+79 / -22)
+- feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt  (+94 / -47)
+- feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt  (+51 / -14)
+- feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt  (+36 / -10)
+- feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt  (+20 / -4)
+- feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt  (+20 / -3)
+
+Preservation notes:
+- All parent files outside the R05 UI allowlist are byte-identical to the PH13-R04 manifest.
+- Public screen function contracts for all modified feature UI files match PH13-R04.
+- onXxx callback invocation fingerprints for all modified feature UI files match PH13-R04.
+- VoiceCloudNavHost differs only by Creator light/dark presentation wrapper selection after normalization.
+- app/build.gradle.kts differs only by launcher background design token after normalization.

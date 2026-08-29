@@ -5,6 +5,7 @@ import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +33,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
+import app.voicecloud.core.designsystem.component.VoiceCloudAudioArtwork
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.VoiceCloudLiveBadge
+import app.voicecloud.core.designsystem.component.VoiceCloudPremiumBackdrop
+import app.voicecloud.core.designsystem.component.VoiceCloudSpeakingAvatar
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
@@ -66,21 +75,30 @@ fun RoomPreviewScreen(
             state.room?.let { room ->
                 item {
                     Box(
-                        Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(ConsumerBrushes.Hero).padding(22.dp)
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(ConsumerBrushes.Hero)
+                            .border(1.dp, ConsumerColors.VipGold.copy(alpha = .45f), RoundedCornerShape(28.dp)).padding(22.dp)
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(Modifier.size(10.dp).clip(CircleShape).background(if (room.isLive) CommonColors.Error else MaterialTheme.colorScheme.outline))
-                                Spacer(Modifier.width(8.dp))
-                                Text(voiceCloudTitleCase(if (room.isLive) "LIVE" else room.status.ifBlank { "ROOM" }), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                                if (room.isLive) VoiceCloudLiveBadge() else {
+                                    VoiceCloudPictogram(VoiceCloudVisualKind.AUDIO, size = 34.dp)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(voiceCloudTitleCase(room.status.ifBlank { "ROOM" }), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                                }
                                 Spacer(Modifier.weight(1f))
                                 TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) { Text(voiceCloudTitleCase(if (state.saved) "Saved" else "Save")) }
                             }
-                            Text(room.title.ifBlank { "${VoiceCloudBrand.name} Room" }, style = MaterialTheme.typography.headlineMedium, color = ConsumerColors.Ink)
-                            if (!room.description.isNullOrBlank()) Text(room.description, color = ConsumerColors.Text, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                                    Text(room.title.ifBlank { "${VoiceCloudBrand.name} Room" }, style = MaterialTheme.typography.headlineMedium, color = ConsumerColors.Ink, fontWeight = FontWeight.ExtraBold)
+                                    if (!room.description.isNullOrBlank()) Text(room.description, color = ConsumerColors.Text, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                                }
+                                VoiceCloudAudioArtwork(Modifier.size(108.dp), dark = false)
+                            }
+                            VoiceCloudAnimatedWaveform(Modifier.fillMaxWidth().height(42.dp), color = ConsumerColors.Sapphire, active = room.isLive)
                             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                                Text(voiceCloudTitleCase("${room.listenerCount} Listening"), style = MaterialTheme.typography.bodyMedium)
-                                Text(voiceCloudTitleCase("${room.speakerCount} Speakers"), style = MaterialTheme.typography.bodyMedium)
+                                Text(voiceCloudTitleCase("${room.listenerCount} Listening"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                                Text(voiceCloudTitleCase("${room.speakerCount} Speakers"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                             }
                             val metadata = listOf(room.category, room.language).filter { it.isNotBlank() }
                             if (metadata.isNotEmpty()) Text(metadata.joinToString("  •  "), color = ConsumerColors.TextMuted)
@@ -89,11 +107,14 @@ fun RoomPreviewScreen(
                 }
                 val restrictions = room.restrictionLabels()
                 if (restrictions.isNotEmpty()) item {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(voiceCloudTitleCase("Access"), style = MaterialTheme.typography.titleMedium)
+                    VoiceCloudGlossCard {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            VoiceCloudPictogram(VoiceCloudVisualKind.SECURITY, size = 42.dp)
+                            Text(voiceCloudTitleCase("Room Access"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold)
+                        }
                         restrictions.forEach { label ->
                             Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(14.dp)) {
-                                Text(label, Modifier.padding(horizontal = 12.dp, vertical = 9.dp), fontWeight = FontWeight.SemiBold)
+                                Text(label, Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 9.dp), fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -201,7 +222,7 @@ fun LiveRoomScreen(
             }
         },
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding).background(ConsumerColors.DeepNavy)) {
+        VoiceCloudPremiumBackdrop(Modifier.fillMaxSize().padding(padding), dark = true) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(start = 18.dp, top = 12.dp, end = 62.dp, bottom = 20.dp),
@@ -227,9 +248,7 @@ fun LiveRoomScreen(
                 if (state.inRoom) {
                     item { ListenerActions(state, onToggleHand) }
                     item { SectionHeading("People", "${state.participants.size}") }
-                    itemsIndexed(state.participants.distinctBy { it.userId }, key = { index, participant -> "live-person:${participant.userId}:$index" }) { _, participant ->
-                        ParticipantCard(participant, viewerId)
-                    }
+                    item { StageRoster(state.participants.distinctBy { it.userId }, viewerId) }
                     item { ReactionsStrip(state.reactions) }
                     item { SectionHeading("Room chat", null) }
                     if (state.messages.isEmpty()) item { Text(voiceCloudTitleCase("Messages Sent In This Room Will Appear Here."), color = ConsumerColors.TextOnDarkSecondary) }
@@ -301,26 +320,44 @@ private fun LiveRoomTopBar(
 
 @Composable
 private fun LiveFloatingAction(iconRes: Int, description: String, onClick: () -> Unit) {
-    SmallFloatingActionButton(onClick = onClick, containerColor = ConsumerColors.LiveSurfaceElevated, contentColor = ConsumerColors.TextOnDark) {
-        Icon(painterResource(iconRes), contentDescription = description, tint = ConsumerColors.TextOnDark, modifier = Modifier.size(23.dp))
+    SmallFloatingActionButton(
+        onClick = onClick,
+        containerColor = ConsumerColors.LiveSurfaceElevated,
+        contentColor = ConsumerColors.TextOnDark,
+        modifier = Modifier.border(1.dp, ConsumerColors.VipGold.copy(alpha = .42f), CircleShape),
+    ) {
+        Icon(painterResource(iconRes), contentDescription = description, tint = if (description == "Gifts") ConsumerColors.VipGold else ConsumerColors.TextOnDark, modifier = Modifier.size(23.dp))
     }
 }
 
 @Composable
 private fun RoomRuntimeHeader(state: LiveRoomUiState, onRetryAudio: () -> Unit) {
     val rtcLabel = when (state.rtcState) {
-        RtcAudioState.Connected, RtcAudioState.Reconnected -> "Connected"
+        RtcAudioState.Connected, RtcAudioState.Reconnected -> "Crystal clear audio"
         RtcAudioState.Connecting -> "Connecting audio…"
         RtcAudioState.Reconnecting -> "Reconnecting…"
         is RtcAudioState.Failed -> "Audio interrupted"
-        RtcAudioState.Disconnected -> if (state.inRoom) "Disconnected" else "Preparing"
+        RtcAudioState.Disconnected -> if (state.inRoom) "Disconnected" else "Preparing room"
     }
-    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Primary).padding(18.dp)) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(voiceCloudTitleCase("Live Audio · $rtcLabel"), color = Color.White, fontWeight = FontWeight.SemiBold)
-            state.room?.let { room -> Text(voiceCloudTitleCase("${room.listenerCount} Listeners  •  ${room.speakerCount} Speakers"), color = Color.White.copy(alpha = .85f)) }
+    Box(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(26.dp))
+            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(ConsumerColors.LiveSurfaceElevated, ConsumerColors.DeepNavy)))
+            .border(1.dp, ConsumerColors.VipGold.copy(alpha = .36f), RoundedCornerShape(26.dp))
+            .padding(18.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                VoiceCloudLiveBadge()
+                Spacer(Modifier.width(9.dp))
+                Text(voiceCloudTitleCase(rtcLabel), color = ConsumerColors.TextOnDark, fontWeight = FontWeight.SemiBold)
+            }
+            state.room?.let { room ->
+                Text(room.title.ifBlank { "Live room" }, color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(voiceCloudTitleCase("${room.listenerCount} listeners  •  ${room.speakerCount} speakers"), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodyMedium)
+            }
+            VoiceCloudAnimatedWaveform(Modifier.fillMaxWidth().height(38.dp), color = ConsumerColors.Ice, active = state.inRoom && !state.paused)
             if (state.rtcState is RtcAudioState.Failed || (state.rtcState is RtcAudioState.Disconnected && state.inRoom)) {
-                TextButton(onClick = onRetryAudio) { Text(voiceCloudTitleCase("Retry Audio"), color = Color.White) }
+                TextButton(onClick = onRetryAudio) { Text(voiceCloudTitleCase("Retry audio"), color = ConsumerColors.Ice, fontWeight = FontWeight.Bold) }
             }
         }
     }
@@ -334,21 +371,95 @@ private fun ListenerActions(state: LiveRoomUiState, onToggleHand: () -> Unit) {
 }
 
 @Composable
+private fun StageRoster(participants: List<RtcPresenceState>, viewerId: String?) {
+    val speakers = participants.filter { it.role.lowercase() != "listener" || it.isSpeaking }
+    val listeners = participants.filter { it !in speakers }
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        if (speakers.isNotEmpty()) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), contentPadding = PaddingValues(horizontal = 2.dp)) {
+                itemsIndexed(speakers, key = { index, participant -> "stage:${participant.userId}:$index" }) { _, participant ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(78.dp)) {
+                        VoiceCloudSpeakingAvatar(
+                            label = participant.username?.takeIf { it.isNotBlank() } ?: if (participant.userId == viewerId) "You" else "V",
+                            speaking = participant.isSpeaking,
+                            size = 58.dp,
+                            dark = true,
+                        )
+                        Text(
+                            participant.username?.takeIf { it.isNotBlank() } ?: if (participant.userId == viewerId) "You" else "Member",
+                            color = ConsumerColors.TextOnDark,
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                        val stageState = when {
+                            participant.handRaised -> "Hand raised"
+                            participant.isSpeaking -> "Speaking"
+                            participant.isMuted && participant.role.lowercase() != "listener" -> "Muted"
+                            else -> participant.role.replace('_', ' ')
+                        }
+                        Text(
+                            voiceCloudTitleCase(stageState),
+                            color = if (participant.isSpeaking) ConsumerColors.Ice else if (participant.handRaised) ConsumerColors.VipGold else ConsumerColors.TextOnDarkSecondary,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                        )
+                    }
+                }
+            }
+        }
+        if (listeners.isNotEmpty()) {
+            Surface(color = ConsumerColors.LiveSurface.copy(alpha = .78f), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    Text(voiceCloudTitleCase("Listeners"), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelLarge)
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                        itemsIndexed(listeners.take(18), key = { index, participant -> "listener:${participant.userId}:$index" }) { _, participant ->
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(62.dp)) {
+                                VoiceCloudSpeakingAvatar(
+                                    label = participant.username?.takeIf { it.isNotBlank() } ?: if (participant.userId == viewerId) "You" else "V",
+                                    speaking = false,
+                                    size = 34.dp,
+                                    dark = true,
+                                )
+                                Text(
+                                    participant.username?.takeIf { it.isNotBlank() } ?: if (participant.userId == viewerId) "You" else "Member",
+                                    color = ConsumerColors.TextOnDarkSecondary,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Center,
+                                )
+                                if (participant.handRaised) Text(voiceCloudTitleCase("✋"), color = ConsumerColors.VipGold, style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                        if (listeners.size > 18) item {
+                            Surface(shape = CircleShape, color = ConsumerColors.LiveSurfaceElevated) {
+                                Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                                    Text(voiceCloudTitleCase("+${listeners.size - 18}"), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun ParticipantCard(participant: RtcPresenceState, viewerId: String?) {
     ElevatedCard(colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.LiveSurface), shape = RoundedCornerShape(18.dp)) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(42.dp).clip(CircleShape).background(ConsumerColors.Sapphire), contentAlignment = Alignment.Center) {
-                Text((participant.username?.firstOrNull() ?: 'V').uppercaseChar().toString(), color = Color.White, fontWeight = FontWeight.Bold)
-            }
-            Spacer(Modifier.width(12.dp))
+            VoiceCloudSpeakingAvatar(participant.username ?: "V", speaking = participant.isSpeaking, size = 42.dp, dark = true)
+            Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(participant.username?.takeIf { it.isNotBlank() } ?: if (participant.userId == viewerId) "You" else "${VoiceCloudBrand.name} member", color = ConsumerColors.TextOnDark, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                val role = participant.role.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
-                Text(voiceCloudTitleCase(role), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodyMedium)
+                Text(voiceCloudTitleCase(participant.role.replace('_', ' ')), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodyMedium)
             }
-            if (participant.handRaised) Text(voiceCloudTitleCase("✋"))
-            if (participant.isSpeaking) Text(voiceCloudTitleCase("  Speaking"), color = ConsumerColors.Ice, style = MaterialTheme.typography.labelLarge)
-            else if (participant.isMuted && participant.role.lowercase() != "listener") Text(voiceCloudTitleCase("  Muted"), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelLarge)
+            if (participant.handRaised) Text(voiceCloudTitleCase("✋"), color = ConsumerColors.VipGold)
+            if (participant.isSpeaking) Text(voiceCloudTitleCase("Speaking"), color = ConsumerColors.Ice, style = MaterialTheme.typography.labelLarge)
+            else if (participant.isMuted && participant.role.lowercase() != "listener") Text(voiceCloudTitleCase("Muted"), color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelLarge)
         }
     }
 }

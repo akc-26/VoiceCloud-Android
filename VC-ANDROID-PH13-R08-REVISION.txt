@@ -1,0 +1,4 @@
+VC-ANDROID-PH13-R08
+Parent: VC-ANDROID-PH13-R07
+Scope: Full premium UI compile closure; no feature/API/business-rule changes.
+Primary correction: AuthScreens.kt premium waveform uses AuthUiState.busy (real state contract) instead of nonexistent AuthUiState.loading.

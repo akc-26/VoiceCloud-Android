@@ -1,3 +1,65 @@
+# VC-ANDROID-PH13-R10 — R09 Device Acceptance Closure
+
+- Parent: `VC-ANDROID-PH13-R09`.
+- Android product/UI/API/runtime/build-input source remains byte-identical to R09.
+- Uses the supplied R09 workstation result as build evidence: Debug/Staging/Release compile, unit tests, lint and assemblies all passed; only Gate 7 failed because ADB install timed out on the selected wireless OnePlus device.
+- Hardens physical-device APK installation with exact installed-APK SHA-256 verification, non-incremental direct install, one transport recovery, and one push + package-manager fallback.
+- Adds a fast path that reuses the still-present hash-verified R09 isolated workspace/build artifacts.
+- Adds a bounded fallback that builds only `assembleDebug` + `assembleDebugAndroidTest`, avoiding another ~30-minute full acceptance cycle for unchanged product source.
+- Retains fail-closed device/instrumentation behavior and delivery integrity.
+
+# VC-ANDROID-PH13-R09 — Full Page-by-Page Premium UI/UX
+
+- Parent: `VC-ANDROID-PH13-R08` (working/build-accepted user baseline).
+- Applies the approved glossy premium VoiceCloud visual quality across all existing End User and Creator/Host feature screen groups rather than a theme-only pass.
+- Adds centralized pictorial/gloss primitives, audio/poster artwork, page heroes, metric tiles, rich empty states and mini charts.
+- Current source inventory contains 87 named feature screens; R09 regression requires every named screen to enter a premium visual shell.
+- Preserves R08 APIs, repositories, ViewModels, models, navigation authority, security, RTC/realtime, payment/economy authority, permissions and business rules.
+- R09 source closure: acceptance wiring 18/18 PASS, full UI compile-risk/coverage 55/55 PASS, product preservation PASS, applicable inherited source chain 26/26 PASS.
+- Use `scripts\VC-ANDROID-PH13-R09-ACCEPTANCE.cmd` for real Windows Debug/Staging/Release compilation, tests, lint, assemblies, device instrumentation and delivery integrity.
+
+# VC-ANDROID-PH13-R07
+
+- Corrected real Kotlin/Compose compilation failures reported by PH13-R06 workstation acceptance.
+- Fixed `drawArc` overload usage in `VoiceCloudBrandMark.kt` with named `style = cloudStroke`.
+- Replaced unresolved `matchParentSize` with supported `fillMaxSize` in `VoiceCloudPremium.kt`.
+- No feature, API, navigation, business-rule, permission, RTC, repository, ViewModel, or model changes.
+- Added fail-closed R07 compiler-correction/preservation regressions and faster dependent-gate handling.
+
+# VC-ANDROID-PH13-R06 — R05 Acceptance Harness Correction
+
+- Parent package: `VC-ANDROID-PH13-R05`.
+- No Android product/UI/API/runtime change; R05 implementation is preserved byte-for-byte.
+- Fixes the R05 wrapper-bootstrap defect that generated from the verified local Gradle ZIP and then rewrote runtime back to `services.gradle.org`.
+- Keeps compile/test/lint/assembly wrapper execution pinned to the verified local Gradle 9.5.0 ZIP.
+- Makes product/source integrity ignore known Android Studio/Gradle machine artifacts while remaining hash fail-closed for tracked files and fail-closed for unknown unmanifested product files.
+- Uses the cached Gradle executable for daemon cleanup to avoid the prior network-fetch cleanup path.
+- Use only `scripts\VC-ANDROID-PH13-R06-ACCEPTANCE.cmd` for workstation/device acceptance.
+
+# VC-ANDROID-PH13-R02 — Gate 8 Acceptance Harness Correction
+
+- Product/Kotlin implementation is unchanged from PH13-R01.
+- Corrects the post-build Gate 8 false failure caused by Windows wrapper-bootstrap CRLF rewriting of `gradle/wrapper/gradle-wrapper.properties`.
+- Separates post-build tracked-source integrity from distributable-ZIP cleanliness.
+- Restores canonical wrapper properties and removes generated wrapper scripts/JAR before final source-integrity verification.
+- Keeps build/cache directories permissible only in the tested workstation tree while continuing to forbid them in the delivered ZIP.
+- Adds PH13-R01 → PH13-R02 preservation and corrective regression gates.
+- Use only `scripts\VC-ANDROID-PH13-R02-ACCEPTANCE.cmd`.
+
+# VC-ANDROID-PH13-R01 — Creator Analytics, Economy & Host Verification
+
+- Adds Creator Analytics, wallet, earnings, gift history, payout request create/list/detail and Creator Notifications.
+- Adds Host eligibility/application, progression and private verification asset upload/replacement.
+- Keeps all financial state server-authoritative and adds idempotency keys to payout submission.
+- Enforces the Android prohibition on stream-key/RTMP/provider-secret reveal or regeneration.
+- Preserves the complete PH12 package outside the explicit PH13 allowlist and adds PH13 acceptance/regression gates.
+
+# VC-ANDROID-PH12-R01 — Creator Audience, Messaging, Followers & Subscribers
+
+- Added Creator Audience, follower metrics/search/sort/follow-back, direct-only Creator messaging, subscription plan create/update/archive, subscriber list/status metrics, and PH12 acceptance/preservation gates.
+- Reused existing Discovery/Engagement authorities and kept subscription/payment state server-authoritative.
+- Parent baseline: `VoiceCloud-Android-VC-ANDROID-PH11-R02` @ `fad14e236a780cbe14a74a4676a3ad94237d9bbe`.
+
 # VC-ANDROID-PH11-R02
 - Parent remains `VoiceCloud-Android-VC-ANDROID-PH10-R01` @ `999a3c310c9e40bf1a47972551050bfd5b00e54d`; PH11-R01 was not Git-frozen.
 - Corrects the R01 workstation unit-test failure after all three Kotlin compile variants passed.
@@ -149,3 +211,26 @@
 - Added a dedicated Windows line-ending regression proving real `gradle.properties` value changes are still detected.
 - No PH09 product/API/UI/security/payment/RTC scope change from R01.
 - Use `scripts\VC-ANDROID-PH09-R02-ACCEPTANCE.cmd` for workstation acceptance.
+
+
+## VC-ANDROID-PH13-R03
+- Replaced post-build mutation classification with an isolated temporary Gradle workspace.
+- Prevents Gradle-generated `gradle/gradle-daemon-jvm.properties`, wrapper files, caches, lint reports and build outputs from ever mutating the delivery/Git source tree.
+- Gate 8 now verifies the untouched original delivery manifest strictly after the isolated workspace is removed.
+- PH13 product/Kotlin implementation remains unchanged from PH13-R01/R02.
+## VC-ANDROID-PH13-R04
+- Product/Kotlin/API implementation remains unchanged from PH13-R01/R02/R03.
+- Replaces fail-fast acceptance discovery with a complete diagnostic pass: independent source checks and Android build gates continue after failures and aggregate all findings at the end.
+- Gate 8 original delivery-tree integrity now always runs after the isolated build attempt, even when an earlier build/cleanup diagnostic reports failure.
+- Gives each acceptance run a private `GRADLE_USER_HOME`, disables persistent Gradle daemons, explicitly stops the run's Gradle daemon, and uses bounded Windows cleanup retries.
+- Separates genuine source/build failures from non-source temporary-workspace cleanup warnings.
+- Corrects the stale README top-level revision label that remained PH13-R02 in the R03 package.
+- Retains strict distributable/Git-source hygiene: build/cache/wrapper/daemon-JVM artifacts remain forbidden from the original delivery tree.
+
+
+## VC-ANDROID-PH13-R08 — Premium UI compile closure
+- Fixed the remaining compiler error reported by the PH13-R07 workstation acceptance run: `AuthScreens.kt` now binds the premium waveform animation to the real `AuthUiState.busy` property instead of nonexistent `state.loading`.
+- Audited the complete premium UI change surface against declared UiState/model/design-token contracts.
+- Added a full UI compile-risk regression covering every redesigned presentation file, centralized premium primitives, RTC presence fields, economy enum references, and theme token references.
+- Compile gates now use Gradle `--continue` so independent feature-module compiler errors are surfaced in the same run rather than serially hidden behind the first failing module.
+- No APIs, repositories, ViewModels, models, navigation behavior, permissions, RTC/realtime authority, security behavior, wallet/economy rules, or backend business logic changed.

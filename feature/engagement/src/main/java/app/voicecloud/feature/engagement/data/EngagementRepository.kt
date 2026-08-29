@@ -58,6 +58,17 @@ class EngagementRepository @Inject constructor(
         return result.copy(conversations = result.conversations.distinctBy { it.id })
     }
 
+    suspend fun directConversations(search: String = ""): ConversationList {
+        val result = api.conversations(search = search.trim().ifBlank { null }, type = "direct")
+        return result.copy(conversations = result.conversations.filter { it.type.equals("direct", ignoreCase = true) }.distinctBy { it.id })
+    }
+
+    suspend fun directConversationById(id: String): Conversation {
+        val conversation = api.conversation(id)
+        require(conversation.type.equals("direct", ignoreCase = true)) { "Only direct creator conversations are available here." }
+        return conversation
+    }
+
     suspend fun conversation(id: String): Conversation = api.conversation(id)
 
     suspend fun messages(id: String): MessagePage {

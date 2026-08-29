@@ -7,6 +7,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,10 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
+import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.feature.profile.model.*
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
@@ -393,7 +402,7 @@ private fun ProfilePage(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val metrics = VoiceCloudPageMetrics.current()
-    Scaffold(topBar = { VoiceCloudPageTopBar(title, subtitle, onBack) }) { padding ->
+    Scaffold(containerColor = ConsumerColors.Cloud, topBar = { VoiceCloudPageTopBar(title, subtitle, onBack) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(
@@ -405,6 +414,14 @@ private fun ProfilePage(
             verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
         ) {
             item {
+                VoiceCloudPageHero(
+                    title = title,
+                    subtitle = subtitle ?: "Your VoiceCloud profile experience.",
+                    kind = voiceCloudVisualFor(title),
+                    badge = "VoiceCloud profile",
+                )
+            }
+            item {
                 Column(verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing), content = content)
             }
         }
@@ -413,10 +430,14 @@ private fun ProfilePage(
 
 @Composable
 private fun ProfileToolButton(title: String, subtitle: String, onClick: () -> Unit) {
-    ElevatedCard(onClick = onClick, shape = RoundedCornerShape(22.dp)) {
-        Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
-            Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable(onClick = onClick), contentPadding = 15.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            VoiceCloudPictogram(voiceCloudVisualFor(title), size = 48.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Text(voiceCloudTitleCase("›"), style = MaterialTheme.typography.headlineSmall, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -429,12 +450,7 @@ private fun StatusCards(state: ProfileUiState) {
 
 @Composable
 private fun EmptyCard(title: String, body: String) {
-    Surface(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(20.dp)) {
-        Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium)
-            Text(voiceCloudTitleCase(body), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
+    VoiceCloudEmptyVisual(title, body, Modifier.fillMaxWidth(), voiceCloudVisualFor(title))
 }
 
 @Composable
@@ -450,7 +466,11 @@ private fun ReadOnlyIdentityField(label: String, value: String) {
 
 @Composable
 private fun PersonCard(person: PersonSummary, subtitle: String? = null, trailing: (@Composable () -> Unit)? = null) {
-    ElevatedCard(shape = RoundedCornerShape(20.dp)) {
+    ElevatedCard(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth().border(1.dp, ConsumerColors.Border.copy(alpha = .6f), RoundedCornerShape(20.dp)),
+        colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.Surface),
+    ) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             RemoteMedia(
                 url = person.avatarUrl,

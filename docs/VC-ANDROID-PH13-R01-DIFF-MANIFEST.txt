@@ -1,0 +1,55 @@
+VoiceCloud Android VC-ANDROID-PH12-R01 -> VC-ANDROID-PH13-R01 Diff Manifest
+
+Parent package authority: VC-ANDROID-PH12-R01 source manifest
+Parent manifest: contracts/VC-ANDROID-PH13-R01-PH12-R01-BASELINE-CANONICAL.sha256
+
+Parent files: 435
+Unchanged parent files: 420
+Modified parent files: 15
+Deleted parent files: 0
+New PH13 delivery files before final source manifest/diff self-entry: 17
+
+=== MODIFIED PARENT FILES ===
+M  CHANGELOG.md
+M  README.md
+M  app/build.gradle.kts
+M  app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+M  feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+M  feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+M  feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+M  feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+M  feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+M  feature/creator/src/test/java/app/voicecloud/feature/creator/model/CreatorModelsTest.kt
+M  feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+M  feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+M  feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+M  feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+M  feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+
+=== DELETED PARENT FILES ===
+NONE
+
+=== NEW PH13 DELIVERY FILES ===
+A  VC-ANDROID-PH13-R01-REVISION.txt
+A  contracts/VC-ANDROID-PH12-R01-SOURCE-MANIFEST.sha256
+A  contracts/VC-ANDROID-PH13-R01-PH12-R01-BASELINE-CANONICAL.sha256
+A  docs/VC-ANDROID-PH12-R01-SOURCE-GATE-RESULTS.txt
+A  docs/VC-ANDROID-PH13-R01-AUTOMATED-EVIDENCE.md
+A  docs/VC-ANDROID-PH13-R01-IMPLEMENTATION-REPORT.md
+A  docs/VC-ANDROID-PH13-R01-MANUAL-QA.md
+A  docs/VC-ANDROID-PH13-R01-SOURCE-GATE-RESULTS.txt
+A  scripts/VC-ANDROID-PH13-R01-ACCEPTANCE.cmd
+A  scripts/ph13_r01_acceptance_wiring_regression.py
+A  scripts/ph13_r01_backend_contract_regression.py
+A  scripts/ph13_r01_compile_surface_regression.py
+A  scripts/ph13_r01_package_hygiene.py
+A  scripts/ph13_r01_preservation_regression.py
+A  scripts/ph13_r01_source_check.py
+A  scripts/ph13_r01_unit_contract_regression.py
+A  scripts/ph13_r01_whitespace_regression.py
+
+=== SCOPE NOTES ===
+- Creator Analytics, Wallet, Earnings, Gifts, Payout Requests and Notifications are PH13 Creator surfaces.
+- Host eligibility/progression/application and private verification asset upload/replacement are PH13 Host surfaces.
+- Stream-key/RTMP/provider-secret reveal or regeneration is intentionally prohibited in Android by the stricter Android product authority.
+- Real Android Gradle compile/test/lint/assembly/device acceptance remains a workstation gate; this packaging environment has no Android SDK.

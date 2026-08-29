@@ -7,12 +7,14 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,10 +28,24 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
+import app.voicecloud.core.designsystem.component.VoiceCloudHeroCard
+import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
+import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
+import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
+import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
+import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
+import app.voicecloud.core.designsystem.component.VoiceCloudLiveBadge
+import app.voicecloud.core.designsystem.component.VoiceCloudPremiumCard
+import app.voicecloud.core.designsystem.component.VoiceCloudSectionHeader
+import app.voicecloud.core.designsystem.component.VoiceCloudSpeakingAvatar
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
+import app.voicecloud.core.designsystem.theme.PortalTheme
+import app.voicecloud.core.designsystem.theme.VoiceCloudTheme
 import app.voicecloud.feature.hosting.model.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -43,18 +59,42 @@ private fun HostPage(
     title: String,
     subtitle: String? = null,
     onBack: () -> Unit,
+    dark: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val metrics = VoiceCloudPageMetrics.current()
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = { VoiceCloudPageTopBar(title, subtitle, onBack) },
-    ) { padding ->
-        Column(
-            Modifier.fillMaxSize().padding(padding).padding(horizontal = metrics.horizontalPadding).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
-            content = content,
-        )
+    VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = dark) {
+        val metrics = VoiceCloudPageMetrics.current()
+        Scaffold(
+            containerColor = if (dark) ConsumerColors.DeepNavy else MaterialTheme.colorScheme.background,
+            topBar = {
+                if (!dark) VoiceCloudPageTopBar(title, subtitle, onBack)
+                else Surface(color = ConsumerColors.DeepNavy, shadowElevation = 2.dp) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(onClick = onBack) { Text(voiceCloudTitleCase("Back"), color = ConsumerColors.TextOnDark) }
+                        Column(Modifier.weight(1f)) {
+                            Text(voiceCloudTitleCase(title), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            if (!subtitle.isNullOrBlank()) Text(subtitle, color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        VoiceCloudLiveBadge()
+                    }
+                }
+            },
+        ) { padding ->
+            Column(
+                Modifier.fillMaxSize().padding(padding).padding(horizontal = metrics.horizontalPadding).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
+            ) {
+                VoiceCloudPageHero(
+                    title = title,
+                    subtitle = subtitle ?: "Professional VoiceCloud host tools.",
+                    kind = voiceCloudVisualFor(title),
+                    badge = if (dark) "Live host console" else "Creator portal · Host tools",
+                    dark = dark,
+                    creator = !dark,
+                )
+                content()
+            }
+        }
     }
 }
 
@@ -73,11 +113,18 @@ fun HostStudioScreen(
     onRoom: (String) -> Unit,
     onSchedule: (String) -> Unit,
     onStartScheduled: (ScheduledHostRoom) -> Unit,
+    onVerification: () -> Unit,
     onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad() }
     HostPage("Host Studio", "Create, schedule and manage your audio rooms.", onBack) {
         HostingStatus(state)
+        VoiceCloudHeroCard(
+            title = "Your live studio",
+            subtitle = "Create premium audio rooms, schedule ahead and manage every host session from one place.",
+            badge = "Creator portal · Host tools",
+        ) { VoiceCloudSpeakingAvatar("H", speaking = false, size = 46.dp) }
+        OutlinedButton(onClick = onVerification, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Host Verification & Progress")) }
         if (state.eligibilityChecked) {
             val approved = state.hostProfile?.status.equals("APPROVED", true)
             if (!approved) {
@@ -99,21 +146,24 @@ fun HostStudioScreen(
                     OutlinedButton(onClick = onScheduleRoom, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Schedule"), maxLines = 1) }
                 }
                 Text(voiceCloudTitleCase("My Rooms"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                if (state.rooms.isEmpty() && !state.loading) Text(voiceCloudTitleCase("No Rooms Yet. Create Your First Room When You Are Ready To Host."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (state.rooms.isEmpty() && !state.loading) VoiceCloudEmptyVisual("No Rooms Yet", "Create Your First Room When You Are Ready To Host.", Modifier.fillMaxWidth(), VoiceCloudVisualKind.LIVE)
                 state.rooms.forEach { room -> HostRoomCard(room, { onRoom(room.id) }) }
                 Text(voiceCloudTitleCase("Scheduled"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                if (state.schedules.isEmpty() && !state.loading) Text(voiceCloudTitleCase("No Upcoming Rooms."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (state.schedules.isEmpty() && !state.loading) VoiceCloudEmptyVisual("No Upcoming Rooms", "Schedule a polished live session for your audience.", Modifier.fillMaxWidth(), VoiceCloudVisualKind.SCHEDULE)
                 state.schedules.forEach { schedule ->
-                    Card(Modifier.fillMaxWidth().clickable { onSchedule(schedule.id) }) {
-                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                            Text(schedule.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(formatSchedule(schedule.scheduledStartTime, schedule.timeZone), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text(schedule.visibility, style = MaterialTheme.typography.labelMedium)
-                                if (schedule.isPremium) Text(voiceCloudTitleCase("Ticketed"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
+                    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable { onSchedule(schedule.id) }, contentPadding = 14.dp) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            VoiceCloudPictogram(VoiceCloudVisualKind.SCHEDULE, size = 48.dp)
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(schedule.title, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(formatSchedule(schedule.scheduledStartTime, schedule.timeZone), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text(voiceCloudTitleCase(schedule.visibility), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
+                                    if (schedule.isPremium) Text(voiceCloudTitleCase("Ticketed"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.VipGold)
+                                }
                             }
-                            Button(onClick = { onStartScheduled(schedule) }) { Text(voiceCloudTitleCase("Start Room")) }
                         }
+                        Button(onClick = { onStartScheduled(schedule) }, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Start Room")) }
                     }
                 }
                 Spacer(Modifier.height(24.dp))
@@ -124,14 +174,15 @@ fun HostStudioScreen(
 
 @Composable
 private fun HostRoomCard(room: HostRoom, onOpen: () -> Unit) {
-    Card(Modifier.fillMaxWidth().clickable(onClick = onOpen)) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable(onClick = onOpen), contentPadding = 14.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            VoiceCloudPictogram(VoiceCloudVisualKind.LIVE, size = 50.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(room.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(room.category + " · " + room.status.replaceFirstChar { it.uppercase() }, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (room.isPremium || room.isTicketRequired) Text(voiceCloudTitleCase("Ticket Access Enabled"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
+                Text(room.title, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(voiceCloudTitleCase(room.category + " · " + room.status.replaceFirstChar { it.uppercase() }), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                if (room.isPremium || room.isTicketRequired) Text(voiceCloudTitleCase("Premium / Ticket Access"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.VioletDeep, fontWeight = FontWeight.Bold)
             }
-            Text(voiceCloudTitleCase("Open"), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.SemiBold)
+            Text(voiceCloudTitleCase("Open"), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.ExtraBold)
         }
     }
 }
@@ -158,6 +209,11 @@ fun RoomEditorScreen(
     var price by rememberSaveable(roomId, existing?.id) { mutableStateOf(existing?.ticketPriceAmount?.toString()?.takeIf { it != "null" } ?: "0") }
     HostPage(if (roomId == null) "Create Room" else "Room Settings", "Room access and ticket settings stay server-authoritative.", onBack) {
         HostingStatus(state)
+        VoiceCloudHeroCard(
+            title = if (roomId == null) "Create a room worth joining" else "Refine your room",
+            subtitle = "Set the room identity, audience and access controls. VoiceCloud keeps all permissions server-authoritative.",
+            badge = if (roomId == null) "Live now" else "Room settings",
+        )
         OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Room Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 3, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(category, { category = it }, label = { Text(voiceCloudTitleCase("Category")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
@@ -230,6 +286,11 @@ fun ScheduleEditorScreen(
     val context = LocalContext.current
     HostPage(if (scheduleId == null) "Schedule Room" else "Edit Schedule", "Times are shown in your device time zone (${zone.id}).", onBack) {
         HostingStatus(state)
+        VoiceCloudHeroCard(
+            title = if (scheduleId == null) "Plan your next room" else "Refine your schedule",
+            subtitle = "Choose a local date and time, then configure access exactly as your VoiceCloud audience needs.",
+            badge = "Smart scheduling",
+        )
         OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 2, modifier = Modifier.fillMaxWidth())
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -299,12 +360,15 @@ fun HostRoomManageScreen(
     HostPage("Room Management", room?.title, onBack) {
         HostingStatus(state)
         if (room != null) {
-            Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(room.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text(voiceCloudTitleCase("${room.status.replaceFirstChar { it.uppercase() }} · ${room.participantCount} Participants"))
-                    if (room.isPrivate || room.isInviteOnly) Text(voiceCloudTitleCase("Restricted Access"), color = ConsumerColors.SapphireDeep)
-                    if (room.isTicketRequired || room.isPremium) Text(voiceCloudTitleCase("Ticket Access Enabled"), color = ConsumerColors.SapphireDeep)
+            VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    VoiceCloudPictogram(VoiceCloudVisualKind.LIVE, size = 54.dp)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Text(room.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
+                        Text(voiceCloudTitleCase("${room.status.replaceFirstChar { it.uppercase() }} · ${room.participantCount} Participants"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (room.isPrivate || room.isInviteOnly) Text(voiceCloudTitleCase("Restricted Access"), color = ConsumerColors.SapphireDeep, style = MaterialTheme.typography.labelMedium)
+                        if (room.isTicketRequired || room.isPremium) Text(voiceCloudTitleCase("Ticket Access Enabled"), color = ConsumerColors.VipGold, style = MaterialTheme.typography.labelMedium)
+                    }
                 }
             }
             OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Room Settings")) }
@@ -361,12 +425,21 @@ fun HostLiveConsoleScreen(
     var inviteQuery by rememberSaveable { mutableStateOf("") }
     val room = state.selectedRoom
     val stage = state.stage
-    HostPage("Host Console", room?.title ?: "Live room", onBack) {
+    HostPage("Host Console", room?.title ?: "Live room", onBack, dark = true) {
         HostingStatus(state)
         VoiceCloudToastEffect(if (permissionDenied) "Microphone Permission Is Required To Speak" else null, null)
-        Card(Modifier.fillMaxWidth().background(ConsumerBrushes.Hero)) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(voiceCloudTitleCase(if (state.rtcConnected) "Live audio connected" else "Connecting live audio…"), fontWeight = FontWeight.Bold)
+        Card(
+            Modifier.fillMaxWidth().border(1.dp, ConsumerColors.VipGold.copy(alpha = .38f), RoundedCornerShape(26.dp)),
+            shape = RoundedCornerShape(26.dp),
+            colors = CardDefaults.cardColors(containerColor = ConsumerColors.LiveSurface),
+        ) {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    VoiceCloudLiveBadge()
+                    Spacer(Modifier.width(9.dp))
+                    Text(voiceCloudTitleCase(if (state.rtcConnected) "Live audio connected" else "Connecting live audio…"), color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
+                }
+                VoiceCloudAnimatedWaveform(Modifier.fillMaxWidth().height(40.dp), color = ConsumerColors.Ice, active = state.rtcConnected && !state.microphoneBusy)
                 Button(
                     enabled = state.rtcConnected && !state.microphoneBusy,
                     onClick = {
@@ -385,7 +458,7 @@ fun HostLiveConsoleScreen(
                 if (onInteractive != null) OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Polls & Quiz")) }
             }
         }
-        Text(voiceCloudTitleCase("Raised Hands"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        VoiceCloudSectionHeader("Raised Hands", dark = true)
         if (state.stage?.handQueue.isNullOrEmpty()) Text(voiceCloudTitleCase("No Raised Hands Right Now."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         stage?.handQueue.orEmpty().forEach { hand ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -394,7 +467,7 @@ fun HostLiveConsoleScreen(
                 Button(onClick = { onApprove(hand.userId) }) { Text(voiceCloudTitleCase("Approve")) }
             }
         }
-        Text(voiceCloudTitleCase("Speakers"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        VoiceCloudSectionHeader("Speakers", dark = true)
         stage?.speakers.orEmpty().forEach { speaker ->
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(speaker.username ?: stageName(speaker.userId, stage, viewerId), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -404,7 +477,7 @@ fun HostLiveConsoleScreen(
                 }
             }
         }
-        Text(voiceCloudTitleCase("Audience"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        VoiceCloudSectionHeader("Audience", dark = true)
         val currentSpeakers = stage?.speakers.orEmpty()
         stage?.participants.orEmpty()
             .filter { participant -> currentSpeakers.none { speaker -> speaker.userId == participant.userId } }
@@ -415,7 +488,7 @@ fun HostLiveConsoleScreen(
                 if (participant.userId != viewerId) TextButton(onClick = { onInviteSpeaker(participant.userId) }) { Text(voiceCloudTitleCase("Invite To Stage")) }
             }
         }
-        Text(voiceCloudTitleCase("Invite Participant"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        VoiceCloudSectionHeader("Invite Participant", dark = true)
         OutlinedTextField(
             inviteQuery, { inviteQuery = it; onSearchInvite(it) }, label = { Text(voiceCloudTitleCase("Search People")) },
             singleLine = true, modifier = Modifier.fillMaxWidth()
@@ -473,15 +546,18 @@ fun PollsQuizScreen(
             enabled = pollTitle.trim().isNotBlank() && parsedPollOptions.size >= 2,
         ) { Text(voiceCloudTitleCase("Create Poll")) }
         state.polls.forEach { poll ->
-            Card(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(poll.title, fontWeight = FontWeight.Bold)
-                    Text(voiceCloudTitleCase(poll.status), style = MaterialTheme.typography.labelMedium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (!poll.status.equals("ACTIVE", true)) TextButton(onClick = { onStartPoll(poll.id) }) { Text(voiceCloudTitleCase("Start")) }
-                        else TextButton(onClick = { onStopPoll(poll.id) }) { Text(voiceCloudTitleCase("Stop")) }
-                        TextButton(onClick = { onDeletePoll(poll.id) }) { Text(voiceCloudTitleCase("Delete")) }
+            VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    VoiceCloudPictogram(VoiceCloudVisualKind.AUDIENCE, size = 44.dp)
+                    Column(Modifier.weight(1f)) {
+                        Text(poll.title, fontWeight = FontWeight.ExtraBold)
+                        Text(voiceCloudTitleCase(poll.status), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                     }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (!poll.status.equals("ACTIVE", true)) TextButton(onClick = { onStartPoll(poll.id) }) { Text(voiceCloudTitleCase("Start")) }
+                    else TextButton(onClick = { onStopPoll(poll.id) }) { Text(voiceCloudTitleCase("Stop")) }
+                    TextButton(onClick = { onDeletePoll(poll.id) }) { Text(voiceCloudTitleCase("Delete")) }
                 }
             }
         }
@@ -489,16 +565,19 @@ fun PollsQuizScreen(
         Text(voiceCloudTitleCase("Quiz"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         val active = state.activeQuiz
         if (active != null) {
-            Card(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(active.title, fontWeight = FontWeight.Bold)
-                    Text(voiceCloudTitleCase("${active.status} · Round ${active.currentRound ?: 0}/${active.totalRounds}"))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (!active.status.equals("ACTIVE", true)) Button(onClick = { onStartQuiz(active.id) }) { Text(voiceCloudTitleCase("Start")) }
-                        else {
-                            OutlinedButton(onClick = { onNextQuiz(active.id) }) { Text(voiceCloudTitleCase("Next Round")) }
-                            OutlinedButton(onClick = { onStopQuiz(active.id) }) { Text(voiceCloudTitleCase("Stop")) }
-                        }
+            VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    VoiceCloudPictogram(VoiceCloudVisualKind.REWARD, size = 44.dp)
+                    Column(Modifier.weight(1f)) {
+                        Text(active.title, fontWeight = FontWeight.ExtraBold)
+                        Text(voiceCloudTitleCase("${active.status} · Round ${active.currentRound ?: 0}/${active.totalRounds}"), color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (!active.status.equals("ACTIVE", true)) Button(onClick = { onStartQuiz(active.id) }) { Text(voiceCloudTitleCase("Start")) }
+                    else {
+                        OutlinedButton(onClick = { onNextQuiz(active.id) }) { Text(voiceCloudTitleCase("Next Round")) }
+                        OutlinedButton(onClick = { onStopQuiz(active.id) }) { Text(voiceCloudTitleCase("Stop")) }
                     }
                 }
             }
@@ -524,3 +603,135 @@ private fun formatSchedule(iso: String, zoneId: String): String = runCatching {
     val zone = runCatching { ZoneId.of(zoneId) }.getOrDefault(ZoneId.systemDefault())
     OffsetDateTime.parse(iso).atZoneSameInstant(zone).format(DateTimeFormatter.ofPattern("dd MMM yyyy · hh:mm a z"))
 }.getOrDefault(iso)
+
+@Composable
+fun HostVerificationScreen(
+    state: HostingUiState,
+    onLoad: () -> Unit,
+    onApply: (String, String?, String?, List<String>, List<String>, String?) -> Unit,
+    onUpload: (HostVerificationAssetKind, ByteArray, String, String) -> Unit,
+    onReplace: (String, HostVerificationAssetKind, ByteArray, String, String) -> Unit,
+    onBack: () -> Unit,
+) {
+    val context = LocalContext.current
+    var pendingReplacement by remember { mutableStateOf<HostVerificationAsset?>(null) }
+    var realName by rememberSaveable { mutableStateOf("") }
+    var bio by rememberSaveable { mutableStateOf("") }
+    var country by rememberSaveable { mutableStateOf("") }
+    var languages by rememberSaveable { mutableStateOf("") }
+    var categories by rememberSaveable { mutableStateOf("") }
+    var experience by rememberSaveable { mutableStateOf("") }
+
+    fun deliver(uri: android.net.Uri?, kind: HostVerificationAssetKind, replacement: HostVerificationAsset? = null) {
+        if (uri == null) return
+        runCatching {
+            val resolver = context.contentResolver
+            val bytes = resolver.openInputStream(uri)?.use { it.readBytes() } ?: error("Unable to read selected file.")
+            val mime = resolver.getType(uri).orEmpty().ifBlank { "application/octet-stream" }
+            var name = uri.lastPathSegment.orEmpty().substringAfterLast('/').ifBlank { "verification-file" }
+            resolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) cursor.getString(0)?.takeIf(String::isNotBlank)?.let { name = it }
+            }
+            Triple(bytes, name, mime)
+        }.onSuccess { (bytes, name, mime) ->
+            if (replacement == null) onUpload(kind, bytes, name, mime)
+            else onReplace(replacement.id, kind, bytes, name, mime)
+        }
+    }
+
+    val governmentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { deliver(it, HostVerificationAssetKind.GOVERNMENT_ID) }
+    val photoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { deliver(it, HostVerificationAssetKind.PROFILE_PHOTO) }
+    val documentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { deliver(it, HostVerificationAssetKind.SUPPORTING_DOCUMENT) }
+    val replacementLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        val asset = pendingReplacement
+        pendingReplacement = null
+        if (asset != null) deliver(uri, verificationKind(asset.type), asset)
+    }
+
+    LaunchedEffect(Unit) { onLoad() }
+    HostPage("Host Verification", "Private identity verification and host progression.", onBack) {
+        HostingStatus(state)
+        val profile = state.hostProfile
+        val eligibility = state.eligibility
+        ElevatedCard(Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(voiceCloudTitleCase("Host Status"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(voiceCloudTitleCase(profile?.status?.ifBlank { "Not Applied" } ?: "Not Applied"), color = MaterialTheme.colorScheme.primary)
+                profile?.rejectionReason?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                if (eligibility != null) {
+                    Text(voiceCloudTitleCase(if (eligibility.eligible) "Eligible To Apply" else "Eligibility Requirements Pending"))
+                    eligibility.reasons.forEach { Text(voiceCloudTitleCase("• $it"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                }
+                if (profile == null && eligibility?.eligible == true && eligibility.applicationsEnabled) {
+                    OutlinedTextField(realName, { realName = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Real Name")) }, singleLine = true)
+                    OutlinedTextField(bio, { bio = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Bio")) }, minLines = 2, maxLines = 4)
+                    OutlinedTextField(country, { country = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Country")) }, singleLine = true)
+                    OutlinedTextField(languages, { languages = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Languages")) }, supportingText = { Text(voiceCloudTitleCase("Separate With Commas")) })
+                    OutlinedTextField(categories, { categories = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Creator Categories")) }, supportingText = { Text(voiceCloudTitleCase("Separate With Commas")) })
+                    OutlinedTextField(experience, { experience = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Hosting Experience")) }, minLines = 2, maxLines = 4)
+                    Button(
+                        onClick = { onApply(realName, bio.takeIf(String::isNotBlank), country.takeIf(String::isNotBlank), languages.split(',').map(String::trim).filter(String::isNotBlank), categories.split(',').map(String::trim).filter(String::isNotBlank), experience.takeIf(String::isNotBlank)) },
+                        enabled = realName.isNotBlank() && !state.verificationBusy,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(voiceCloudTitleCase(if (state.verificationBusy) "Submitting…" else "Apply To Become A Host")) }
+                }
+            }
+        }
+
+        state.progression?.let { progression ->
+            Text(voiceCloudTitleCase("Progression"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            progression.metrics.forEach { metric ->
+                ElevatedCard(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth().padding(14.dp)) {
+                        Text(voiceCloudTitleCase(metric.label), Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(metric.value, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+
+        Text(voiceCloudTitleCase("Private Verification Files"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(
+            voiceCloudTitleCase("Files Are Sent Only Through VoiceCloud's Authenticated Verification APIs And Are Not Published As Profile Media."),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Button(onClick = { governmentLauncher.launch(arrayOf("image/*", "application/pdf")) }, enabled = !state.verificationBusy, modifier = Modifier.fillMaxWidth()) {
+            Text(voiceCloudTitleCase("Upload Government ID"))
+        }
+        OutlinedButton(onClick = { photoLauncher.launch(arrayOf("image/*")) }, enabled = !state.verificationBusy, modifier = Modifier.fillMaxWidth()) {
+            Text(voiceCloudTitleCase("Upload Verification Selfie"))
+        }
+        OutlinedButton(onClick = { documentLauncher.launch(arrayOf("image/*", "application/pdf")) }, enabled = !state.verificationBusy, modifier = Modifier.fillMaxWidth()) {
+            Text(voiceCloudTitleCase("Upload Supporting Document"))
+        }
+
+        if (state.verificationAssets.isEmpty() && !state.loading) {
+            Text(voiceCloudTitleCase("No Verification Assets Are Currently Returned By VoiceCloud."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        state.verificationAssets.forEach { asset ->
+            ElevatedCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(voiceCloudTitleCase(asset.type.replace('_', ' ').ifBlank { "Verification Asset" }), fontWeight = FontWeight.Bold)
+                    if (asset.status.isNotBlank()) Text(voiceCloudTitleCase(asset.status), color = MaterialTheme.colorScheme.primary)
+                    asset.fileName?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    asset.rejectionReason?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    if (asset.status.equals("REJECTED", true) || asset.rejectionReason != null) {
+                        OutlinedButton(onClick = { pendingReplacement = asset; replacementLauncher.launch(arrayOf("image/*", "application/pdf")) }, enabled = !state.verificationBusy) {
+                            Text(voiceCloudTitleCase("Replace Rejected File"))
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(30.dp))
+    }
+}
+
+private fun verificationKind(raw: String): HostVerificationAssetKind {
+    val normalized = raw.uppercase()
+    return when {
+        "GOVERNMENT" in normalized || "ID" == normalized -> HostVerificationAssetKind.GOVERNMENT_ID
+        "PHOTO" in normalized || "SELFIE" in normalized || "PROFILE" in normalized -> HostVerificationAssetKind.PROFILE_PHOTO
+        else -> HostVerificationAssetKind.SUPPORTING_DOCUMENT
+    }
+}

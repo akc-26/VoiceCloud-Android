@@ -7,7 +7,28 @@ data class HostProfile(
     val verificationBadge: Boolean = false,
     val displayName: String? = null,
     val username: String? = null,
+    val hostLevel: Int = 0,
+    val realName: String? = null,
+    val rejectionReason: String? = null,
+    val hasGovernmentIdUploaded: Boolean = false,
+    val hasProfilePhotoUploaded: Boolean = false,
+    val hasVerificationDocumentsUploaded: Boolean = false,
 )
+
+data class HostProgressMetric(val key: String, val label: String, val value: String)
+data class HostProgression(val metrics: List<HostProgressMetric> = emptyList(), val updatedAt: String? = null)
+
+data class HostVerificationAsset(
+    val id: String = "",
+    val type: String = "",
+    val status: String = "",
+    val fileName: String? = null,
+    val mimeType: String? = null,
+    val rejectionReason: String? = null,
+    val createdAt: String? = null,
+)
+
+enum class HostVerificationAssetKind { GOVERNMENT_ID, PROFILE_PHOTO, SUPPORTING_DOCUMENT }
 
 data class HostNumericRequirement(val current: Int = 0, val minimum: Int = 0, val met: Boolean = false)
 data class HostStandingRequirement(val required: Boolean = false, val met: Boolean = false)
@@ -256,6 +277,9 @@ data class HostingUiState(
     val eligibilityChecked: Boolean = false,
     val hostProfile: HostProfile? = null,
     val eligibility: HostEligibility? = null,
+    val progression: HostProgression? = null,
+    val verificationAssets: List<HostVerificationAsset> = emptyList(),
+    val verificationBusy: Boolean = false,
     val rooms: List<HostRoom> = emptyList(),
     val schedules: List<ScheduledHostRoom> = emptyList(),
     val selectedRoom: HostRoom? = null,

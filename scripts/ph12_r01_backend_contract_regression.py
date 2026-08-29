@@ -1,0 +1,20 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+checks=[]
+def r(p): return (ROOT/p).read_text(encoding='utf-8')
+def ck(n,o): checks.append(bool(o)); print(('[PASS] ' if o else '[FAIL] ')+n)
+api=r('feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt'); repo=r('feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt'); eng=r('feature/engagement/src/main/java/app/voicecloud/feature/engagement/data/EngagementRepository.kt'); disc=r('feature/discovery/src/main/java/app/voicecloud/feature/discovery/data/DiscoveryRepository.kt')
+for verb,path in [('GET','creator/plans'),('POST','creator/plans'),('PATCH','creator/plans/{id}'),('DELETE','creator/plans/{id}'),('GET','creator/subscribers')]: ck(f'{verb} {path} wired',f'@{verb}("{path}")' in api)
+for field in ['"title" to','"description" to','"monthlyPrice" to','"yearlyPrice" to','"benefits" to','"visibility" to']: ck('CreateCreatorPlan DTO field '+field.split()[0],field in repo)
+ck('Update plan sends documented status','"status" to cleanStatus' in repo)
+ck('Plan status allowlist exact', 'setOf("DRAFT", "ACTIVE", "ARCHIVED")' in repo)
+ck('Visibility allowlist exact','setOf("PUBLIC", "PRIVATE", "CLUB_ONLY", "LINK_ONLY")' in repo)
+ck('Archive uses DELETE authority','api.archivePlan(id)' in repo)
+ck('Subscribers status allowlist exact','setOf("ACTIVE", "CANCELLED", "EXPIRED", "PENDING")' in repo)
+ck('Unknown subscriber total remains nullable','val total: Int? = null' in r('feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt'))
+ck('Direct conversations call backend type direct','api.conversations(search = search.trim().ifBlank { null }, type = "direct")' in eng)
+ck('Follow mutations use canonical users follow endpoints','setFollowing(userId: String, follow: Boolean)' in disc)
+ck('No fabricated payment completion model','paymentStatus' not in repo and 'paid' not in repo.lower())
+passed=sum(checks)
+if passed!=len(checks): raise SystemExit(f'[FAIL] VC-ANDROID-PH12-R01 backend contract: {passed}/{len(checks)} PASS')
+print(f'[PASS] VC-ANDROID-PH12-R01 backend contract: {passed}/{len(checks)} PASS')

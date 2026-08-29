@@ -50,17 +50,27 @@ Write-Host "[INFO] Generating standard Gradle Wrapper $version from verified loc
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $propsPath = Join-Path $root 'gradle\wrapper\gradle-wrapper.properties'
+# Keep the acceptance wrapper pinned to the already verified local ZIP.
+# R05 generated the wrapper from this ZIP and then accidentally rewrote the
+# URL back to services.gradle.org, forcing every compile gate to redownload it.
+$escapedLocalDistributionUri = $localDistributionUri -replace ':', '\:'
 $props = @(
     'distributionBase=GRADLE_USER_HOME',
     'distributionPath=wrapper/dists',
     "distributionSha256Sum=$distributionSha256",
-    "distributionUrl=https\://services.gradle.org/distributions/gradle-$version-bin.zip",
+    "distributionUrl=$escapedLocalDistributionUri",
     'networkTimeout=60000',
     'validateDistributionUrl=true',
     'zipStoreBase=GRADLE_USER_HOME',
     'zipStorePath=wrapper/dists'
 )
 Set-Content -Path $propsPath -Value $props -Encoding ASCII
+
+$writtenProps = Get-Content -LiteralPath $propsPath -Raw
+if (-not $writtenProps.Contains('distributionUrl=file\:///')) {
+    throw 'Generated wrapper is not pinned to the verified local Gradle distribution.'
+}
+Write-Host "[PASS] Wrapper runtime pinned to verified local Gradle ZIP: $resolvedZipPath"
 
 if (-not (Test-Path 'gradle\wrapper\gradle-wrapper.jar')) { throw 'Gradle wrapper JAR was not generated.' }
 if (-not (Test-Path 'gradlew.bat')) { throw 'gradlew.bat was not generated.' }

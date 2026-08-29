@@ -101,6 +101,34 @@ class DiscoveryRepository @Inject constructor(private val api: DiscoveryApi) {
     suspend fun following(viewer: ViewerIdentity, search: String = ""): List<VoiceCloudUser> =
         visibleUsers(api.following(search = search.trim().ifBlank { null }).data, viewer)
 
+    suspend fun followersPage(viewer: ViewerIdentity, search: String = "", page: Int = 1, limit: Int = 50): PaginatedData<VoiceCloudUser> {
+        val raw = api.followers(page = page, limit = limit, search = search.trim().ifBlank { null })
+        return raw.copy(data = visibleUsers(raw.data, viewer))
+    }
+
+    suspend fun followingPage(viewer: ViewerIdentity, search: String = "", page: Int = 1, limit: Int = 50): PaginatedData<VoiceCloudUser> {
+        val raw = api.following(page = page, limit = limit, search = search.trim().ifBlank { null })
+        return raw.copy(data = visibleUsers(raw.data, viewer))
+    }
+
+    suspend fun allFollowers(viewer: ViewerIdentity, search: String = ""): PaginatedData<VoiceCloudUser> {
+        val first = followersPage(viewer, search, page = 1, limit = 100)
+        val pages = maxOf(first.totalPages, if (first.total > 0) (first.total + first.limit - 1) / first.limit else 1)
+        if (pages <= 1) return first
+        val all = first.data.toMutableList()
+        for (page in 2..pages.coerceAtMost(1000)) all += followersPage(viewer, search, page, 100).data
+        return first.copy(data = all.distinctBy { it.id })
+    }
+
+    suspend fun allFollowing(viewer: ViewerIdentity): PaginatedData<VoiceCloudUser> {
+        val first = followingPage(viewer, page = 1, limit = 100)
+        val pages = maxOf(first.totalPages, if (first.total > 0) (first.total + first.limit - 1) / first.limit else 1)
+        if (pages <= 1) return first
+        val all = first.data.toMutableList()
+        for (page in 2..pages.coerceAtMost(1000)) all += followingPage(viewer, page = page, limit = 100).data
+        return first.copy(data = all.distinctBy { it.id })
+    }
+
     suspend fun friends(viewer: ViewerIdentity): List<FriendListItem> = coroutineScope {
         friendItems(api.friends()).map { item ->
             async { authoritativeRelationshipUser(item.user, viewer)?.let { item.copy(user = it) } }
