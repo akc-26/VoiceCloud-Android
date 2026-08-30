@@ -147,12 +147,18 @@ fun VoiceCloudHeroCard(
                     Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = bodyColor, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 }
                 if (trailing != null) trailing.invoke(this)
-                else VoiceCloudPictogram(
-                    kind = voiceCloudVisualFor(title),
-                    size = 62.dp,
-                    dark = dark,
-                    modifier = Modifier.padding(start = 12.dp),
-                )
+                else Box(
+                    Modifier.padding(start = 12.dp).size(width = 92.dp, height = 78.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, ConsumerColors.VipGold.copy(alpha=.28f), RoundedCornerShape(20.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    VoiceCloudPosterArtwork(
+                        kind = voiceCloudVisualFor(title),
+                        modifier = Modifier.fillMaxSize(),
+                        dark = dark,
+                    )
+                }
             }
         }
     }
@@ -245,7 +251,6 @@ fun VoiceCloudSpeakingAvatar(
         animationSpec = infiniteRepeatable(tween(if (speaking && motionEnabled) 850 else 100000), RepeatMode.Reverse),
         label = "speaker-pulse",
     )
-    val initial = label.firstOrNull()?.uppercaseChar()?.toString() ?: "V"
     val avatarDiameter = size
     Box(modifier.size(avatarDiameter + 14.dp), contentAlignment = Alignment.Center) {
         if (speaking) {
@@ -256,11 +261,24 @@ fun VoiceCloudSpeakingAvatar(
         }
         Box(
             Modifier.size(avatarDiameter).clip(CircleShape)
-                .background(Brush.linearGradient(listOf(ConsumerColors.Sapphire, ConsumerColors.SapphireDeep)))
+                .background(Brush.linearGradient(listOf(ConsumerColors.SapphireSoft, ConsumerColors.SurfaceSoft)))
                 .border(2.dp, if (speaking) ConsumerColors.Ice else ConsumerColors.VipGold.copy(alpha = .72f), CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Text(initial, color = Color.White, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge)
+            Canvas(Modifier.fillMaxSize().padding(avatarDiameter * .18f)) {
+                val canvasSize = this.size
+                val center = Offset(canvasSize.width / 2f, canvasSize.height * .36f)
+                drawCircle(ConsumerColors.SapphireDeep, radius = canvasSize.minDimension * .19f, center = center)
+                drawArc(
+                    color = ConsumerColors.SapphireDeep,
+                    startAngle = 200f,
+                    sweepAngle = 140f,
+                    useCenter = false,
+                    topLeft = Offset(canvasSize.width * .16f, canvasSize.height * .43f),
+                    size = Size(canvasSize.width * .68f, canvasSize.height * .48f),
+                    style = Stroke(width = canvasSize.minDimension * .14f, cap = StrokeCap.Round),
+                )
+            }
         }
     }
 }

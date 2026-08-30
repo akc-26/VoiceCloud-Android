@@ -1,5 +1,6 @@
 param(
-    [string]$ProjectRoot = ''
+    [string]$ProjectRoot = '',
+    [switch]$PreflightOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -287,6 +288,11 @@ if ($currentUserResult.ExitCode -ne 0 -or $currentUserResult.TimedOut -or -not [
     exit 1
 }
 Write-Host "[PASS] Foreground Android user resolved: $currentUser"
+
+if ($PreflightOnly) {
+    Write-Host '[PASS] Device preflight completed; healthy authorized device/user is ready for instrumentation.'
+    exit 0
+}
 
 if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
     $projectRootResolved = Split-Path -Parent $PSScriptRoot

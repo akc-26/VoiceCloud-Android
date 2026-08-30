@@ -53,6 +53,7 @@ import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
 import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
 import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
 import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudPosterArtwork
 import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
 import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
@@ -143,8 +144,10 @@ private fun MessageScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                VoiceCloudPictogram(voiceCloudVisualFor(title), size = 78.dp)
-                VoiceCloudBrandMark()
+                Box(Modifier.fillMaxWidth().height(118.dp).background(ConsumerColors.SurfaceSoft, RoundedCornerShape(22.dp))) {
+                    VoiceCloudPosterArtwork(voiceCloudVisualFor(title), Modifier.fillMaxSize(), dark = false)
+                    VoiceCloudBrandMark(52.dp, Modifier.align(Alignment.Center))
+                }
                 Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center, fontWeight = FontWeight.ExtraBold)
                 Text(voiceCloudTitleCase(message), color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                 caption?.let { Text(voiceCloudTitleCase(it), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center) }
@@ -173,45 +176,17 @@ private fun ForceUpdateScreen(state: BootstrapState.ForceUpdate) {
 @Composable
 private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: Boolean) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(ConsumerColors.Surface, ConsumerColors.Cloud, ConsumerColors.SurfaceSoft)))
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().background(ConsumerColors.Surface).padding(horizontal = 28.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            VoiceCloudBrandMark(68.dp)
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            VoiceCloudBrandMark(78.dp)
+            Text(VoiceCloudBrand.name, style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+            Text("LIVE AUDIO. REAL CONNECTIONS.", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.VipGold, letterSpacing = androidx.compose.ui.unit.TextUnit.Unspecified)
             Spacer(Modifier.height(18.dp))
-            Text(VoiceCloudBrand.name, style = MaterialTheme.typography.displaySmall)
-            Text(voiceCloudTitleCase("Getting VoiceCloud Ready"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.height(28.dp))
-            VoiceCloudPageHero(
-                title = "VoiceCloud Is Ready",
-                subtitle = "Secure account access, live audio and mobile configuration are prepared for your session.",
-                kind = VoiceCloudVisualKind.AUDIO,
-                badge = "Premium live audio",
-            )
-            Spacer(Modifier.height(14.dp))
-            VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    StatusRow("Mobile configuration", "Connected")
-                    StatusRow(
-                        "Login capabilities",
-                        if (loginMethods.isEmpty()) "Backend controlled" else loginMethods.joinToString(" · ") {
-                            it.replaceFirstChar { char -> char.uppercaseChar() }
-                        },
-                    )
-                    StatusRow("Live audio", if (liveKitAvailable) "Available" else "Backend controlled")
-                    HorizontalDivider()
-                    Text(voiceCloudTitleCase("Secure Account Access Is Loading"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+            VoiceCloudAnimatedWaveform(Modifier.fillMaxWidth().height(64.dp), color = ConsumerColors.Sapphire, active = true)
+            Text("Connecting voices…", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+            LinearProgressIndicator(Modifier.width(150.dp), color = ConsumerColors.Sapphire, trackColor = ConsumerColors.SapphireSoft, strokeCap = StrokeCap.Round)
         }
     }
 }

@@ -1,0 +1,23 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+ps=(ROOT/'scripts/VC-ANDROID-PH13-R13-DEVICE-CLOSURE.ps1').read_text(encoding='utf-8')
+checks=[]
+def ck(label,cond): checks.append(bool(cond)); print(('[PASS] ' if cond else '[FAIL] ')+label)
+ck('R13 verifies build-proven runtime manifest before device work','Test-RuntimeManifest -Root $sourceRoot' in ps)
+ck('R13 preflights device before prior-workspace/test build','-PreflightOnly' in ps and ps.index('-PreflightOnly') < ps.index('$workspace = Find-PriorWorkspace'))
+ck('no healthy device remains pending exit 2',"$preflightRc -eq 2" in ps and 'exit 2' in ps)
+ck('R13 searches the actual R12/R11 temporary workspace pattern','VoiceCloud-PH13-R11-DEVICE-*' in ps)
+ck('R13 also searches earlier R10 and R09 workspaces','VoiceCloud-PH13-R10-DEVICE-*' in ps and 'VoiceCloud-PH13-R09-*' in ps)
+ck('prior workspace reuse requires Debug app metadata','Test-AppArtifact -Root $dir.FullName' in ps)
+ck('prior workspace reuse requires build-proven runtime hashes','Test-RuntimeManifest -Root $dir.FullName' in ps)
+ck('corrected androidTest source is copied into reused workspace','Copy-Item -LiteralPath $sourceTest -Destination $destTest -Force' in ps)
+ck('fast path rebuilds androidTest only',"& $gradlew ':app:assembleDebugAndroidTest' '--no-daemon' '--stacktrace'" in ps)
+ck('fast path does not rebuild production app in androidTest-only branch',"[R13 FAST TEST BUILD] Rebuilding androidTest APK only" in ps)
+ck('fallback remains limited to Debug + androidTest prerequisites',"':app:assembleDebug' ':app:assembleDebugAndroidTest'" in ps)
+ck('wrapper remains pinned to verified local Gradle ZIP',"distributionUrl=file\\:///" in ps)
+ck('corrected test APK output metadata is required','Test-TestArtifact -Root $Root' in ps)
+ck('connected instrumentation still uses existing resilient device script','-File $deviceScript -ProjectRoot $workspace' in ps)
+ck('genuine corrected instrumentation failure remains fail-closed','exit 1' in ps and 'genuine test/device failure' in ps)
+ck('device disappearing after preflight remains pending','Device became unavailable before corrected instrumentation completed' in ps and 'exit 2' in ps)
+if not all(checks): raise SystemExit(1)
+print(f'[PASS] VC-ANDROID-PH13-R13 device/test closure regression: {len(checks)}/{len(checks)} PASS')

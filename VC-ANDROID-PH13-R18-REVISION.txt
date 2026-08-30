@@ -1,0 +1,3 @@
+VC-ANDROID-PH13-R18
+Parent: VC-ANDROID-PH13-R17
+Scope: consolidated component-signature compiler closure for Economy, Hosting and Creator; preserve approved R16 UI/UX and R17 compiler/UTF-8 fixes.

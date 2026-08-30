@@ -1,0 +1,14 @@
+core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudVisuals.kt
+core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+core/designsystem/src/main/res/drawable/vc_nav_live.xml
+core/designsystem/src/main/res/drawable-nodpi/vc_onboarding_conversation.png
+core/designsystem/src/main/res/drawable-nodpi/vc_ref_creator_mic.png
+core/designsystem/src/main/res/drawable-nodpi/vc_ref_creator_wallet.png
+core/designsystem/src/main/res/drawable-nodpi/vc_ref_home_mic.png
+core/designsystem/src/main/res/drawable-nodpi/vc_ref_live_forest.png
+core/designsystem/src/main/res/drawable-nodpi/vc_ref_vip_crown.png
+core/designsystem/src/main/res/drawable-nodpi/vc_ref_wallet_spark.png
+feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt

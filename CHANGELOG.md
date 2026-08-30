@@ -1,4 +1,61 @@
-# VC-ANDROID-PH13-R10 — R09 Device Acceptance Closure
+## VC-ANDROID-PH13-R19
+- Consolidates the latest End User + Creator physical-device video findings instead of patching one acceptance-log symptom at a time.
+- Corrects Listener bottom navigation semantics to Home / Discover / Live / Messages / Profile; the center microphone/live action no longer opens Search.
+- Separates Home (`For You`) from Discover/Search and strengthens Home creator discovery/quick access.
+- Reworks My Profile around backend cover/avatar identity and profile actions rather than a wallet/settings-first hub.
+- Removes the misleading standalone Speaker portal.
+- Makes Creator Studio consume existing Host access authority before exposing rooms/schedules/go-live controls; non-approved Creators receive Host-access guidance.
+- Reworks Creator Dashboard low-data composition and Creator Profile overview/edit flow while preserving backend-authoritative analytics/economy values.
+- Adds dedicated video-product, preservation, compile-surface, workstation-artifact and full acceptance gates.
+
+## VC-ANDROID-PH13-R18
+- Corrected all stale `VoiceCloudRemoteMedia` named-argument callsites across Economy, Hosting and Creator (`label` -> `contentDescription`, `fallbackKind` -> `kind`).
+- Removed the ten Economy unused imports and obsolete `glyph()` helper reported by Android Studio.
+- Added project-wide VoiceCloud component named-argument/signature regression and retained the full R16 design + R17 compiler/UTF-8 closure.
+
+# VC-ANDROID-PH13-R17
+
+- Parent: VC-ANDROID-PH13-R16.
+- Preserves the approved R16 page-by-page UI/UX implementation and all functional/API/RTC/payment/navigation authority.
+- Closes the real R16 Kotlin compiler failure in `VoiceCloudSpeakingAvatar`: the public `size: Dp` parameter shadowed `DrawScope.size`, so Canvas geometry now captures `val canvasSize = this.size` before reading width/height/minDimension.
+- Closes the Windows Python 3.14 `cp1252` diagnostic crash by forcing UTF-8 mode in the acceptance CMD and PowerShell diagnostic launcher and making the exact R16 compile-surface checker use explicit UTF-8 reads.
+- Adds R17 regression coverage for DrawScope-size shadowing, Compose extension imports across the R16-changed UI surface, callback wiring, locale-independent diagnostics, workstation artifacts and fail-closed delivery integrity.
+- Full Debug/Staging/Release compile, unit tests, lint, assemblies and physical-device instrumentation remain mandatory on the Android workstation before acceptance.
+
+# VC-ANDROID-PH13-R16
+
+- Rebuilt the Android presentation against the approved End User + Creator/Host design boards while preserving R15 functional authority.
+- Added compact board-derived components, board typography/spacing metrics, backend-media-first artwork treatment and approved board-derived fallback assets.
+- Reconstructed Auth/Onboarding, Discovery/Search/Community, Listener Live, Economy/Profile/Settings, Creator Dashboard/Growth, Room Creation/Scheduling, Host Controls/Moderation and Creator Showcase surfaces.
+- Removed the rejected generic feature `VoiceCloudPageHero` composition from feature-screen usage.
+- Preserved whitespace in application-authored title handling and added board-like OTP digit entry and registration terms consent.
+- Removed fabricated hard-coded Creator analytics/earnings time-series charts; backend metrics remain authoritative and unavailable series are represented honestly.
+- Added R16-specific design-fidelity, product-preservation, compiler-surface, workstation-artifact, hygiene, harness and delivery-integrity gates.
+- Restored the full Windows acceptance sequence: Debug/Staging/Release Kotlin compile, unit tests, lint, all assemblies, physical-device instrumentation and final integrity.
+
+## VC-ANDROID-PH13-R15
+- Closed the actual R14 Kotlin compiler failure: missing `androidx.compose.ui.draw.clip` import in HostingScreens.
+- Removed the remaining redundant-Elvis compiler warning in DiscoveryScreens.
+- R14 intended UI/UX and functional/API/RTC/payment/navigation authority otherwise unchanged.
+
+# VC-ANDROID-PH13-R14 — Physical-Device-Driven Full UI/UX Correction
+
+- Parent: `VC-ANDROID-PH13-R13`.
+- Corrects the real-device systemic whitespace defect and adds device instrumentation assertions that prevent its return.
+- Reworks shared premium heroes/cards/top bars/typography and adds centralized Coil-backed backend media/avatar presentation.
+- Replaces giant letter placeholders and expands real cover/avatar/community/event/conversation media across Listener + Creator/Host surfaces.
+- Applies targeted Home/Auth/Profile/Live/Economy/Settings/Creator/Host corrections while protecting API/repository/ViewModel/navigation/RTC/security/payment/business authority.
+- Restores the full Debug/Staging/Release compile + tests + lint + assemblies + physical-device acceptance sequence.
+- Treats only the configured Room database schema JSON path as generated build evidence; arbitrary drift remains fail-closed.
+
+## VC-ANDROID-PH13-R12
+
+- Acceptance-only correction: preservation now ignores the same known workstation-generated artifacts as delivery integrity.
+- Added exact R11 contamination simulation and fail-closed unknown-drift checks.
+- Fixed Windows batch device exit-code handling using delayed expansion.
+- Android product/UI/API/runtime source unchanged from build-proven R09/R10/R11.
+
+# VC-ANDROID-PH13-R11 — R09 Device Acceptance Closure
 
 - Parent: `VC-ANDROID-PH13-R09`.
 - Android product/UI/API/runtime/build-input source remains byte-identical to R09.
@@ -234,3 +291,18 @@
 - Added a full UI compile-risk regression covering every redesigned presentation file, centralized premium primitives, RTC presence fields, economy enum references, and theme token references.
 - Compile gates now use Gradle `--continue` so independent feature-module compiler errors are surfaced in the same run rather than serially hidden behind the first failing module.
 - No APIs, repositories, ViewModels, models, navigation behavior, permissions, RTC/realtime authority, security behavior, wallet/economy rules, or backend business logic changed.
+
+## VC-ANDROID-PH13-R13
+- Corrected the stale physical-device instrumentation palette assertions left from the pre-redesign color authority.
+- `ConsumerColors.Text` instrumentation expectation now matches `consumer.text=#18312D`.
+- `ConsumerColors.Sapphire` instrumentation expectation now matches `consumer.sapphire=#006C63`.
+- Production Android app/UI/API/runtime source remains unchanged from the build-proven R09/R12 authority.
+- Added a verified prior-workspace fast path that rebuilds only the androidTest APK when the prior Debug app APK is available.
+
+## VC-ANDROID-PH13-R20
+- Corrected systemic UI overlap by changing the shared approved card container from Box stacking to vertically spaced Column layout.
+- Aligned global typography to clean sans-serif approved-board hierarchy.
+- Replaced screenshot-fragment fallback artwork with clean high-resolution VoiceCloud visual assets.
+- Added dedicated Live microphone navigation icon for Listener and Creator center actions.
+- Rebalanced startup/onboarding composition and reconstructed Discover into a content-rich experience.
+- Preserved R19 functional/API/RTC/payment/security/business authority.

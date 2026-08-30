@@ -1,0 +1,4 @@
+VC-ANDROID-PH13-R12
+Parent: VC-ANDROID-PH13-R11
+Scope: acceptance-harness closure only; Android product source remains byte-identical to build-proven PH13-R09/R10/R11.
+Corrections: workstation-generated artifact tolerance is aligned across preservation/integrity gates; Windows batch device exit-code handling uses delayed expansion.

@@ -28,9 +28,9 @@ object VoiceCloudPageMetrics {
         val px = LocalWindowInfo.current.containerSize.width
         val widthDp = with(LocalDensity.current) { px.toDp() }
         return when {
-            widthDp < 360.dp -> VoiceCloudAdaptiveMetrics(16.dp, 10.dp, 16.dp, 58.dp, 70.dp, 22.dp, 14.dp)
-            widthDp < 600.dp -> VoiceCloudAdaptiveMetrics(20.dp, 12.dp, 20.dp, 62.dp, 74.dp, 24.dp, 16.dp)
-            else -> VoiceCloudAdaptiveMetrics(28.dp, 16.dp, 28.dp, 68.dp, 80.dp, 26.dp, 20.dp)
+            widthDp < 360.dp -> VoiceCloudAdaptiveMetrics(14.dp, 8.dp, 14.dp, 50.dp, 62.dp, 21.dp, 12.dp)
+            widthDp < 600.dp -> VoiceCloudAdaptiveMetrics(16.dp, 8.dp, 16.dp, 52.dp, 64.dp, 22.dp, 14.dp)
+            else -> VoiceCloudAdaptiveMetrics(24.dp, 12.dp, 24.dp, 58.dp, 70.dp, 24.dp, 18.dp)
         }
     }
 }

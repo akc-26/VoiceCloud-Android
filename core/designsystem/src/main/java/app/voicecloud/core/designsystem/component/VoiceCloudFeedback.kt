@@ -56,20 +56,52 @@ fun VoiceCloudToastEffect(error: String?, notice: String?) {
     }
 }
 
-/** Title-case application-authored UI copy without altering URLs, e-mails or handles. */
+/**
+ * Normalizes application-authored UI copy without damaging whitespace, URLs,
+ * e-mail addresses, handles or backend-provided identifiers.
+ *
+ * Short control labels are presented in a restrained title case; descriptive
+ * sentences keep their authored casing so body copy remains natural and easy
+ * to read on a phone. Whitespace is intentionally preserved.
+ */
 fun voiceCloudTitleCase(value: String): String {
     if (value.isBlank()) return value
-    return value.split(Regex("(\\s+)"))
-        .joinToString("") { token ->
-            if (token.isBlank()) return@joinToString token
-            val lead = token.takeWhile { !it.isLetterOrDigit() && it != '@' }
-            val tail = token.drop(lead.length)
-            if (tail.isBlank()) return@joinToString token
-            val core = tail.trimEnd('.', ',', ':', ';', '!', '?', ')', ']', '}')
-            val suffix = tail.drop(core.length)
-            val preserve = core.startsWith("@") || core.contains("@") || core.contains("://") ||
-                core.matches(Regex("[A-Z0-9_./-]{2,}")) || core.any(Char::isDigit) && core.none(Char::isLetter)
-            if (preserve || core.isBlank()) token
-            else lead + core.replaceFirstChar { if (it.isLetter()) it.titlecase() else it.toString() } + suffix
+
+    val trimmed = value.trim()
+    val words = Regex("\\S+").findAll(trimmed).map { it.value }.toList()
+    val isSentence = words.size > 5 || trimmed.any { it == '.' || it == '!' || it == '?' }
+
+    if (isSentence) {
+        val firstLetter = value.indexOfFirst(Char::isLetter)
+        if (firstLetter < 0) return value
+        return buildString(value.length) {
+            append(value, 0, firstLetter)
+            append(value[firstLetter].titlecase())
+            append(value, firstLetter + 1, value.length)
         }
+    }
+
+    val minorWords = setOf("a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with")
+    var wordIndex = 0
+    return Regex("\\s+|\\S+").findAll(value).joinToString(separator = "") { match ->
+        val token = match.value
+        if (token.firstOrNull()?.isWhitespace() == true) return@joinToString token
+
+        val lead = token.takeWhile { !it.isLetterOrDigit() && it != '@' }
+        val tail = token.drop(lead.length)
+        if (tail.isBlank()) return@joinToString token
+        val core = tail.trimEnd('.', ',', ':', ';', '!', '?', ')', ']', '}')
+        val suffix = tail.drop(core.length)
+        val preserve = core.startsWith("@") || core.contains("@") || core.contains("://") ||
+            core.matches(Regex("[A-Z0-9_./-]{2,}")) || core.drop(1).any(Char::isUpperCase) ||
+            (core.any(Char::isDigit) && core.none(Char::isLetter))
+        val current = wordIndex++
+        if (preserve || core.isBlank()) token
+        else {
+            val lower = core.lowercase()
+            val titled = if (current > 0 && lower in minorWords) lower
+            else lower.replaceFirstChar { if (it.isLetter()) it.titlecase() else it.toString() }
+            lead + titled + suffix
+        }
+    }
 }

@@ -1,0 +1,9 @@
+VC-ANDROID-PH13-R19 product changes vs R18
+
+app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+
+All other R18 product/runtime/build inputs remain protected by the R19 canonical product manifest.

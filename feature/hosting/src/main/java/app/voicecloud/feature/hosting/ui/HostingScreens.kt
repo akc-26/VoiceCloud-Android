@@ -8,12 +8,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -21,27 +18,27 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
 import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
-import app.voicecloud.core.designsystem.component.VoiceCloudHeroCard
 import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
-import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
-import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
 import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudRemoteMedia
 import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
-import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.VoiceCloudLiveBadge
-import app.voicecloud.core.designsystem.component.VoiceCloudPremiumCard
 import app.voicecloud.core.designsystem.component.VoiceCloudSectionHeader
 import app.voicecloud.core.designsystem.component.VoiceCloudSpeakingAvatar
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedCard
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedPrimaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSecondaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSectionTitle
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedTopBar
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
-import app.voicecloud.core.designsystem.theme.ConsumerBrushes
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
 import app.voicecloud.core.designsystem.theme.PortalTheme
@@ -65,33 +62,29 @@ private fun HostPage(
     VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = dark) {
         val metrics = VoiceCloudPageMetrics.current()
         Scaffold(
-            containerColor = if (dark) ConsumerColors.DeepNavy else MaterialTheme.colorScheme.background,
+            containerColor = if (dark) ConsumerColors.DeepNavy else ConsumerColors.Surface,
             topBar = {
-                if (!dark) VoiceCloudPageTopBar(title, subtitle, onBack)
-                else Surface(color = ConsumerColors.DeepNavy, shadowElevation = 2.dp) {
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        TextButton(onClick = onBack) { Text(voiceCloudTitleCase("Back"), color = ConsumerColors.TextOnDark) }
-                        Column(Modifier.weight(1f)) {
-                            Text(voiceCloudTitleCase(title), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                            if (!subtitle.isNullOrBlank()) Text(subtitle, color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (!dark) {
+                    Surface(color = ConsumerColors.Surface, shadowElevation = 1.dp) { Row(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding)) { VoiceCloudApprovedTopBar(title, onBack = onBack) } }
+                } else {
+                    Surface(color = ConsumerColors.DeepNavy, shadowElevation = 1.dp) {
+                        Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            TextButton(onClick = onBack, contentPadding = PaddingValues(horizontal = 4.dp)) { Text("‹", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.headlineSmall) }
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                                Text(voiceCloudTitleCase(title), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                if (!subtitle.isNullOrBlank()) Text(subtitle, color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                            VoiceCloudLiveBadge()
                         }
-                        VoiceCloudLiveBadge()
                     }
                 }
             },
         ) { padding ->
             Column(
-                Modifier.fillMaxSize().padding(padding).padding(horizontal = metrics.horizontalPadding).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
+                Modifier.fillMaxSize().padding(padding).padding(horizontal = metrics.horizontalPadding, vertical = 8.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                VoiceCloudPageHero(
-                    title = title,
-                    subtitle = subtitle ?: "Professional VoiceCloud host tools.",
-                    kind = voiceCloudVisualFor(title),
-                    badge = if (dark) "Live host console" else "Creator portal · Host tools",
-                    dark = dark,
-                    creator = !dark,
-                )
+                if (!subtitle.isNullOrBlank() && !dark) Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
                 content()
             }
         }
@@ -119,12 +112,8 @@ fun HostStudioScreen(
     LaunchedEffect(Unit) { onLoad() }
     HostPage("Host Studio", "Create, schedule and manage your audio rooms.", onBack) {
         HostingStatus(state)
-        VoiceCloudHeroCard(
-            title = "Your live studio",
-            subtitle = "Create premium audio rooms, schedule ahead and manage every host session from one place.",
-            badge = "Creator portal · Host tools",
-        ) { VoiceCloudSpeakingAvatar("H", speaking = false, size = 46.dp) }
-        OutlinedButton(onClick = onVerification, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Host Verification & Progress")) }
+        VoiceCloudApprovedSectionTitle("Content planner")
+        VoiceCloudApprovedSecondaryButton("Host Verification & Progress", onClick = onVerification)
         if (state.eligibilityChecked) {
             val approved = state.hostProfile?.status.equals("APPROVED", true)
             if (!approved) {
@@ -135,15 +124,15 @@ fun HostStudioScreen(
                         state.eligibility?.reasons.orEmpty().drop(1).take(3).forEach { Text(voiceCloudTitleCase("• $it"), style = MaterialTheme.typography.bodySmall) }
                         state.eligibility?.let { eligibility ->
                             if (eligibility.applicationsEnabled && eligibility.eligible) {
-                                Text(voiceCloudTitleCase("Your Account Currently Meets The Host Eligibility Requirements."), color = ConsumerColors.SapphireDeep)
+                                Text(voiceCloudTitleCase("Your account currently meets the Host eligibility requirements."), color = ConsumerColors.SapphireDeep)
                             }
                         }
                     }
                 }
             } else {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(onClick = onCreateRoom, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Create Room"), maxLines = 1) }
-                    OutlinedButton(onClick = onScheduleRoom, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Schedule"), maxLines = 1) }
+                    VoiceCloudApprovedPrimaryButton("Create Room", modifier = Modifier.weight(1f), onClick = onCreateRoom)
+                    VoiceCloudApprovedSecondaryButton("Schedule", modifier = Modifier.weight(1f), onClick = onScheduleRoom)
                 }
                 Text(voiceCloudTitleCase("My Rooms"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 if (state.rooms.isEmpty() && !state.loading) VoiceCloudEmptyVisual("No Rooms Yet", "Create Your First Room When You Are Ready To Host.", Modifier.fillMaxWidth(), VoiceCloudVisualKind.LIVE)
@@ -151,9 +140,18 @@ fun HostStudioScreen(
                 Text(voiceCloudTitleCase("Scheduled"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 if (state.schedules.isEmpty() && !state.loading) VoiceCloudEmptyVisual("No Upcoming Rooms", "Schedule a polished live session for your audience.", Modifier.fillMaxWidth(), VoiceCloudVisualKind.SCHEDULE)
                 state.schedules.forEach { schedule ->
-                    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable { onSchedule(schedule.id) }, contentPadding = 14.dp) {
+                    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 9.dp, onClick = { onSchedule(schedule.id) }) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            VoiceCloudPictogram(VoiceCloudVisualKind.SCHEDULE, size = 48.dp)
+                            Box(Modifier.size(50.dp).clip(RoundedCornerShape(10.dp))) {
+                                VoiceCloudRemoteMedia(
+                                    url = null,
+                                    contentDescription = schedule.title,
+                                    modifier = Modifier.fillMaxSize(),
+                                    kind = VoiceCloudVisualKind.SCHEDULE,
+                                    dark = false,
+                                    fallbackDrawable = app.voicecloud.core.designsystem.R.drawable.vc_ref_live_forest,
+                                )
+                            }
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(schedule.title, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(formatSchedule(schedule.scheduledStartTime, schedule.timeZone), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
@@ -174,15 +172,24 @@ fun HostStudioScreen(
 
 @Composable
 private fun HostRoomCard(room: HostRoom, onOpen: () -> Unit) {
-    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable(onClick = onOpen), contentPadding = 14.dp) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            VoiceCloudPictogram(VoiceCloudVisualKind.LIVE, size = 50.dp)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(room.title, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(voiceCloudTitleCase(room.category + " · " + room.status.replaceFirstChar { it.uppercase() }), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                if (room.isPremium || room.isTicketRequired) Text(voiceCloudTitleCase("Premium / Ticket Access"), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.VioletDeep, fontWeight = FontWeight.Bold)
+    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 9.dp, onClick = onOpen) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Box(Modifier.size(50.dp).clip(RoundedCornerShape(10.dp))) {
+                VoiceCloudRemoteMedia(
+                    url = null,
+                    contentDescription = room.title,
+                    modifier = Modifier.fillMaxSize(),
+                    kind = VoiceCloudVisualKind.LIVE,
+                    dark = room.isLive,
+                    fallbackDrawable = app.voicecloud.core.designsystem.R.drawable.vc_ref_creator_mic,
+                )
             }
-            Text(voiceCloudTitleCase("Open"), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.ExtraBold)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(room.title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(voiceCloudTitleCase(room.status), style = MaterialTheme.typography.labelSmall, color = if (room.isLive) ConsumerColors.Sapphire else ConsumerColors.TextMuted)
+                Text("${room.participantCount} participants · ${room.category}", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted, maxLines = 1)
+            }
+            Text("›", color = ConsumerColors.SapphireDeep, style = MaterialTheme.typography.titleLarge)
         }
     }
 }
@@ -209,22 +216,22 @@ fun RoomEditorScreen(
     var price by rememberSaveable(roomId, existing?.id) { mutableStateOf(existing?.ticketPriceAmount?.toString()?.takeIf { it != "null" } ?: "0") }
     HostPage(if (roomId == null) "Create Room" else "Room Settings", "Room access and ticket settings stay server-authoritative.", onBack) {
         HostingStatus(state)
-        VoiceCloudHeroCard(
-            title = if (roomId == null) "Create a room worth joining" else "Refine your room",
-            subtitle = "Set the room identity, audience and access controls. VoiceCloud keeps all permissions server-authoritative.",
-            badge = if (roomId == null) "Live now" else "Room settings",
-        )
-        OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Room Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 3, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(category, { category = it }, label = { Text(voiceCloudTitleCase("Category")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        Row(Modifier.fillMaxWidth().background(ConsumerColors.SurfaceSoft, RoundedCornerShape(12.dp)).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Surface(shape = RoundedCornerShape(9.dp), color = ConsumerColors.Sapphire, modifier = Modifier.weight(1f)) { Text("Live Now", Modifier.padding(vertical = 9.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = androidx.compose.ui.graphics.Color.White, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+            Surface(shape = RoundedCornerShape(9.dp), color = androidx.compose.ui.graphics.Color.Transparent, modifier = Modifier.weight(1f)) { Text("Schedule", Modifier.padding(vertical = 9.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = ConsumerColors.TextMuted, style = MaterialTheme.typography.labelSmall) }
+        }
+        OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Room Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(11.dp))
+        OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 3, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(11.dp))
+        OutlinedTextField(category, { category = it }, label = { Text(voiceCloudTitleCase("Category")) }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(11.dp))
         SwitchLine("Private room", privateRoom) { privateRoom = it; if (it) inviteOnly = true }
         SwitchLine("Lock room entry", locked) { locked = it }
         SwitchLine("Invite only", inviteOnly) { inviteOnly = it }
         SwitchLine("Subscribers only", subscriberOnly) { subscriberOnly = it }
         SwitchLine("Verified listeners only", verifiedOnly) { verifiedOnly = it }
         SwitchLine("Ticketed / premium access", ticketed) { ticketed = it }
-        if (ticketed) OutlinedTextField(price, { price = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text(voiceCloudTitleCase("Ticket Price")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        Button(
+        if (ticketed) OutlinedTextField(price, { price = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text(voiceCloudTitleCase("Ticket Price")) }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(11.dp))
+        VoiceCloudApprovedPrimaryButton(
+            text = if (roomId == null) "Create live room" else "Save changes",
             enabled = title.trim().length >= 3 && !state.loading,
             onClick = {
                 onSave(RoomEditorInput(
@@ -244,16 +251,15 @@ fun RoomEditorScreen(
                     clubId = existing?.clubId,
                 ))
             },
-            modifier = Modifier.fillMaxWidth(),
-        ) { Text(voiceCloudTitleCase(if (roomId == null) "Create room" else "Save settings")) }
+        )
         Spacer(Modifier.height(24.dp))
     }
 }
 
 @Composable
 private fun SwitchLine(label: String, checked: Boolean, onChecked: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(voiceCloudTitleCase(label), Modifier.weight(1f))
+    Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(voiceCloudTitleCase(label), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
         Switch(checked, onCheckedChange = onChecked)
     }
 }
@@ -286,11 +292,7 @@ fun ScheduleEditorScreen(
     val context = LocalContext.current
     HostPage(if (scheduleId == null) "Schedule Room" else "Edit Schedule", "Times are shown in your device time zone (${zone.id}).", onBack) {
         HostingStatus(state)
-        VoiceCloudHeroCard(
-            title = if (scheduleId == null) "Plan your next room" else "Refine your schedule",
-            subtitle = "Choose a local date and time, then configure access exactly as your VoiceCloud audience needs.",
-            badge = "Smart scheduling",
-        )
+        VoiceCloudApprovedSectionTitle(if (scheduleId == null) "Schedule a room" else "Edit schedule")
         OutlinedTextField(title, { title = it }, label = { Text(voiceCloudTitleCase("Title")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(description, { description = it }, label = { Text(voiceCloudTitleCase("Description")) }, minLines = 2, modifier = Modifier.fillMaxWidth())
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -314,7 +316,7 @@ fun ScheduleEditorScreen(
         val localDateTime = LocalDateTime.of(date, time)
         val offset = localDateTime.atZone(zone).toOffsetDateTime()
         val future = offset.isAfter(OffsetDateTime.now(zone))
-        if (!future) Text(voiceCloudTitleCase("Choose A Future Date & Time"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        if (!future) Text(voiceCloudTitleCase("Choose a future date & time"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         Button(
             enabled = title.trim().length >= 3 && future && !state.loading,
             onClick = {
@@ -335,7 +337,7 @@ fun ScheduleEditorScreen(
                 ))
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(voiceCloudTitleCase(if (scheduleId == null) "Schedule room" else "Save schedule")) }
-        if (onDelete != null) OutlinedButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Delete Schedule")) }
+        if (onDelete != null) VoiceCloudApprovedSecondaryButton("Delete Schedule", onClick = onDelete)
         Spacer(Modifier.height(24.dp))
     }
 }
@@ -360,7 +362,7 @@ fun HostRoomManageScreen(
     HostPage("Room Management", room?.title, onBack) {
         HostingStatus(state)
         if (room != null) {
-            VoiceCloudGlossCard(Modifier.fillMaxWidth()) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 11.dp) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     VoiceCloudPictogram(VoiceCloudVisualKind.LIVE, size = 54.dp)
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -371,23 +373,23 @@ fun HostRoomManageScreen(
                     }
                 }
             }
-            OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Room Settings")) }
+            VoiceCloudApprovedSecondaryButton("Room Settings", onClick = onSettings)
             when {
                 room.status.equals("paused", true) -> {
                     Button(onClick = onResume, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Resume Room")) }
                     OutlinedButton(onClick = onEnd, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("End Room")) }
                 }
                 room.isLive || room.status.equals("live", true) -> {
-                    Button(onClick = onOpenConsole, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Open Host Console")) }
+                    VoiceCloudApprovedPrimaryButton("Open Host Console", onClick = onOpenConsole)
                     if (onInteractive != null) OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Polls & Quiz")) }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Pause")) }
                         OutlinedButton(onClick = onEnd, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("End")) }
                     }
                 }
-                else -> Button(onClick = onStart, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Start Room")) }
+                else -> VoiceCloudApprovedPrimaryButton("Start Room", onClick = onStart)
             }
-            OutlinedButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Delete Room")) }
+            VoiceCloudApprovedSecondaryButton("Delete Room", onClick = onDelete)
         }
         Spacer(Modifier.height(24.dp))
     }
@@ -418,91 +420,100 @@ fun HostLiveConsoleScreen(
     DisposableEffect(roomId) { onDispose { onLeave() } }
     val context = LocalContext.current
     var permissionDenied by rememberSaveable { mutableStateOf(false) }
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        permissionDenied = !granted
-        if (granted) onMicrophone(true)
-    }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> permissionDenied = !granted; if (granted) onMicrophone(true) }
     var inviteQuery by rememberSaveable { mutableStateOf("") }
     val room = state.selectedRoom
     val stage = state.stage
     HostPage("Host Console", room?.title ?: "Live room", onBack, dark = true) {
         HostingStatus(state)
         VoiceCloudToastEffect(if (permissionDenied) "Microphone Permission Is Required To Speak" else null, null)
-        Card(
-            Modifier.fillMaxWidth().border(1.dp, ConsumerColors.VipGold.copy(alpha = .38f), RoundedCornerShape(26.dp)),
-            shape = RoundedCornerShape(26.dp),
-            colors = CardDefaults.cardColors(containerColor = ConsumerColors.LiveSurface),
-        ) {
-            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    VoiceCloudLiveBadge()
-                    Spacer(Modifier.width(9.dp))
-                    Text(voiceCloudTitleCase(if (state.rtcConnected) "Live audio connected" else "Connecting live audio…"), color = ConsumerColors.TextOnDark, fontWeight = FontWeight.Bold)
-                }
-                VoiceCloudAnimatedWaveform(Modifier.fillMaxWidth().height(40.dp), color = ConsumerColors.Ice, active = state.rtcConnected && !state.microphoneBusy)
-                Button(
-                    enabled = state.rtcConnected && !state.microphoneBusy,
-                    onClick = {
-                        if (state.microphoneEnabled) onMicrophone(false)
-                        else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) onMicrophone(true)
-                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(voiceCloudTitleCase(if (state.microphoneEnabled) "Mute microphone" else "Go on mic")) }
-                if (permissionDenied) Text(voiceCloudTitleCase("You Can Still Host And Listen Without Microphone Access"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = onPause, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Pause")) }
-                    OutlinedButton(onClick = onResume, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Resume")) }
-                    OutlinedButton(onClick = onEnd, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("End")) }
-                }
-                if (onInteractive != null) OutlinedButton(onClick = onInteractive, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Polls & Quiz")) }
-            }
-        }
-        VoiceCloudSectionHeader("Raised Hands", dark = true)
-        if (state.stage?.handQueue.isNullOrEmpty()) Text(voiceCloudTitleCase("No Raised Hands Right Now."), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        stage?.handQueue.orEmpty().forEach { hand ->
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(stageName(hand.userId, stage, viewerId), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                TextButton(onClick = { onReject(hand.userId) }) { Text(voiceCloudTitleCase("Reject")) }
-                Button(onClick = { onApprove(hand.userId) }) { Text(voiceCloudTitleCase("Approve")) }
+                VoiceCloudLiveBadge()
+                Spacer(Modifier.width(8.dp))
+                Text("${stage?.speakers?.size ?: 0} speakers · ${stage?.participants?.size ?: 0} listeners", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDarkSecondary, modifier = Modifier.weight(1f))
+                Text(if (state.rtcConnected) "Connected" else "Connecting", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.Ice)
             }
+            VoiceCloudSpeakingAvatar(room?.hostName ?: "Host", speaking = state.microphoneEnabled, size = 86.dp, dark = true)
+            Text(room?.hostName ?: "Host", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.TextOnDark)
+            Text("Host", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.VipGold)
+            VoiceCloudAnimatedWaveform(Modifier.fillMaxWidth().height(34.dp), color = ConsumerColors.Ice, active = state.rtcConnected && state.microphoneEnabled)
         }
         VoiceCloudSectionHeader("Speakers", dark = true)
-        stage?.speakers.orEmpty().forEach { speaker ->
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(speaker.username ?: stageName(speaker.userId, stage, viewerId), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (speaker.userId != viewerId) {
-                    TextButton(onClick = { onMuteSpeaker(speaker.userId, !speaker.isMuted) }) { Text(voiceCloudTitleCase(if (speaker.isMuted) "Unmute" else "Mute")) }
-                    TextButton(onClick = { onRemoveSpeaker(speaker.userId) }) { Text(voiceCloudTitleCase("Remove")) }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            stage?.speakers.orEmpty().take(4).forEach { speaker ->
+                Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    VoiceCloudSpeakingAvatar(speaker.username ?: stageName(speaker.userId, stage, viewerId), speaking = !speaker.isMuted, size = 50.dp, dark = true)
+                    Text(speaker.username ?: stageName(speaker.userId, stage, viewerId), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDark, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
-        VoiceCloudSectionHeader("Audience", dark = true)
-        val currentSpeakers = stage?.speakers.orEmpty()
-        stage?.participants.orEmpty()
-            .filter { participant -> currentSpeakers.none { speaker -> speaker.userId == participant.userId } }
-            .take(30)
-            .forEach { participant ->
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(participant.username ?: "Listener", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (participant.userId != viewerId) TextButton(onClick = { onInviteSpeaker(participant.userId) }) { Text(voiceCloudTitleCase("Invite To Stage")) }
+        VoiceCloudSectionHeader("Listeners", dark = true)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            stage?.participants.orEmpty().filter { p -> stage?.speakers.orEmpty().none { it.userId == p.userId } }.take(6).forEach { participant ->
+                VoiceCloudSpeakingAvatar(participant.username ?: "Listener", speaking = false, size = 36.dp, dark = true)
             }
         }
-        VoiceCloudSectionHeader("Invite Participant", dark = true)
-        OutlinedTextField(
-            inviteQuery, { inviteQuery = it; onSearchInvite(it) }, label = { Text(voiceCloudTitleCase("Search People")) },
-            singleLine = true, modifier = Modifier.fillMaxWidth()
-        )
+        VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 9.dp, dark = true) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+                HostConsoleAction(if (state.microphoneEnabled) "Mute" else "Mic", VoiceCloudVisualKind.AUDIO) {
+                    if (state.microphoneEnabled) onMicrophone(false)
+                    else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) onMicrophone(true)
+                    else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+                HostConsoleAction("Pause", VoiceCloudVisualKind.ACTIVITY, onPause)
+                if (onInteractive != null) HostConsoleAction("Polls", VoiceCloudVisualKind.AUDIENCE, onInteractive)
+                HostConsoleAction("End", VoiceCloudVisualKind.SECURITY, onEnd)
+            }
+        }
+        if (permissionDenied) Text("You can still host and listen without microphone access.", color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelSmall)
+        VoiceCloudSectionHeader("Speaker queue", dark = true)
+        if (stage?.handQueue.isNullOrEmpty()) Text("No microphone requests right now.", color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.bodySmall)
+        stage?.handQueue.orEmpty().forEach { hand ->
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 8.dp, dark = true) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    VoiceCloudSpeakingAvatar(stageName(hand.userId, stage, viewerId), speaking = false, size = 38.dp, dark = true)
+                    Text(stageName(hand.userId, stage, viewerId), Modifier.weight(1f), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.bodyMedium)
+                    TextButton(onClick = { onReject(hand.userId) }) { Text("Decline") }
+                    Button(onClick = { onApprove(hand.userId) }, contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp)) { Text("Accept", style = MaterialTheme.typography.labelSmall) }
+                }
+            }
+        }
+        VoiceCloudSectionHeader("Manage speakers", dark = true)
+        stage?.speakers.orEmpty().filter { it.userId != viewerId }.forEach { speaker ->
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 8.dp, dark = true) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(speaker.username ?: stageName(speaker.userId, stage, viewerId), Modifier.weight(1f), color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.bodyMedium)
+                    TextButton(onClick = { onMuteSpeaker(speaker.userId, !speaker.isMuted) }) { Text(if (speaker.isMuted) "Unmute" else "Mute") }
+                    TextButton(onClick = { onRemoveSpeaker(speaker.userId) }) { Text("Remove") }
+                }
+            }
+        }
+        VoiceCloudSectionHeader("Invite participant", dark = true)
+        OutlinedTextField(inviteQuery, { inviteQuery = it; onSearchInvite(it) }, label = { Text("Search people") }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(11.dp))
         state.inviteCandidates.take(6).forEach { candidate ->
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(candidate.displayName.ifBlank { candidate.username }, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                    Text(voiceCloudTitleCase("@${candidate.username}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 8.dp, dark = true) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    VoiceCloudSpeakingAvatar(candidate.displayName.ifBlank { candidate.username }, speaking = false, size = 38.dp, dark = true)
+                    Column(Modifier.weight(1f)) {
+                        Text(candidate.displayName.ifBlank { candidate.username }, color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.bodyMedium)
+                        Text("@${candidate.username}", color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelSmall)
+                    }
+                    TextButton(onClick = { onInviteParticipant(candidate.id) }) { Text("Invite") }
                 }
-                Button(onClick = { onInviteParticipant(candidate.id) }) { Text(voiceCloudTitleCase("Invite")) }
             }
         }
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(22.dp))
+    }
+}
+
+@Composable
+private fun HostConsoleAction(label: String, kind: VoiceCloudVisualKind, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = CircleShape, color = ConsumerColors.LiveSurfaceElevated, modifier = Modifier.size(56.dp), border = androidx.compose.foundation.BorderStroke(1.dp, ConsumerColors.Ice.copy(alpha = .16f))) {
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            VoiceCloudPictogram(kind, size = 26.dp, dark = true)
+            Text(label, style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDark)
+        }
     }
 }
 
@@ -546,7 +557,7 @@ fun PollsQuizScreen(
             enabled = pollTitle.trim().isNotBlank() && parsedPollOptions.size >= 2,
         ) { Text(voiceCloudTitleCase("Create Poll")) }
         state.polls.forEach { poll ->
-            VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 9.dp) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     VoiceCloudPictogram(VoiceCloudVisualKind.AUDIENCE, size = 44.dp)
                     Column(Modifier.weight(1f)) {
@@ -565,7 +576,7 @@ fun PollsQuizScreen(
         Text(voiceCloudTitleCase("Quiz"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         val active = state.activeQuiz
         if (active != null) {
-            VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 9.dp) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     VoiceCloudPictogram(VoiceCloudVisualKind.REWARD, size = 44.dp)
                     Column(Modifier.weight(1f)) {
@@ -653,8 +664,8 @@ fun HostVerificationScreen(
         HostingStatus(state)
         val profile = state.hostProfile
         val eligibility = state.eligibility
-        ElevatedCard(Modifier.fillMaxWidth()) {
-            Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(voiceCloudTitleCase("Host Status"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(voiceCloudTitleCase(profile?.status?.ifBlank { "Not Applied" } ?: "Not Applied"), color = MaterialTheme.colorScheme.primary)
                 profile?.rejectionReason?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -681,8 +692,8 @@ fun HostVerificationScreen(
         state.progression?.let { progression ->
             Text(voiceCloudTitleCase("Progression"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             progression.metrics.forEach { metric ->
-                ElevatedCard(Modifier.fillMaxWidth()) {
-                    Row(Modifier.fillMaxWidth().padding(14.dp)) {
+                VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 12.dp) {
+                    Row(Modifier.fillMaxWidth()) {
                         Text(voiceCloudTitleCase(metric.label), Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(metric.value, fontWeight = FontWeight.Bold)
                     }
@@ -692,12 +703,10 @@ fun HostVerificationScreen(
 
         Text(voiceCloudTitleCase("Private Verification Files"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(
-            voiceCloudTitleCase("Files Are Sent Only Through VoiceCloud's Authenticated Verification APIs And Are Not Published As Profile Media."),
+            voiceCloudTitleCase("Files are sent only through VoiceCloud's authenticated verification APIs and are not published as profile media."),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Button(onClick = { governmentLauncher.launch(arrayOf("image/*", "application/pdf")) }, enabled = !state.verificationBusy, modifier = Modifier.fillMaxWidth()) {
-            Text(voiceCloudTitleCase("Upload Government ID"))
-        }
+        VoiceCloudApprovedPrimaryButton("Upload Government ID", enabled = !state.verificationBusy) { governmentLauncher.launch(arrayOf("image/*", "application/pdf")) }
         OutlinedButton(onClick = { photoLauncher.launch(arrayOf("image/*")) }, enabled = !state.verificationBusy, modifier = Modifier.fillMaxWidth()) {
             Text(voiceCloudTitleCase("Upload Verification Selfie"))
         }
@@ -706,11 +715,11 @@ fun HostVerificationScreen(
         }
 
         if (state.verificationAssets.isEmpty() && !state.loading) {
-            Text(voiceCloudTitleCase("No Verification Assets Are Currently Returned By VoiceCloud."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(voiceCloudTitleCase("No verification assets are currently returned by VoiceCloud."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         state.verificationAssets.forEach { asset ->
-            ElevatedCard(Modifier.fillMaxWidth()) {
-                Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 12.dp) {
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(voiceCloudTitleCase(asset.type.replace('_', ' ').ifBlank { "Verification Asset" }), fontWeight = FontWeight.Bold)
                     if (asset.status.isNotBlank()) Text(voiceCloudTitleCase(asset.status), color = MaterialTheme.colorScheme.primary)
                     asset.fileName?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }

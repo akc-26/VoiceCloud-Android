@@ -1,0 +1,3 @@
+VC-ANDROID-PH13-R16
+Parent functional/build baseline: VC-ANDROID-PH13-R15
+Scope: approved-design page-by-page UI/UX fidelity implementation; functional authority preserved

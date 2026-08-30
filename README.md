@@ -1,28 +1,87 @@
-# VoiceCloud Android — VC-ANDROID-PH13-R10
+# VoiceCloud Android VC-ANDROID-PH13-R19 — Consolidated Video-Driven Product Correction
 
-PH13-R10 is a **device-acceptance corrective revision only** on top of PH13-R09. The Android product/UI/API/runtime/build-input source is byte-identical to R09. The supplied R09 workstation acceptance already proved Debug/Staging/Release Kotlin compilation, unit tests, lint and all assemblies; its only failing gate was the wireless ADB physical-device APK install timing out.
+R19 uses the build-proven R15 core carried through R18 and closes the product/navigation problems exposed by the latest End User + Creator physical-device videos. Listener navigation is now Home / Discover / Live / Messages / Profile, the center live/microphone control no longer opens Search, Speaker is removed as a pseudo-portal, Creator Studio is Host-approval aware, and Creator Profile opens as an overview before editing. The approved R16 board reconstruction remains the visual authority.
 
-## Fast corrective acceptance
-Run only:
-```powershell
-scripts\VC-ANDROID-PH13-R10-ACCEPTANCE.cmd
+Run the full Windows acceptance from a freshly extracted package:
+
+```bat
+scripts\VC-ANDROID-PH13-R19-ACCEPTANCE.cmd
 ```
 
-R10 first proves the product/build-input hashes are identical to R09. It then reuses the hash-verified R09 temporary build artifacts when they still exist. If they are unavailable, it builds **Debug + androidTest prerequisites only** and runs the corrected device gate. It does not make you repeat the already-proven Staging/Release compile, unit-test, lint and full-assembly chain.
+Do not Git-freeze or call R19 fully accepted until the full compile/test/lint/assembly/device gate and manual device QA pass.
 
-## Device-gate correction
-- disables incremental ADB install for the corrective path;
-- verifies the exact installed APK by SHA-256, including after an ADB client timeout;
-- performs one bounded ADB transport recovery;
-- falls back to `adb push` + `pm install` when direct install cannot be proven;
-- retries instrumentation once only when the ADB client itself times out;
-- preserves USB-first device preference;
-- remains fail-closed for real install/instrumentation failures.
+## PH13 R18 acceptance
+R18 preserves the approved R16 design implementation and R17 compiler/UTF-8 fixes while closing Economy/Hosting/Creator component API signature drift. Run `scripts\VC-ANDROID-PH13-R18-ACCEPTANCE.cmd` on Windows for the full Debug/Staging/Release, tests, lint, assemblies and device gate.
+
+# VoiceCloud Android VC-ANDROID-PH13-R16 — Approved Design Fidelity Candidate
+
+R16 freezes **VC-ANDROID-PH13-R15** as the functional/build baseline and reconstructs the Android presentation against the nine approved End User + Creator/Host design boards bundled under `docs/reference/approved-r16/`. The approved boards—not the rejected R14/R15 generic premium-shell composition—are the visual authority for this revision.
+
+Functional authority remains protected: API, repository, ViewModel, model, RTC, security, payment/economy and backend business-rule source is preserved unless explicitly listed in the R16 approved presentation manifest. Run the complete Windows acceptance only from a freshly extracted package:
+
+```bat
+scripts\VC-ANDROID-PH13-R16-ACCEPTANCE.cmd
+```
+
+R16 is not BUILD/DEVICE ACCEPTED until that command completes all Debug/Staging/Release compile gates, tests, lint, assemblies and physical-device instrumentation.
+
+# VC-ANDROID-PH13-R15
+
+R15 is the compiler-closure revision for the full physical-device-driven R14 UI/UX implementation. Run `scripts\VC-ANDROID-PH13-R15-ACCEPTANCE.cmd` on Windows. Full compile/test/lint/assembly/device acceptance remains mandatory.
+
+# VoiceCloud Android — VC-ANDROID-PH13-R14
+
+R14 is the consolidated physical-device-driven UI/UX correction over PH13-R13. It fixes the systemic text-spacing defect, replaces placeholder-like media behavior with real backend cover/avatar/image rendering plus polished fallbacks, strengthens Home/Auth/Profile/Live/Economy/Settings/Creator/Host presentation, and protects the existing functional/API/RTC/payment/navigation authority.
+
+Run only:
+```bat
+scripts\VC-ANDROID-PH13-R14-ACCEPTANCE.cmd
+```
+
+R14 uses the full required acceptance chain: Debug/Staging/Release Kotlin compilation, unit tests, all-variant lint, Debug/Staging/Release and DebugAndroidTest assemblies, physical-device instrumentation, and final delivery integrity. A missing device is **PENDING**, not full acceptance.
+
+See `docs/VC-ANDROID-PH13-R14-IMPLEMENTATION-REPORT.md` and `docs/VC-ANDROID-PH13-R14-MANUAL-DEVICE-QA.md`.
+
+---
+
+# PH13 R12 Workstation-Safe Acceptance Closure
+
+R12 preserves the build-proven R09/R10/R11 Android product source and corrects only acceptance-harness behavior for workstation-generated artifacts and Windows batch device return-code handling. Run `scripts\VC-ANDROID-PH13-R12-ACCEPTANCE.cmd`.
+
+# VoiceCloud Android — VC-ANDROID-PH13-R11
+
+PH13-R11 is the final **acceptance/device-gate correction** on top of the build-proven PH13-R09/R10 product. Android app/UI/API/runtime/build-input source remains byte-identical to the R09 product authority.
+
+The supplied R09 workstation acceptance already proved:
+- Debug Kotlin compile — PASS
+- Staging Kotlin compile — PASS
+- Release Kotlin compile — PASS
+- Unit tests — PASS
+- Debug/Staging/Release lint — PASS
+- Debug/Staging/Release + DebugAndroidTest assemblies — PASS
+
+R10 then proved the quick Debug + androidTest prerequisite build again, but no healthy authorized device was available by the time device closure ran. R11 corrects that workflow contradiction.
+
+## Acceptance
+Run only:
+```powershell
+scripts\VC-ANDROID-PH13-R11-ACCEPTANCE.cmd
+```
+
+R11 performs the device availability preflight **before any artifact preparation or Gradle build**.
+
+- If no healthy authorized API 26+ device is available, R11 reports physical-device QA as **PENDING**, performs no fallback build, preserves the already-proven host/build acceptance, and exits successfully.
+- If a device is available, R11 first reuses hash-verified R10/R09 Debug + androidTest artifacts when possible.
+- Only when a device is available and reusable artifacts are unavailable does R11 build `assembleDebug + assembleDebugAndroidTest` once.
+- Genuine ADB/install/instrumentation failures remain fail-closed.
+
+## Product preservation
+R11 does not change the premium UI/UX, application code, APIs, repositories, ViewModels, models, navigation authority, RTC/realtime, security, payment/economy logic or business rules.
 
 ## Documentation
-- `docs/VC-ANDROID-PH13-R10-CORRECTION-REPORT.md`
-- `docs/VC-ANDROID-PH13-R10-AUTOMATED-EVIDENCE.md`
-- `docs/VC-ANDROID-PH13-R10-DEVICE-RETEST.md`
+- `docs/VC-ANDROID-PH13-R11-CORRECTION-REPORT.md`
+- `docs/VC-ANDROID-PH13-R11-AUTOMATED-EVIDENCE.md`
+- `docs/VC-ANDROID-PH13-R11-DEVICE-CLOSURE.md`
 
 ---
 
@@ -247,3 +306,17 @@ Acceptance-harness correction only. PH13 product/Kotlin source is unchanged from
 
 ### PH13-R08 acceptance
 Run `scripts\VC-ANDROID-PH13-R08-ACCEPTANCE.cmd` from a freshly extracted PH13-R08 folder. This revision closes the Auth UI compiler defect exposed by PH13-R07 and performs a broader premium-UI contract audit before the mandatory Debug/Staging/Release Kotlin compile gates.
+
+### PH13-R13 acceptance
+R13 is an androidTest-only palette-authority correction. Run on Windows with:
+
+`scripts\VC-ANDROID-PH13-R13-ACCEPTANCE.cmd`
+
+When the prior R12/R11 temporary build workspace is still available and hash-valid, R13 reuses the unchanged production Debug APK and rebuilds only the corrected androidTest APK before physical-device instrumentation.
+## PH13 R17 corrective acceptance
+
+R17 preserves the approved R16 UI/UX and closes two concrete R16 validation defects: the Windows Python locale crash in the source compile-surface diagnostic and the real Kotlin `DrawScope.size` shadowing compiler failure in `VoiceCloudSpeakingAvatar`. Run `scripts\VC-ANDROID-PH13-R17-ACCEPTANCE.cmd` from Windows. The command forces Python UTF-8 mode and then executes the complete Debug/Staging/Release compile, tests, lint, assemblies and physical-device instrumentation sequence.
+
+
+### PH13 R20
+R20 is the consolidated physical-device UI/UX root-cause correction over R19. Run `scripts\VC-ANDROID-PH13-R20-ACCEPTANCE.cmd` from a freshly extracted package for the mandatory full Windows acceptance sequence.

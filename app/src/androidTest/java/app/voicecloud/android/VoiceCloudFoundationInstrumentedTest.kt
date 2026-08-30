@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.compose.ui.graphics.toArgb
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.CreatorColors
@@ -104,7 +105,12 @@ class VoiceCloudFoundationInstrumentedTest {
 
         val renderedArgb = palette.map { it.toArgb() }
         assertEquals(palette.size, renderedArgb.size)
-        assertEquals(0xFF10262E.toInt(), ConsumerColors.Text.toArgb())
-        assertEquals(0xFF0B7C86.toInt(), ConsumerColors.Sapphire.toArgb())
+        assertEquals(0xFF18312D.toInt(), ConsumerColors.Text.toArgb())
+        assertEquals(0xFF006C63.toInt(), ConsumerColors.Sapphire.toArgb())
+        assertEquals("Welcome to VoiceCloud", voiceCloudTitleCase("Welcome to VoiceCloud"))
+        assertEquals(
+            "Only backend-supported profile fields are editable here.",
+            voiceCloudTitleCase("Only backend-supported profile fields are editable here."),
+        )
     }
 }

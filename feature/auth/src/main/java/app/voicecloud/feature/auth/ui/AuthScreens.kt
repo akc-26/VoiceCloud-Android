@@ -7,10 +7,13 @@ import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -19,8 +22,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,10 +36,17 @@ import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.component.VoiceCloudAnimatedWaveform
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedCard
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedChip
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedMetrics
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedPrimaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSecondaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedTextField
 import app.voicecloud.core.designsystem.component.VoiceCloudPremiumBackdrop
 import app.voicecloud.core.designsystem.component.VoiceCloudPremiumCard
 import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
 import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudPosterArtwork
 import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
 import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
@@ -59,51 +72,26 @@ private fun AuthPage(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     VoiceCloudTheme(portal = if (creator) PortalTheme.Creator else PortalTheme.User, darkTheme = false) {
-        VoiceCloudPremiumBackdrop(Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().imePadding().padding(horizontal = 20.dp)) {
-                Column(
-                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 26.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Spacer(Modifier.height(8.dp))
-                    VoiceCloudBrandMark(74.dp)
-                    Text(
-                        VoiceCloudBrand.name,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = ConsumerColors.Ink,
-                    )
-                    Text(
-                        voiceCloudTitleCase(VoiceCloudBrand.tagline),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = ConsumerColors.VioletDeep,
-                    )
-                    VoiceCloudAnimatedWaveform(
-                        Modifier.fillMaxWidth(.62f).height(42.dp),
-                        color = ConsumerColors.Sapphire,
-                        active = state.busy,
-                    )
-                    VoiceCloudToastEffect(state.error, state.notice)
-                    VoiceCloudPictogram(
-                        kind = voiceCloudVisualFor(title),
-                        size = 62.dp,
-                        dark = creator,
-                        modifier = Modifier.padding(bottom = 10.dp),
-                    )
-                    Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = ConsumerColors.Ink)
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        voiceCloudTitleCase(subtitle),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    VoiceCloudPremiumCard(Modifier.fillMaxWidth().widthIn(max = 560.dp)) {
-                        content()
+        Box(Modifier.fillMaxSize().background(ConsumerColors.Surface).imePadding()) {
+            Column(
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                    .padding(horizontal = VoiceCloudApprovedMetrics.pagePadding, vertical = 18.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                VoiceCloudToastEffect(state.error, state.notice)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                    VoiceCloudBrandMark(34.dp)
+                    Column {
+                        Text(VoiceCloudBrand.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                        Text(voiceCloudTitleCase(VoiceCloudBrand.tagline), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.VioletDeep)
                     }
-                    Spacer(Modifier.height(28.dp))
                 }
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                    Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.TextMuted)
+                }
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) { content() }
+                Spacer(Modifier.height(18.dp))
             }
         }
     }
@@ -111,29 +99,29 @@ private fun AuthPage(
 
 @Composable
 private fun InfoCard(message: String) {
-    VoiceCloudGlossCard(contentPadding = 14.dp) {
+    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 12.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            VoiceCloudPictogram(VoiceCloudVisualKind.HELP, size = 36.dp)
-            Text(voiceCloudTitleCase(message), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            VoiceCloudPictogram(VoiceCloudVisualKind.HELP, size = 32.dp)
+            Text(voiceCloudTitleCase(message), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
         }
     }
 }
 
 @Composable
 private fun BusyButton(text: String, busy: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
-    Button(onClick = onClick, enabled = enabled && !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-        if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text(voiceCloudTitleCase(text))
-    }
+    VoiceCloudApprovedPrimaryButton(text = text, enabled = enabled && !busy, onClick = onClick)
 }
 
 @Composable
 private fun SecondaryButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
-    OutlinedButton(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) { Text(voiceCloudTitleCase(text)) }
+    VoiceCloudApprovedSecondaryButton(text = text, enabled = enabled, onClick = onClick)
 }
 
 @Composable
 private fun TextAction(text: String, onClick: () -> Unit) {
-    TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase(text)) }
+    TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Text(voiceCloudTitleCase(text), style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep)
+    }
 }
 
 @Composable
@@ -147,38 +135,53 @@ private fun Field(
     minLines: Int = 1,
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(voiceCloudTitleCase(label)) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = singleLine,
-        minLines = minLines,
-        visualTransformation = if (password && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-        trailingIcon = if (password) {
-            {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        painter = painterResource(if (passwordVisible) R.drawable.vc_icon_visibility_off else R.drawable.vc_icon_visibility),
-                        contentDescription = if (passwordVisible) "Hide Password" else "Show Password",
-                    )
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted)
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = singleLine,
+            minLines = minLines,
+            textStyle = MaterialTheme.typography.bodyMedium,
+            visualTransformation = if (password && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+            trailingIcon = if (password) {
+                {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            painter = painterResource(if (passwordVisible) R.drawable.vc_icon_visibility_off else R.drawable.vc_icon_visibility),
+                            contentDescription = if (passwordVisible) "Hide Password" else "Show Password",
+                        )
+                    }
                 }
-            }
-        } else null,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(16.dp),
-    )
+            } else null,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            shape = RoundedCornerShape(11.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = ConsumerColors.Sapphire,
+                unfocusedBorderColor = ConsumerColors.Border,
+                focusedContainerColor = androidx.compose.ui.graphics.Color.White,
+                unfocusedContainerColor = androidx.compose.ui.graphics.Color.White,
+            ),
+        )
+    }
 }
 
 @Composable
 fun AuthGateScreen() {
-    VoiceCloudPremiumBackdrop(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                VoiceCloudBrandMark(84.dp)
-                Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = ConsumerColors.Ink)
-                VoiceCloudAnimatedWaveform(Modifier.width(210.dp).height(52.dp), color = ConsumerColors.Sapphire, active = true)
-                Text(voiceCloudTitleCase("Connecting voices…"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    VoiceCloudTheme(portal = PortalTheme.User, darkTheme = false) {
+        Box(Modifier.fillMaxSize().background(ConsumerColors.Surface), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                VoiceCloudBrandMark(86.dp)
+                Text(VoiceCloudBrand.name, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                Text("LIVE AUDIO. REAL CONNECTIONS.", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.VipGold, fontWeight = FontWeight.Bold)
+                VoiceCloudAnimatedWaveform(Modifier.width(220.dp).height(74.dp), color = ConsumerColors.Sapphire, active = true)
+                Spacer(Modifier.height(8.dp))
+                Text(voiceCloudTitleCase("Connecting voices..."), style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                Text(voiceCloudTitleCase("Please wait"), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted)
+                Box(Modifier.width(140.dp).height(2.dp).background(ConsumerColors.Border)) {
+                    Box(Modifier.fillMaxWidth(.36f).height(2.dp).background(ConsumerColors.Sapphire))
+                }
             }
         }
     }
@@ -189,54 +192,77 @@ fun PortalSelectorScreen(
     state: AuthUiState,
     onUser: () -> Unit,
     onCreator: () -> Unit,
+    onGuest: () -> Unit,
 ) {
+    var step by rememberSaveable { mutableStateOf(0) }
     VoiceCloudTheme(portal = PortalTheme.User, darkTheme = false) {
-        VoiceCloudPremiumBackdrop(Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().imePadding()) {
+        Box(Modifier.fillMaxSize().background(ConsumerColors.Surface)) {
             VoiceCloudToastEffect(state.error, state.notice)
-            Column(
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 28.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Spacer(Modifier.height(18.dp))
-                Surface(
-                    shape = RoundedCornerShape(30.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    tonalElevation = 4.dp,
+            if (step == 0) {
+                Column(
+                    Modifier.fillMaxSize().padding(horizontal = 22.dp, vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Box(Modifier.padding(22.dp), contentAlignment = Alignment.Center) { VoiceCloudBrandMark(78.dp) }
-                }
-                Spacer(Modifier.height(22.dp))
-                Text(voiceCloudTitleCase("Welcome To ${VoiceCloudBrand.name}"), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(6.dp))
-                Text(voiceCloudTitleCase("Choose Your Experience"), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(6.dp))
-                Text(voiceCloudTitleCase("One Account • Seamless Switching"), color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(26.dp))
-                Column(Modifier.fillMaxWidth().widthIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    PortalChoice(
-                        eyebrow = "Listen & Connect",
-                        title = "VoiceCloud",
-                        body = "Discover Rooms, Join Conversations, Follow Creators",
-                        action = "Enter VoiceCloud",
-                        iconRes = R.drawable.vc_portal_user,
-                        accent = MaterialTheme.colorScheme.primary,
-                        onClick = onUser,
+                    Spacer(Modifier.height(8.dp))
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                        VoiceCloudBrandMark(40.dp)
+                        Spacer(Modifier.width(9.dp))
+                        Text(VoiceCloudBrand.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Welcome to VoiceCloud",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = ConsumerColors.Ink,
+                        textAlign = TextAlign.Center,
                     )
-                    PortalChoice(
-                        eyebrow = "Create & Host",
-                        title = "Creator Studio",
-                        body = "Go Live, Schedule Rooms, Grow Your Community",
-                        action = "Open Creator Studio",
-                        iconRes = R.drawable.vc_portal_creator,
-                        accent = app.voicecloud.core.designsystem.theme.CreatorColors.PrimaryDark,
-                        onClick = onCreator,
+                    Text(
+                        "Join live conversations, discover creators and connect through voice.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = ConsumerColors.TextMuted,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.widthIn(max = 330.dp),
                     )
+                    Image(
+                        painter = painterResource(R.drawable.vc_onboarding_conversation),
+                        contentDescription = "VoiceCloud live conversation",
+                        modifier = Modifier.fillMaxWidth().height(250.dp).clip(RoundedCornerShape(20.dp)),
+                        contentScale = ContentScale.Crop,
+                    )
+                    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        repeat(3) { index ->
+                            Box(Modifier.padding(horizontal = 3.dp).size(if (index == 0) 8.dp else 6.dp).clip(CircleShape).background(if (index == 0) ConsumerColors.Sapphire else ConsumerColors.Border))
+                        }
+                    }
+                    Spacer(Modifier.weight(1f))
+                    VoiceCloudApprovedPrimaryButton("Get Started", onClick = { step = 1 })
+                    VoiceCloudApprovedSecondaryButton("Explore as Guest", onClick = onGuest)
                 }
-                Spacer(Modifier.height(20.dp))
-                Text(voiceCloudTitleCase("You Can Switch Experiences Anytime"), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(20.dp))
-            }
+            } else {
+                Column(
+                    Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        VoiceCloudBrandMark(34.dp)
+                        Text(VoiceCloudBrand.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                    }
+                    Spacer(Modifier.height(10.dp))
+                    Text("How do you want\nto continue?", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                    Text("Choose how you want to experience VoiceCloud.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                    Spacer(Modifier.height(4.dp))
+                    PortalChoice("Listener", "Join rooms, listen and connect with amazing people.", R.drawable.vc_portal_user, ConsumerColors.Sapphire, onUser)
+                    PortalChoice("Creator", "Build your audience, manage creator tools and grow your community.", R.drawable.vc_portal_creator, ConsumerColors.SapphireDeep, onCreator)
+                    Spacer(Modifier.weight(1f))
+                    VoiceCloudApprovedPrimaryButton("Continue as Listener", onClick = onUser)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Already have an account?", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                        TextButton(onClick = onUser) { Text("Sign In", style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold) }
+                    }
+                    TextButton(onClick = { step = 0 }, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("Back", style = MaterialTheme.typography.labelSmall) }
+                }
             }
         }
     }
@@ -244,39 +270,27 @@ fun PortalSelectorScreen(
 
 @Composable
 private fun PortalChoice(
-    eyebrow: String,
     title: String,
     body: String,
-    action: String,
     iconRes: Int,
     accent: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit,
 ) {
-    ElevatedCard(
+    Surface(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(13.dp),
+        color = androidx.compose.ui.graphics.Color.White,
+        border = androidx.compose.foundation.BorderStroke(1.dp, accent.copy(alpha = .32f)),
     ) {
-        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = RoundedCornerShape(20.dp), color = accent.copy(alpha = .12f), modifier = Modifier.size(66.dp)) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(painter = painterResource(iconRes), contentDescription = null, tint = accent, modifier = Modifier.size(34.dp))
-                    }
-                }
-                Spacer(Modifier.width(16.dp))
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(voiceCloudTitleCase(eyebrow), style = MaterialTheme.typography.labelLarge, color = accent, fontWeight = FontWeight.SemiBold)
-                    Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                }
+        Row(Modifier.fillMaxWidth().padding(13.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+            Surface(shape = CircleShape, color = accent.copy(alpha = .10f), modifier = Modifier.size(42.dp)) {
+                Box(contentAlignment = Alignment.Center) { Icon(painterResource(iconRes), null, tint = accent, modifier = Modifier.size(21.dp)) }
             }
-            Text(voiceCloudTitleCase(body), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Surface(shape = RoundedCornerShape(14.dp), color = accent.copy(alpha = .10f)) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(voiceCloudTitleCase(action), modifier = Modifier.weight(1f), color = accent, fontWeight = FontWeight.SemiBold)
-                    Text(voiceCloudTitleCase("›"), style = MaterialTheme.typography.titleLarge, color = accent)
-                }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = ConsumerColors.Ink)
+                Text(voiceCloudTitleCase(body), style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted, maxLines = 2)
             }
+            Surface(shape = CircleShape, color = accent, modifier = Modifier.size(18.dp)) { Box(Modifier.padding(5.dp).clip(CircleShape).background(androidx.compose.ui.graphics.Color.White)) }
         }
     }
 }
@@ -301,12 +315,12 @@ fun UserSignInScreen(
     }
     fun enabled(vararg aliases: String) = aliases.any { alias -> methods.any { it.contains(alias) } }
 
-    AuthPage("User Portal", "Welcome back", state) {
+    AuthPage("Welcome back 👋", "Sign in to continue", state) {
         if (enabled("email", "password", "username")) {
             Field(identifier, { identifier = it }, "Email or username", keyboardType = KeyboardType.Email)
             Field(password, { password = it }, "Password", password = true)
+            TextButton(onClick = onForgot, modifier = Modifier.align(Alignment.End)) { Text("Forgot password?", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.SapphireDeep) }
             BusyButton("Sign In", state.busy) { onLogin(identifier, password) }
-            TextAction("Forgot password?", onForgot)
         }
         if (enabled("phone")) SecondaryButton("Continue with phone", !state.busy, onPhone)
         if (enabled("google")) GoogleAuthButton(
@@ -315,10 +329,13 @@ fun UserSignInScreen(
             enabled = !state.busy,
             onToken = onGoogleToken,
         )
-        if (enabled("guest")) SecondaryButton("Continue as guest", !state.busy, onGuest)
+        if (enabled("guest")) SecondaryButton("Continue as Guest", !state.busy, onGuest)
         HorizontalDivider()
-        TextAction("Signup", onRegister)
-        SecondaryButton("Creator Portal", !state.busy, onBack)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Text("Don’t have an account?", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+            TextButton(onClick = onRegister) { Text("Sign Up", style = MaterialTheme.typography.labelMedium, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold) }
+        }
+        TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Creator Portal", style = MaterialTheme.typography.labelMedium, color = ConsumerColors.TextMuted) }
     }
 }
 
@@ -328,13 +345,18 @@ fun RegisterScreen(state: AuthUiState, onSubmit: (String, String, String, String
     var displayName by rememberSaveableCompat("")
     var email by rememberSaveableCompat("")
     var password by rememberSaveableCompat("")
-    AuthPage("Create your account", "Your email and username become part of your ${VoiceCloudBrand.name} account identity.", state) {
-        Field(displayName, { displayName = it }, "Display name")
-        Field(username, { username = it }, "Username")
+    var acceptedTerms by rememberSaveable { mutableStateOf(false) }
+    AuthPage("Create your VoiceCloud account", "Let’s get you started", state) {
+        Field(displayName, { displayName = it }, "Full name")
         Field(email, { email = it }, "Email", keyboardType = KeyboardType.Email)
-        Field(password, { password = it }, "Password (8+ characters)", password = true)
-        BusyButton("Create Account", state.busy) { onSubmit(username, displayName, email, password) }
-        TextAction("Back to sign in", onBack)
+        Field(username, { username = it }, "Username")
+        Field(password, { password = it }, "Password", password = true)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Checkbox(checked = acceptedTerms, onCheckedChange = { acceptedTerms = it }, modifier = Modifier.size(20.dp))
+            Text("I agree to the Terms of Service and Privacy Policy", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted, modifier = Modifier.weight(1f))
+        }
+        BusyButton("Create Account", state.busy, acceptedTerms && username.isNotBlank() && email.isNotBlank() && password.length >= 8) { onSubmit(username, displayName, email, password) }
+        TextAction("Already have an account? Sign In", onBack)
     }
 }
 
@@ -351,6 +373,39 @@ fun PhoneSignInScreen(state: AuthUiState, onSend: (String, String) -> Unit, onBa
 }
 
 @Composable
+private fun VoiceCloudOtpDigitsField(value: String, onValueChange: (String) -> Unit) {
+    BasicTextField(
+        value = value,
+        onValueChange = { onValueChange(it.filter(Char::isDigit).take(6)) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        cursorBrush = SolidColor(androidx.compose.ui.graphics.Color.Transparent),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = androidx.compose.ui.graphics.Color.Transparent),
+        modifier = Modifier.fillMaxWidth().height(58.dp),
+        decorationBox = { inner ->
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    repeat(6) { index ->
+                        val digit = value.getOrNull(index)?.toString().orEmpty()
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = androidx.compose.ui.graphics.Color.White,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if (index == value.length.coerceAtMost(5)) ConsumerColors.Sapphire.copy(alpha = .55f) else ConsumerColors.Border),
+                            modifier = Modifier.weight(1f).height(50.dp),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(digit, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                            }
+                        }
+                    }
+                }
+                Box(Modifier.size(1.dp)) { inner() }
+            }
+        },
+    )
+}
+
+@Composable
 fun OtpVerifyScreen(state: AuthUiState, onVerify: (String) -> Unit, onResend: () -> Unit, onBack: () -> Unit) {
     var code by rememberSaveableCompat("")
     var cooldown by remember(state.otpCooldownSeconds, state.pendingPhone) { mutableIntStateOf(state.otpCooldownSeconds) }
@@ -361,14 +416,22 @@ fun OtpVerifyScreen(state: AuthUiState, onVerify: (String) -> Unit, onResend: ()
         }
     }
     AuthPage("Verify your phone", "Enter the six-digit code sent to ${state.pendingPhone}.", state) {
-        Field(code, { value -> code = value.filter(Char::isDigit).take(6) }, "6-digit code", keyboardType = KeyboardType.Number)
-        state.developmentOtp?.let {
-            InfoCard("Development OTP: $it")
-        }
+        Text("We’ve sent a 6-digit code to ${state.pendingPhone}.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+        VoiceCloudOtpDigitsField(code) { code = it }
+        Text(
+            if (cooldown > 0) "Resend code in 00:${cooldown.toString().padStart(2, '0')}" else "You can request a new code now.",
+            style = MaterialTheme.typography.labelSmall,
+            color = ConsumerColors.TextMuted,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+        state.developmentOtp?.let { InfoCard("Development OTP: $it") }
         BusyButton("Verify & Continue", state.busy, code.length == 6) { onVerify(code) }
-        SecondaryButton(if (cooldown > 0) "Resend in ${cooldown}s" else "Resend code", enabled = !state.busy && cooldown == 0) {
-            cooldown = state.otpCooldownSeconds
-            onResend()
+        VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 12.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Didn’t receive the code?", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = ConsumerColors.Ink)
+                Text("Check your SMS spam folder or request a new code.", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted)
+                TextButton(onClick = { cooldown = state.otpCooldownSeconds; onResend() }, enabled = !state.busy && cooldown == 0) { Text("Resend Code", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.SapphireDeep) }
+            }
         }
         TextAction("Change phone number", onBack)
     }
@@ -405,7 +468,7 @@ fun ResetPasswordScreen(state: AuthUiState, token: String, onSubmit: (String) ->
     }
 }
 
-private val onboardingInterests = listOf("Deep Talks", "Music", "Mindfulness", "Culture", "Books", "Comedy", "Night Rooms", "Learning")
+private val onboardingInterests = listOf("Music", "Podcast", "Gaming", "Technology", "Motivation", "Business", "Sports", "Health", "Lifestyle")
 
 @Composable
 fun OnboardingScreen(state: AuthUiState, onFinish: (String, String, List<String>, Boolean) -> Unit) {
@@ -424,17 +487,17 @@ fun OnboardingScreen(state: AuthUiState, onFinish: (String, String, List<String>
             }
             2 -> {
                 Text(voiceCloudTitleCase("Choose Topics You Enjoy"), style = MaterialTheme.typography.titleMedium)
-                onboardingInterests.chunked(2).forEach { row ->
+                onboardingInterests.chunked(3).forEach { row ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         row.forEach { interest ->
-                            FilterChip(
+                            VoiceCloudApprovedChip(
+                                text = interest,
                                 selected = interest in interests,
-                                onClick = { interests = if (interest in interests) interests - interest else interests + interest },
-                                label = { Text(voiceCloudTitleCase(interest)) },
                                 modifier = Modifier.weight(1f),
+                                onClick = { interests = if (interest in interests) interests - interest else interests + interest },
                             )
                         }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
+                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                     }
                 }
             }
@@ -443,7 +506,7 @@ fun OnboardingScreen(state: AuthUiState, onFinish: (String, String, List<String>
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(voiceCloudTitleCase("Room And Activity Reminders"), fontWeight = FontWeight.SemiBold)
-                        Text(voiceCloudTitleCase("You Can Change This Later."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(voiceCloudTitleCase("You can change this later."), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(checked = reminders, onCheckedChange = { reminders = it })
                 }

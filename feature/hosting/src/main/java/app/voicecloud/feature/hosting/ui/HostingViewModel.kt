@@ -53,17 +53,21 @@ class HostingViewModel @Inject constructor(
         viewModelScope.launch {
             mutateLoading(true)
             try {
-                val rooms = repository.rooms()
-                val schedules = viewerId?.let { repository.schedules(it) }.orEmpty()
+                val (profile, eligibility) = repository.hostAccess()
+                val approved = profile?.status.equals("APPROVED", true)
+                val rooms = if (approved) repository.rooms() else emptyList()
+                val schedules = viewerId?.let { id -> if (approved) repository.schedules(id) else emptyList() }.orEmpty()
                 mutableState.value = mutableState.value.copy(
                     loading = false,
                     eligibilityChecked = true,
+                    hostProfile = profile,
+                    eligibility = eligibility,
                     rooms = rooms,
                     schedules = schedules,
                     error = null,
                 )
             } catch (error: Throwable) {
-                fail(error, "Your Creator Rooms Couldn’t Be Loaded. Try Again.")
+                fail(error, "Your Creator Studio Couldn’t Be Loaded. Try Again.")
             }
         }
     }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -52,25 +53,27 @@ fun VoiceCloudPageTopBar(
     actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val metrics = VoiceCloudPageMetrics.current()
-    val hasTrailingAction = actions != null || (actionLabel != null && onAction != null)
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = ConsumerColors.Surface.copy(alpha = .995f),
+        color = ConsumerColors.Surface.copy(alpha = .985f),
         tonalElevation = 0.dp,
-        shadowElevation = 5.dp,
+        shadowElevation = 3.dp,
     ) {
-        Column(Modifier.fillMaxWidth()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = metrics.topBarMinHeight)
-                    .padding(horizontal = (metrics.horizontalPadding - 12.dp).coerceAtLeast(4.dp)),
+        Column(
+            Modifier.fillMaxWidth().padding(
+                start = (metrics.horizontalPadding - 10.dp).coerceAtLeast(6.dp),
+                end = (metrics.horizontalPadding - 10.dp).coerceAtLeast(6.dp),
+                top = 5.dp,
+                bottom = if (subtitle.isNullOrBlank()) 5.dp else 8.dp,
+            )
+        ) {
+            Row(
+                Modifier.fillMaxWidth().heightIn(min = metrics.topBarMinHeight - 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     onClick = onBack,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .semantics { contentDescription = "Back" },
+                    modifier = Modifier.semantics { contentDescription = "Back" },
                 ) {
                     val arrowColor = MaterialTheme.colorScheme.onSurface
                     Canvas(Modifier.size(22.dp)) {
@@ -83,32 +86,30 @@ fun VoiceCloudPageTopBar(
                         drawLine(arrowColor, Offset(leftX, midY), Offset(size.width * 0.48f, size.height * 0.75f), stroke, StrokeCap.Round)
                     }
                 }
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth()
-                        .padding(horizontal = if (hasTrailingAction) 108.dp else 58.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-                ) {
-                    VoiceCloudPictogram(
-                        kind = voiceCloudVisualFor(title),
-                        size = 32.dp,
-                        modifier = Modifier.padding(end = 8.dp),
-                    )
+                Box(
+                    Modifier.padding(start = 2.dp, end = 10.dp).size(width = 4.dp, height = 30.dp)
+                        .background(ConsumerColors.Sapphire, RoundedCornerShape(50))
+                )
+                Column(Modifier.weight(1f), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(1.dp)) {
                     Text(
                         text = voiceCloudTitleCase(title),
                         style = MaterialTheme.typography.titleLarge,
                         color = ConsumerColors.Ink,
-                        textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
+                    if (!subtitle.isNullOrBlank()) {
+                        Text(
+                            text = voiceCloudTitleCase(subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
-
-                if (hasTrailingAction) {
-                    Row(modifier = Modifier.align(Alignment.CenterEnd), verticalAlignment = Alignment.CenterVertically) {
+                if (actions != null || (actionLabel != null && onAction != null)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         actions?.invoke(this)
                         if (actionLabel != null && onAction != null) {
                             TextButton(onClick = onAction, enabled = actionEnabled) {
@@ -118,21 +119,6 @@ fun VoiceCloudPageTopBar(
                     }
                 }
             }
-
-            if (!subtitle.isNullOrBlank()) {
-                Text(
-                    text = voiceCloudTitleCase(subtitle),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = metrics.horizontalPadding, end = metrics.horizontalPadding, bottom = metrics.contentTopSpacing),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Box(Modifier.fillMaxWidth().height(1.dp).padding(horizontal = metrics.horizontalPadding).background(ConsumerColors.VipGold.copy(alpha = .28f)))
         }
     }
 }

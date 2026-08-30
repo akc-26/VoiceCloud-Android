@@ -1,0 +1,15 @@
+VC-ANDROID-PH13-R18 DIFF MANIFEST
+Parent: VC-ANDROID-PH13-R17
+
+Android product/source files changed:
+- feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+- feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+- feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+
+Product correction:
+- VoiceCloudRemoteMedia label -> contentDescription
+- VoiceCloudRemoteMedia fallbackKind -> kind
+- all 10 stale callsites across Economy/Hosting/Creator closed
+- Economy ten unused imports and unused glyph helper removed
+
+No API/repository/ViewModel/model/navigation/RTC/security/payment/business logic changes.

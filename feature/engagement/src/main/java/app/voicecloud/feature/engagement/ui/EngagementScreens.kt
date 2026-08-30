@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,9 +35,17 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedCard
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedMetricRow
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedPersonRow
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedPrimaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSearchBar
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSectionTitle
 import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
 import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
 import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
+import app.voicecloud.core.designsystem.component.VoiceCloudRemoteMedia
+import app.voicecloud.core.designsystem.component.VoiceCloudAvatar
 import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
 import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
 import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
@@ -62,7 +71,7 @@ private fun SecondaryPageLayout(
     content: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(
-        containerColor = ConsumerColors.Cloud,
+        containerColor = ConsumerColors.Surface,
         topBar = {
             VoiceCloudPageTopBar(
                 title = title,
@@ -103,13 +112,10 @@ private fun Empty(title: String, body: String) {
 
 @Composable
 private fun RowScope.QuickAction(label: String, iconRes: Int, onClick: () -> Unit) {
-    VoiceCloudGlossCard(
-        modifier = Modifier.weight(1f).heightIn(min = 72.dp).clickable(onClick = onClick),
-        contentPadding = 11.dp,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            VoiceCloudPictogram(voiceCloudVisualFor(label), size = 38.dp)
-            Text(voiceCloudTitleCase(label), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, softWrap = false)
+    VoiceCloudApprovedCard(Modifier.weight(1f).clickable(onClick = onClick), contentPadding = 8.dp) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
+            Icon(painterResource(iconRes), null, tint = ConsumerColors.Sapphire, modifier = Modifier.size(20.dp))
+            Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, maxLines = 1)
         }
     }
 }
@@ -136,57 +142,46 @@ fun CommunitiesScreen(
     onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad("") }
-    val metrics = VoiceCloudPageMetrics.current()
     SecondaryPageLayout(
         title = "Communities",
         onBack = onBack,
         actions = {
             VoiceCloudTopBarIconAction(R.drawable.vc_icon_search, "Search communities", onClick = onSearch)
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(4.dp))
             VoiceCloudTopBarIconAction(R.drawable.vc_icon_calendar, "Upcoming events", onClick = onEvents)
         },
     ) { pageModifier ->
         LazyColumn(
-            pageModifier,
-            contentPadding = PaddingValues(horizontal = metrics.horizontalPadding, vertical = metrics.contentTopSpacing),
-            verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
+            pageModifier.background(ConsumerColors.Surface),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            item { Feedback(state) { onLoad("") } }
             item {
-                ElevatedCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(26.dp),
-                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-                ) {
-                    Box(Modifier.fillMaxWidth().background(ConsumerBrushes.Hero).padding(20.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                Text(voiceCloudTitleCase("Build Your Circle"), color = ConsumerColors.Ink, fontSize = 25.sp, fontWeight = FontWeight.Bold)
-                                Text(voiceCloudTitleCase("Create A Place For Your Audience."), color = ConsumerColors.Text, style = MaterialTheme.typography.bodyMedium)
-                            }
-                            FilledIconButton(onClick = onCreate, modifier = Modifier.size(52.dp)) {
-                                Text(voiceCloudTitleCase("+"), fontSize = 27.sp, fontWeight = FontWeight.Medium)
-                            }
-                        }
-                    }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onCreate, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)) { Text("Create Community", style = MaterialTheme.typography.labelSmall) }
+                    OutlinedButton(onClick = onMessages, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)) { Text("Messages", style = MaterialTheme.typography.labelSmall) }
                 }
             }
-            item { Ph04QuickActions(onCommunities = { onLoad("") }, onMessages = onMessages, onNotifications = onNotifications) }
-            item { Feedback(state) { onLoad("") } }
-            if (state.communities.isEmpty() && !state.loading) item { Empty("No communities", "Create the first one.") }
+            if (state.communities.isEmpty() && !state.loading) item { Empty("No communities", "Communities you join or create will appear here.") }
             itemsIndexed(state.communities.distinctBy { it.id }, key = { i, c -> "community:${c.id}:$i" }) { _, community ->
-                VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable { onOpen(community.handle.ifBlank { community.id }) }, contentPadding = 15.dp) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        VoiceCloudPictogram(VoiceCloudVisualKind.COMMUNITY, size = 50.dp)
-                        Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 0.dp, onClick = { onOpen(community.handle.ifBlank { community.id }) }) {
+                    Column {
+                        VoiceCloudRemoteMedia(
+                            url = community.bannerUrl ?: community.imageUrl,
+                            contentDescription = community.name.ifBlank { "Community" },
+                            modifier = Modifier.fillMaxWidth().height(112.dp),
+                            kind = VoiceCloudVisualKind.COMMUNITY,
+                            contentScale = ContentScale.Crop,
+                        )
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(community.name.ifBlank { "Community" }, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                if (community.isVerified) Text(voiceCloudTitleCase("✓"), color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+                                Text(community.name.ifBlank { "Community" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                if (community.isVerified) Text("✓", color = ConsumerColors.Sapphire, fontWeight = FontWeight.Bold)
                             }
-                            Text(voiceCloudTitleCase("@${community.handle} · ${community.memberCount} Members"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            if (community.description.isNotBlank()) Text(community.description, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                            Text(community.description.ifBlank { "A place for meaningful conversations." }, style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            VoiceCloudApprovedMetricRow(listOf(community.memberCount.toString() to "Members", community.hostCount.toString() to "Hosts", community.upcomingRoomsCount.toString() to "Rooms"))
                         }
-                        Text(voiceCloudTitleCase("›"), fontSize = 24.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -226,24 +221,21 @@ fun CommunityDetailScreen(
             verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
         ) {
             item { Feedback(state, onLoad) }
-            item { VoiceCloudPageHero(community?.name ?: "Community", community?.description?.takeIf { it.isNotBlank() } ?: "A place for people, hosts and conversations to grow together.", VoiceCloudVisualKind.COMMUNITY, badge = community?.category ?: "Community") }
             if (community != null) {
                 item {
-                    VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 20.dp) {
-                        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                VoiceCloudPictogram(VoiceCloudVisualKind.COMMUNITY, size = 66.dp)
-                                Spacer(Modifier.width(14.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text(community.name, style = MaterialTheme.typography.titleLarge)
-                                    Text(voiceCloudTitleCase("${community.category} · ${community.visibility.lowercase().replaceFirstChar(Char::uppercase)}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 0.dp) {
+                        Column {
+                            Box(Modifier.fillMaxWidth().height(168.dp)) {
+                                VoiceCloudRemoteMedia(community.bannerUrl ?: community.imageUrl, community.name, Modifier.fillMaxSize(), VoiceCloudVisualKind.COMMUNITY, dark = true, contentScale = ContentScale.Crop)
+                                Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, ConsumerColors.DeepNavy.copy(alpha = .86f)))))
+                                Column(Modifier.align(Alignment.BottomStart).padding(14.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                    Text(community.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Text("${community.category} · ${community.memberCount} members", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextOnDarkSecondary)
                                 }
                             }
-                            if (community.description.isNotBlank()) Text(community.description, maxLines = 4, overflow = TextOverflow.Ellipsis)
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                CommunityStat(community.memberCount.toString(), "Members")
-                                CommunityStat(community.hostCount.toString(), "Hosts")
-                                CommunityStat(community.upcomingRoomsCount.toString(), "Upcoming")
+                            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(community.description.ifBlank { "A supportive space to grow together, share ideas and elevate your mindset." }, style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.Text)
+                                VoiceCloudApprovedMetricRow(listOf(community.memberCount.toString() to "Members", community.hostCount.toString() to "Hosts", community.upcomingRoomsCount.toString() to "Upcoming"))
                             }
                         }
                     }
@@ -269,7 +261,7 @@ fun CommunityDetailScreen(
                         }
                     }
                     if (community.rules.isNotEmpty()) item {
-                        VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 16.dp) {
+                        VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 16.dp) {
                             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Text(voiceCloudTitleCase("Community Rules"), fontWeight = FontWeight.Bold)
                                 community.rules.take(4).forEachIndexed { index, rule -> Text(voiceCloudTitleCase("${index + 1}. $rule"), style = MaterialTheme.typography.bodyMedium) }
@@ -315,7 +307,7 @@ fun CommunityEditorScreen(
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Feedback(state) }
-        item { VoiceCloudPageHero(if (existing == null) "Create Community" else "Manage Community", if (existing == null) "Create a polished home for your audience, rules and upcoming conversations." else "Refine community details, membership and access while keeping the same community identity.", VoiceCloudVisualKind.COMMUNITY, badge = if (existing == null) "Build your circle" else "Community tools") }
+        item { VoiceCloudApprovedSectionTitle(if (existing == null) "Create Community" else "Manage Community") }
         if (existing == null) item {
             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(ConsumerBrushes.Hero).padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -325,7 +317,7 @@ fun CommunityEditorScreen(
                     Spacer(Modifier.width(14.dp))
                     Column {
                         Text(voiceCloudTitleCase("Start A Community"), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
-                        Text(voiceCloudTitleCase("Name It. Shape It. Grow It."), style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.Text)
+                        Text(voiceCloudTitleCase("Name it. Shape it. Grow it."), style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.Text)
                     }
                 }
             }
@@ -338,7 +330,7 @@ fun CommunityEditorScreen(
         item { OutlinedTextField(rules, { rules = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Rules · One Per Line")) }, minLines = 3, shape = RoundedCornerShape(18.dp)) }
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { Text(voiceCloudTitleCase("Private Community"), fontWeight = FontWeight.Bold); Text(voiceCloudTitleCase("Requires The Secure Invitation Code To Join."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                Column(Modifier.weight(1f)) { Text(voiceCloudTitleCase("Private Community"), fontWeight = FontWeight.Bold); Text(voiceCloudTitleCase("Requires the secure invitation code to join."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 Switch(checked = privateCommunity, onCheckedChange = { privateCommunity = it })
             }
         }
@@ -347,7 +339,7 @@ fun CommunityEditorScreen(
         }
         if (!state.inviteCode.isNullOrBlank()) item {
             Card(colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft), modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp)) { Text(voiceCloudTitleCase("Current One-Time Shareable Invitation Code"), fontWeight = FontWeight.Bold); Text(state.inviteCode, fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                Column(Modifier.padding(16.dp)) { Text(voiceCloudTitleCase("Current one-time shareable invitation code"), fontWeight = FontWeight.Bold); Text(state.inviteCode, fontSize = 20.sp, fontWeight = FontWeight.Bold) }
             }
         }
         if (existing != null && onMembers != null) item { OutlinedButton(onClick = onMembers, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Manage Members And Roles")) } }
@@ -382,14 +374,14 @@ fun CommunityMembersScreen(
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Feedback(state) }
-        item { VoiceCloudPageHero("Community Members", "See the people who make this community active and manage roles when your permissions allow it.", VoiceCloudVisualKind.AUDIENCE, badge = "People & roles") }
+        item { VoiceCloudApprovedSectionTitle("Community Members") }
         if (state.members.isEmpty() && !state.loading) item { Empty("No members", "No member identities are available.") }
         itemsIndexed(state.members.distinctBy { it.id.ifBlank { it.userId } }, key = { i, m -> "member:${m.id.ifBlank { m.userId }}:$i" }) { _, member ->
             val user = member.user
             val memberName = user?.displayName?.takeIf { it.isNotBlank() }
                 ?: user?.username?.takeIf { it.isNotBlank() }
                 ?: "${VoiceCloudBrand.name} member"
-            VoiceCloudGlossCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 14.dp) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(11.dp)) {
                     VoiceCloudPictogram(VoiceCloudVisualKind.PROFILE, size = 44.dp)
                     Column(Modifier.weight(1f)) {
@@ -416,9 +408,14 @@ fun CommunityMembersScreen(
 
 @Composable
 private fun EventCard(event: ScheduledEvent, onClick: () -> Unit) {
-    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable(onClick = onClick), contentPadding = 16.dp) {
+    VoiceCloudApprovedCard(Modifier.fillMaxWidth().clickable(onClick = onClick), contentPadding = 16.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            VoiceCloudPictogram(VoiceCloudVisualKind.EVENT, size = 58.dp)
+            VoiceCloudRemoteMedia(
+                url = event.coverUrl,
+                contentDescription = event.title.ifBlank { "Event artwork" },
+                modifier = Modifier.size(width = 78.dp, height = 88.dp).clip(RoundedCornerShape(18.dp)),
+                kind = VoiceCloudVisualKind.EVENT,
+            )
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     Surface(shape = RoundedCornerShape(50), color = ConsumerColors.SapphireSoft) { Text(voiceCloudTitleCase(event.status), Modifier.padding(horizontal=8.dp,vertical=4.dp), color=ConsumerColors.SapphireDeep, fontWeight=FontWeight.Bold, style=MaterialTheme.typography.labelSmall) }
@@ -447,7 +444,7 @@ fun EventsScreen(state: EngagementUiState, onLoad: (String) -> Unit, onOpen: (St
         onBack = onBack,
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { VoiceCloudPageHero("Upcoming Events", "Plan ahead for scheduled VoiceCloud conversations, community sessions and reminders.", VoiceCloudVisualKind.EVENT, badge = "Live audio calendar") }
+        item { VoiceCloudApprovedSectionTitle("Upcoming Events") }
         item { OutlinedTextField(search, { search = it }, Modifier.fillMaxWidth(), label = { Text(voiceCloudTitleCase("Search Scheduled Sessions")) }, singleLine = true, trailingIcon = { TextButton(onClick = { onLoad(search) }) { Text(voiceCloudTitleCase("Search")) } }) }
         item { Feedback(state) { onLoad(search) } }
         if (state.events.isEmpty() && !state.loading) item { Empty("No scheduled sessions", "Upcoming sessions will appear here.") }
@@ -467,7 +464,7 @@ fun EventDetailScreen(state: EngagementUiState, onLoad: () -> Unit, onReminder: 
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Feedback(state, onLoad) }
-        item { VoiceCloudPageHero(event?.title ?: "Scheduled Event", event?.description?.takeIf { it.isNotBlank() } ?: "Review the session, host context and reminder details before it begins.", VoiceCloudVisualKind.EVENT, badge = event?.status ?: "Upcoming") }
+        item { VoiceCloudApprovedSectionTitle(event?.title ?: "Scheduled Event") }
         if (event != null) {
             item { EventCard(event) {} }
             item { Button(onClick = onReminder, enabled = !state.mutationBusy, modifier = Modifier.fillMaxWidth()) { Text(voiceCloudTitleCase("Remind Me")) } }
@@ -537,23 +534,17 @@ fun MessagesScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             if (searchVisible) item {
-                OutlinedTextField(
-                    search,
-                    { search = it },
-                    Modifier.fillMaxWidth(),
-                    placeholder = { Text(voiceCloudTitleCase("Search Conversations")) },
-                    singleLine = true,
-                    leadingIcon = { Icon(painterResource(R.drawable.vc_icon_search), contentDescription = null) },
-                    trailingIcon = { TextButton(onClick = { onLoad(search.trim()) }) { Text(voiceCloudTitleCase("Go")) } },
-                    shape = RoundedCornerShape(20.dp),
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    VoiceCloudApprovedSearchBar(search, { search = it }, placeholder = "Search conversations")
+                    if (search.isNotBlank()) VoiceCloudApprovedPrimaryButton("Search", onClick = { onLoad(search.trim()) })
+                }
             }
-            if (!selectionMode) item { VoiceCloudPageHero("Your Conversations", "Direct messages and community connections, presented in one polished inbox.", VoiceCloudVisualKind.MESSAGE, badge = "Private & connected") }
+            if (!selectionMode) item { VoiceCloudApprovedSectionTitle("Your Conversations") }
             item { Feedback(state) { onLoad(search) } }
             if (state.conversations.isEmpty() && !state.loading) item { Empty("No conversations", "Start a new conversation.") }
             itemsIndexed(state.conversations.distinctBy { it.id }, key = { i, c -> "conversation:${c.id}:$i" }) { _, conversation ->
                 val checked = conversation.id in selected
-                VoiceCloudGlossCard(
+                VoiceCloudApprovedCard(
                     modifier = Modifier.fillMaxWidth().border(1.dp, if (checked) ConsumerColors.Sapphire else ConsumerColors.Border.copy(alpha = .62f), RoundedCornerShape(20.dp)),
                     contentPadding = 10.dp,
                 ) {
@@ -568,7 +559,11 @@ fun MessagesScreen(
                             }.padding(vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            VoiceCloudPictogram(VoiceCloudVisualKind.MESSAGE, size = 46.dp)
+                            VoiceCloudAvatar(
+                                url = conversation.peer?.avatarUrl ?: conversation.avatarUrl,
+                                label = conversation.name ?: conversation.peer?.displayName ?: conversation.peer?.username ?: "Conversation",
+                                size = 48.dp,
+                            )
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 val title = conversation.name ?: conversation.peer?.displayName ?: conversation.peer?.username ?: conversation.type.replaceFirstChar(Char::uppercase)
@@ -606,7 +601,7 @@ fun ConversationScreen(state: EngagementUiState, viewerId: String?, onLoad: () -
         VoiceCloudToastEffect(state.error, state.notice)
         Box(Modifier.weight(1f)) {
             LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                item { VoiceCloudPageHero(conversation?.name ?: conversation?.peer?.displayName ?: "Conversation", "Private, polished messaging that stays focused on the people you connect with.", VoiceCloudVisualKind.MESSAGE, badge = "Direct conversation") }
+                item { if (state.messages.isNotEmpty()) Text("Today", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) }
                 if (state.loading && state.messages.isEmpty()) item { Feedback(state) }
                 if (state.messages.isEmpty() && !state.loading) item { Empty("Start the conversation", "Send a message to start the conversation.") }
                 itemsIndexed(state.messages.distinctBy { it.id }, key = { i, m -> "message:${m.id}:$i" }) { _, message ->
@@ -686,7 +681,7 @@ fun NotificationsScreen(
         onAction = onReadAll,
     ) { pageModifier ->
         LazyColumn(pageModifier, contentPadding = adaptivePagePadding(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item { VoiceCloudPageHero("Notifications", "Stay on top of rooms, messages, community activity and important VoiceCloud updates.", VoiceCloudVisualKind.NOTIFICATION, badge = "Activity center") }
+        item { VoiceCloudApprovedSectionTitle("Notifications") }
         item { Feedback(state, onLoad) }
         if (!pushPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) item {
             Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = ConsumerColors.SapphireSoft)) {
@@ -698,7 +693,7 @@ fun NotificationsScreen(
         }
         if (state.notifications.isEmpty() && !state.loading) item { Empty("You're all caught up", "New ${VoiceCloudBrand.name} notifications will appear here.") }
         itemsIndexed(state.notifications.distinctBy { it.id }, key = { i, n -> "notification:${n.id}:$i" }) { _, item ->
-            VoiceCloudGlossCard(
+            VoiceCloudApprovedCard(
                 modifier = Modifier.fillMaxWidth().border(1.dp, ConsumerColors.Border.copy(alpha = if (item.isRead) .55f else .9f), RoundedCornerShape(18.dp)),
                 contentPadding = 0.dp,
             ) {

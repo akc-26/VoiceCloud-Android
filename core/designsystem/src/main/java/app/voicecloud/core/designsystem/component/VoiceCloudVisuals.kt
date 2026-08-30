@@ -92,11 +92,11 @@ fun VoiceCloudGlossCard(
 ) {
     val shape = RoundedCornerShape(24.dp)
     val surface = if (dark) ConsumerColors.LiveSurfaceElevated else ConsumerColors.Surface
-    val edge = if (dark) ConsumerColors.Ice.copy(alpha = .20f) else ConsumerColors.VipGold.copy(alpha = .34f)
+    val edge = if (dark) ConsumerColors.Ice.copy(alpha = .16f) else ConsumerColors.Border.copy(alpha = .88f)
     Card(
         modifier = modifier
             .animateContentSize()
-            .shadow(if (dark) 5.dp else 7.dp, shape, ambientColor = ConsumerColors.DeepNavy.copy(alpha = .10f), spotColor = ConsumerColors.VipGold.copy(alpha = .12f))
+            .shadow(if (dark) 5.dp else 8.dp, shape, ambientColor = ConsumerColors.DeepNavy.copy(alpha = .09f), spotColor = ConsumerColors.DeepNavy.copy(alpha = .06f))
             .border(1.dp, edge, shape),
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = surface),
@@ -105,7 +105,7 @@ fun VoiceCloudGlossCard(
         Box(
             Modifier.fillMaxWidth().background(
                 if (dark) Brush.linearGradient(listOf(ConsumerColors.LiveSurfaceElevated, ConsumerColors.DeepNavy.copy(alpha = .85f)))
-                else Brush.linearGradient(listOf(Color.White, ConsumerColors.Surface, ConsumerColors.Lavender.copy(alpha = .18f)))
+                else Brush.linearGradient(listOf(Color.White, ConsumerColors.Surface, ConsumerColors.SurfaceSoft.copy(alpha = .42f)))
             )
         ) {
             Column(Modifier.fillMaxWidth().padding(contentPadding), verticalArrangement = Arrangement.spacedBy(9.dp), content = content)
@@ -121,12 +121,12 @@ fun VoiceCloudPictogram(
     dark: Boolean = false,
     accent: Color = if (dark) ConsumerColors.Ice else ConsumerColors.Sapphire,
 ) {
-    val background = if (dark) ConsumerColors.LiveSurfaceElevated else ConsumerColors.SapphireSoft
-    val gold = ConsumerColors.VipGold
+    val background = if (dark) ConsumerColors.LiveSurfaceElevated else ConsumerColors.SapphireSoft.copy(alpha = .72f)
+    val gold = if (kind == VoiceCloudVisualKind.VIP || kind == VoiceCloudVisualKind.GIFT || kind == VoiceCloudVisualKind.REWARD) ConsumerColors.VipGold else accent.copy(alpha = .72f)
     Box(
-        modifier.size(size).clip(RoundedCornerShape(size * .32f))
-            .background(Brush.linearGradient(listOf(background, if (dark) ConsumerColors.DeepNavy else Color.White)))
-            .border(1.dp, gold.copy(alpha = .42f), RoundedCornerShape(size * .32f)),
+        modifier.size(size).clip(RoundedCornerShape(size * .28f))
+            .background(background)
+            .border(1.dp, accent.copy(alpha = if (dark) .22f else .14f), RoundedCornerShape(size * .28f)),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.size(size * .66f)) {
@@ -216,7 +216,7 @@ fun VoiceCloudPictogram(
                     repeat(8){i-> val a=(i*PI/4).toFloat(); line(Offset(w*.5f+cos(a)*w*.27f,h*.5f+sin(a)*w*.27f),Offset(w*.5f+cos(a)*w*.38f,h*.5f+sin(a)*w*.38f),accent,thin)}
                 }
                 VoiceCloudVisualKind.SECURITY -> {
-                    val p=Path().apply{moveTo(w*.5f,h*.08f);lineTo(w*.82f,h*.20f);lineTo(w*.77f,h*.58f);quadraticBezierTo(w*.68f,h*.80f,w*.5f,h*.90f);quadraticBezierTo(w*.32f,h*.80f,w*.23f,h*.58f);lineTo(w*.18f,h*.20f);close()}; drawPath(p,accent.copy(alpha=.12f)); drawPath(p,accent,style=Stroke(stroke)); ring(Offset(w*.5f,h*.47f),w*.08f,gold,thin); line(Offset(w*.5f,h*.55f),Offset(w*.5f,h*.67f),gold,thin)
+                    val p=Path().apply{moveTo(w*.5f,h*.08f);lineTo(w*.82f,h*.20f);lineTo(w*.77f,h*.58f);quadraticTo(w*.68f,h*.80f,w*.5f,h*.90f);quadraticTo(w*.32f,h*.80f,w*.23f,h*.58f);lineTo(w*.18f,h*.20f);close()}; drawPath(p,accent.copy(alpha=.12f)); drawPath(p,accent,style=Stroke(stroke)); ring(Offset(w*.5f,h*.47f),w*.08f,gold,thin); line(Offset(w*.5f,h*.55f),Offset(w*.5f,h*.67f),gold,thin)
                 }
                 VoiceCloudVisualKind.HELP -> {
                     ring(Offset(w*.5f,h*.5f),w*.36f,accent,stroke)
@@ -355,24 +355,65 @@ fun VoiceCloudPageHero(
     dark: Boolean = false,
     creator: Boolean = false,
 ) {
-    val shape = RoundedCornerShape(28.dp)
-    val start = when { dark -> ConsumerColors.LiveSurface; creator -> CreatorColors.PrimaryDark; else -> ConsumerColors.Surface }
-    val end = when { dark -> ConsumerColors.DeepNavy; creator -> CreatorColors.Primary; else -> ConsumerColors.SapphireSoft.copy(alpha=.75f) }
+    val shape = RoundedCornerShape(30.dp)
+    val startColor = when { dark -> ConsumerColors.LiveSurface; creator -> CreatorColors.PrimaryDark; else -> ConsumerColors.Surface }
+    val middleColor = when { dark -> ConsumerColors.LiveSurfaceElevated; creator -> CreatorColors.Primary; else -> ConsumerColors.SurfaceSoft }
+    val endColor = when { dark -> ConsumerColors.DeepNavy; creator -> CreatorColors.PrimaryDark; else -> ConsumerColors.SapphireSoft.copy(alpha = .78f) }
     val titleColor = if (dark || creator) Color.White else ConsumerColors.Ink
     val bodyColor = if (dark || creator) ConsumerColors.TextOnDarkSecondary else ConsumerColors.TextMuted
+
     Box(
-        modifier.fillMaxWidth().shadow(8.dp, shape, ambientColor = ConsumerColors.DeepNavy.copy(alpha=.12f), spotColor = ConsumerColors.VipGold.copy(alpha=.18f))
-            .clip(shape).background(Brush.linearGradient(listOf(start,end))).border(1.dp,ConsumerColors.VipGold.copy(alpha=.45f),shape).padding(20.dp)
+        modifier.fillMaxWidth()
+            .shadow(10.dp, shape, ambientColor = ConsumerColors.DeepNavy.copy(alpha=.10f), spotColor = ConsumerColors.DeepNavy.copy(alpha=.08f))
+            .clip(shape)
+            .background(Brush.linearGradient(listOf(startColor, middleColor, endColor)))
+            .border(1.dp, if (dark || creator) ConsumerColors.Ice.copy(alpha=.18f) else ConsumerColors.Border.copy(alpha=.82f), shape)
     ) {
-        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(16.dp)) {
-            Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(7.dp)) {
-                if(!badge.isNullOrBlank()) Surface(shape=RoundedCornerShape(50),color=ConsumerColors.VipGold.copy(alpha=.18f)) {
-                    Text(voiceCloudTitleCase(badge),Modifier.padding(horizontal=10.dp,vertical=5.dp),color=if(dark||creator) ConsumerColors.VipGold else ConsumerColors.VioletDeep,style=MaterialTheme.typography.labelSmall,fontWeight=FontWeight.ExtraBold)
+        Row(
+            Modifier.fillMaxWidth().padding(start = 20.dp, top = 20.dp, bottom = 20.dp, end = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (!badge.isNullOrBlank()) {
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = if (dark || creator) ConsumerColors.VipGold.copy(alpha=.17f) else ConsumerColors.VipGold.copy(alpha=.14f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, ConsumerColors.VipGold.copy(alpha=.28f)),
+                    ) {
+                        Text(
+                            voiceCloudTitleCase(badge),
+                            Modifier.padding(horizontal=10.dp, vertical=5.dp),
+                            color=if(dark||creator) ConsumerColors.VipGold else ConsumerColors.VioletDeep,
+                            style=MaterialTheme.typography.labelSmall,
+                            fontWeight=FontWeight.ExtraBold,
+                            maxLines = 1,
+                        )
+                    }
                 }
-                Text(voiceCloudTitleCase(title),style=MaterialTheme.typography.headlineSmall,color=titleColor,fontWeight=FontWeight.ExtraBold,maxLines=2,overflow=TextOverflow.Ellipsis)
-                Text(voiceCloudTitleCase(subtitle),style=MaterialTheme.typography.bodyMedium,color=bodyColor,maxLines=3,overflow=TextOverflow.Ellipsis)
+                Text(
+                    voiceCloudTitleCase(title),
+                    style=MaterialTheme.typography.headlineSmall,
+                    color=titleColor,
+                    fontWeight=FontWeight.ExtraBold,
+                    maxLines=2,
+                    overflow=TextOverflow.Ellipsis,
+                )
+                Text(
+                    voiceCloudTitleCase(subtitle),
+                    style=MaterialTheme.typography.bodyMedium,
+                    color=bodyColor,
+                    maxLines=4,
+                    overflow=TextOverflow.Ellipsis,
+                )
             }
-            VoiceCloudPictogram(kind=kind,size=72.dp,dark=dark||creator,accent=if(creator) CreatorColors.PrimaryLight else if(dark) ConsumerColors.Ice else ConsumerColors.Sapphire)
+            Box(
+                Modifier.size(width = 104.dp, height = 94.dp).clip(RoundedCornerShape(24.dp))
+                    .border(1.dp, ConsumerColors.VipGold.copy(alpha=.30f), RoundedCornerShape(24.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                VoiceCloudPosterArtwork(kind = kind, modifier = Modifier.fillMaxSize(), dark = dark || creator)
+            }
         }
     }
 }

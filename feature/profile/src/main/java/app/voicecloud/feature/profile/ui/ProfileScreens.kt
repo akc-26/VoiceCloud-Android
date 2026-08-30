@@ -29,9 +29,17 @@ import app.voicecloud.core.designsystem.component.VoiceCloudEmptyVisual
 import app.voicecloud.core.designsystem.component.VoiceCloudGlossCard
 import app.voicecloud.core.designsystem.component.VoiceCloudPageHero
 import app.voicecloud.core.designsystem.component.VoiceCloudPictogram
+import app.voicecloud.core.designsystem.component.VoiceCloudPosterArtwork
 import app.voicecloud.core.designsystem.component.VoiceCloudVisualKind
 import app.voicecloud.core.designsystem.component.voiceCloudVisualFor
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedCard
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedMetricRow
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedPersonRow
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedPrimaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSecondaryButton
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSectionTitle
+import app.voicecloud.core.designsystem.component.VoiceCloudApprovedTopBar
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 import app.voicecloud.core.designsystem.theme.VoiceCloudPageMetrics
@@ -57,26 +65,15 @@ fun ProfileToolsScreen(
     ProfilePage(title = "Activity & Replays", subtitle = "Your Replays, Room Activity And Profile Visitors.", onBack = onBack) {
         StatusCards(state)
         state.profile?.let { profile ->
-            ElevatedCard(shape = RoundedCornerShape(24.dp)) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 0.dp) {
                 Column(Modifier.fillMaxWidth()) {
-                    RemoteMedia(
-                        url = profile.coverUrl,
-                        contentDescription = "Profile cover",
-                        modifier = Modifier.fillMaxWidth().height(150.dp),
-                        fallbackLabel = VoiceCloudBrand.name,
-                    )
-                    Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-                        RemoteMedia(
-                            url = profile.avatarUrl,
-                            contentDescription = "Profile photo",
-                            modifier = Modifier.size(64.dp).clip(CircleShape),
-                            fallbackLabel = profile.displayName.ifBlank { profile.username },
-                        )
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(profile.displayName.ifBlank { profile.username }, style = MaterialTheme.typography.titleLarge)
-                            if (profile.username.isNotBlank()) Text(voiceCloudTitleCase("@${profile.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(voiceCloudTitleCase("Profile Complete · ${profile.profileCompletionPercentage}%"), style = MaterialTheme.typography.bodyMedium)
+                    RemoteMedia(profile.coverUrl, "Profile cover", Modifier.fillMaxWidth().height(112.dp), VoiceCloudBrand.name)
+                    Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        RemoteMedia(profile.avatarUrl, "Profile photo", Modifier.size(56.dp).clip(CircleShape), profile.displayName.ifBlank { profile.username })
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(profile.displayName.ifBlank { profile.username }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            if (profile.username.isNotBlank()) Text("@${profile.username}", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                            Text("Profile complete · ${profile.profileCompletionPercentage}%", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.Sapphire)
                         }
                     }
                 }
@@ -145,37 +142,37 @@ fun EditProfileScreen(
             EmptyCard("Profile unavailable", "Your profile could not be loaded from VoiceCloud.")
         }
         if (profile != null) {
-            ElevatedCard(shape = RoundedCornerShape(24.dp)) {
+            VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 0.dp) {
                 Column(Modifier.fillMaxWidth()) {
-                    RemoteMedia(profile.coverUrl, "Profile cover", Modifier.fillMaxWidth().height(170.dp), profile.displayName)
-                    Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-                        RemoteMedia(profile.avatarUrl, "Profile photo", Modifier.size(72.dp).clip(CircleShape), profile.displayName.ifBlank { identityUsername })
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Button(
+                    Box(Modifier.fillMaxWidth().height(132.dp)) {
+                        RemoteMedia(profile.coverUrl, "Profile cover", Modifier.fillMaxSize(), profile.displayName)
+                        Surface(
+                            onClick = { coverPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                            modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
+                            shape = RoundedCornerShape(50),
+                            color = ConsumerColors.LiveSurface.copy(alpha = .88f),
+                        ) { Text("Edit cover", Modifier.padding(horizontal = 10.dp, vertical = 6.dp), color = androidx.compose.ui.graphics.Color.White, style = MaterialTheme.typography.labelSmall) }
+                    }
+                    Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Box {
+                            RemoteMedia(profile.avatarUrl, "Profile photo", Modifier.size(68.dp).clip(CircleShape), profile.displayName.ifBlank { identityUsername })
+                            Surface(
                                 onClick = { avatarPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                                enabled = !state.mutating,
-                            ) { Text(voiceCloudTitleCase("Change Photo")) }
-                            Text(voiceCloudTitleCase("Preview And Adjust Any Image Before Uploading."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            if (!profile.avatarUrl.isNullOrBlank()) {
-                                TextButton(onClick = onDeleteAvatar, enabled = !state.mutating) { Text(voiceCloudTitleCase("Remove Photo")) }
-                            }
+                                modifier = Modifier.align(Alignment.BottomEnd).size(26.dp),
+                                shape = CircleShape,
+                                color = ConsumerColors.Sapphire,
+                            ) { Box(contentAlignment = Alignment.Center) { Text("+", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold) } }
+                        }
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(profile.displayName.ifBlank { identityUsername }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text("@${identityUsername.ifBlank { profile.username }}", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                            Text("JPG or PNG · crop before upload", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted)
                         }
                     }
-                    Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            OutlinedButton(
-                                onClick = { coverPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                                enabled = !state.mutating,
-                                modifier = Modifier.weight(1f),
-                            ) { Text(voiceCloudTitleCase("Change Cover")) }
-                            if (!profile.coverUrl.isNullOrBlank()) {
-                                TextButton(onClick = onDeleteCover, enabled = !state.mutating, modifier = Modifier.weight(1f)) { Text(voiceCloudTitleCase("Remove Cover")) }
-                            }
-                        }
-                        Text(voiceCloudTitleCase("Any Image Size Is Accepted And Resized After Your Crop."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (!profile.avatarUrl.isNullOrBlank()) TextButton(onClick = onDeleteAvatar, enabled = !state.mutating, modifier = Modifier.weight(1f)) { Text("Remove photo") }
+                        if (!profile.coverUrl.isNullOrBlank()) TextButton(onClick = onDeleteCover, enabled = !state.mutating, modifier = Modifier.weight(1f)) { Text("Remove cover") }
                     }
-                    Spacer(Modifier.height(10.dp))
                 }
             }
 
@@ -206,20 +203,16 @@ fun EditProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             ReadOnlyIdentityField("Language", profile.preferredLanguage.orEmpty().ifBlank { "en" })
-            Button(
-                onClick = {
-                    onSave(
-                        UpdateExtendedProfileBody(
-                            bio = bio,
-                            country = country,
-                            preferredLanguage = profile.preferredLanguage?.ifBlank { "en" } ?: "en",
-                            interests = interests.split(',').map(String::trim).filter(String::isNotBlank),
-                        )
+            VoiceCloudApprovedPrimaryButton(if (state.mutating) "Saving…" else "Save profile", enabled = !state.mutating) {
+                onSave(
+                    UpdateExtendedProfileBody(
+                        bio = bio,
+                        country = country,
+                        preferredLanguage = profile.preferredLanguage?.ifBlank { "en" } ?: "en",
+                        interests = interests.split(',').map(String::trim).filter(String::isNotBlank),
                     )
-                },
-                enabled = !state.mutating,
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text(voiceCloudTitleCase(if (state.mutating) "Saving…" else "Save profile")) }
+                )
+            }
         }
     }
 }
@@ -402,42 +395,36 @@ private fun ProfilePage(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val metrics = VoiceCloudPageMetrics.current()
-    Scaffold(containerColor = ConsumerColors.Cloud, topBar = { VoiceCloudPageTopBar(title, subtitle, onBack) }) { padding ->
+    Scaffold(
+        containerColor = ConsumerColors.Surface,
+        topBar = { Row(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding)) { VoiceCloudApprovedTopBar(title, onBack = onBack) } },
+    ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(
                 start = metrics.horizontalPadding,
                 end = metrics.horizontalPadding,
-                top = metrics.contentTopSpacing,
+                top = 8.dp,
                 bottom = metrics.contentBottomSpacing,
             ),
-            verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            item {
-                VoiceCloudPageHero(
-                    title = title,
-                    subtitle = subtitle ?: "Your VoiceCloud profile experience.",
-                    kind = voiceCloudVisualFor(title),
-                    badge = "VoiceCloud profile",
-                )
-            }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(metrics.sectionSpacing), content = content)
-            }
+            if (!subtitle.isNullOrBlank()) item { Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted) }
+            item { Column(verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
         }
     }
 }
 
 @Composable
 private fun ProfileToolButton(title: String, subtitle: String, onClick: () -> Unit) {
-    VoiceCloudGlossCard(Modifier.fillMaxWidth().clickable(onClick = onClick), contentPadding = 15.dp) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            VoiceCloudPictogram(voiceCloudVisualFor(title), size = 48.dp)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 11.dp, onClick = onClick) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            VoiceCloudPictogram(voiceCloudVisualFor(title), size = 38.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(voiceCloudTitleCase(title), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(voiceCloudTitleCase(subtitle), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
-            Text(voiceCloudTitleCase("›"), style = MaterialTheme.typography.headlineSmall, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
+            Text("›", style = MaterialTheme.typography.titleLarge, color = ConsumerColors.SapphireDeep, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -466,23 +453,13 @@ private fun ReadOnlyIdentityField(label: String, value: String) {
 
 @Composable
 private fun PersonCard(person: PersonSummary, subtitle: String? = null, trailing: (@Composable () -> Unit)? = null) {
-    ElevatedCard(
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth().border(1.dp, ConsumerColors.Border.copy(alpha = .6f), RoundedCornerShape(20.dp)),
-        colors = CardDefaults.elevatedCardColors(containerColor = ConsumerColors.Surface),
-    ) {
-        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            RemoteMedia(
-                url = person.avatarUrl,
-                contentDescription = "Profile photo",
-                modifier = Modifier.size(52.dp).clip(CircleShape),
-                fallbackLabel = person.displayName.ifBlank { person.username.ifBlank { VoiceCloudBrand.name } },
-            )
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(person.displayName.ifBlank { person.username.ifBlank { "VoiceCloud member" } }, style = MaterialTheme.typography.titleMedium)
-                if (person.username.isNotBlank()) Text(voiceCloudTitleCase("@${person.username}"), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                subtitle?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 9.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            RemoteMedia(person.avatarUrl, "Profile photo", Modifier.size(42.dp).clip(CircleShape), person.displayName.ifBlank { person.username })
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                Text(person.displayName.ifBlank { person.username.ifBlank { "VoiceCloud member" } }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                if (person.username.isNotBlank()) Text("@${person.username}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                subtitle?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             }
             trailing?.invoke()
         }
@@ -491,10 +468,10 @@ private fun PersonCard(person: PersonSummary, subtitle: String? = null, trailing
 
 @Composable
 private fun MetricCard(value: String, label: String, modifier: Modifier = Modifier) {
-    Surface(modifier = modifier, color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-            Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    VoiceCloudApprovedCard(modifier, contentPadding = 10.dp) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(value, style = MaterialTheme.typography.titleMedium, color = ConsumerColors.Sapphire, fontWeight = FontWeight.Bold)
+            Text(voiceCloudTitleCase(label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -506,9 +483,9 @@ private fun RemoteMedia(
     modifier: Modifier,
     fallbackLabel: String,
 ) {
-    val fallback = fallbackLabel.trim().take(1).uppercase().ifBlank { "V" }
+    val coverLike = contentDescription.contains("cover", ignoreCase = true) || contentDescription.contains("artwork", ignoreCase = true)
     if (url.isNullOrBlank()) {
-        MediaFallback(fallback, modifier)
+        MediaFallback(modifier, coverLike)
         return
     }
     SubcomposeAsyncImage(
@@ -520,16 +497,27 @@ private fun RemoteMedia(
         val mediaState by painter.state.collectAsState()
         when (mediaState) {
             is AsyncImagePainter.State.Success -> SubcomposeAsyncImageContent()
-            is AsyncImagePainter.State.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(28.dp)) }
-            else -> MediaFallback(fallback, Modifier.fillMaxSize())
+            is AsyncImagePainter.State.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp) }
+            else -> MediaFallback(Modifier.fillMaxSize(), coverLike)
         }
     }
 }
 
 @Composable
-private fun MediaFallback(label: String, modifier: Modifier) {
-    Box(modifier.background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
-        Text(label, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
+private fun MediaFallback(modifier: Modifier, coverLike: Boolean) {
+    Box(
+        modifier.background(
+            androidx.compose.ui.graphics.Brush.linearGradient(
+                listOf(ConsumerColors.SapphireSoft, ConsumerColors.SurfaceSoft, ConsumerColors.Lavender.copy(alpha = .72f))
+            )
+        ),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (coverLike) {
+            VoiceCloudPosterArtwork(VoiceCloudVisualKind.PROFILE, Modifier.fillMaxSize(), dark = false)
+        } else {
+            VoiceCloudPictogram(VoiceCloudVisualKind.PROFILE, size = 46.dp)
+        }
     }
 }
 

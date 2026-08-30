@@ -328,6 +328,7 @@ fun VoiceCloudNavHost(
                 state = authState,
                 onUser = { open(VoiceCloudRoutes.UserSignIn) },
                 onCreator = { open(VoiceCloudRoutes.CreatorSignIn) },
+                onGuest = { authViewModel.guestLogin() },
             )
         }
         composable(VoiceCloudRoutes.UserSignIn) {
@@ -449,6 +450,7 @@ fun VoiceCloudNavHost(
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onAnalytics = { open(VoiceCloudRoutes.CreatorAnalytics) },
                     onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
                 )
             }
@@ -466,6 +468,7 @@ fun VoiceCloudNavHost(
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onAnalytics = { open(VoiceCloudRoutes.CreatorAnalytics) },
                     onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
                 )
             }
@@ -484,6 +487,7 @@ fun VoiceCloudNavHost(
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onAnalytics = { open(VoiceCloudRoutes.CreatorAnalytics) },
                     onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
                 )
             }
@@ -685,6 +689,8 @@ fun VoiceCloudNavHost(
                     onProfile = { open(VoiceCloudRoutes.CreatorProfile) },
                     onSettings = { open(VoiceCloudRoutes.CreatorSettings) },
                     onHelp = { open(VoiceCloudRoutes.CreatorHelp) },
+                    onAnalytics = { open(VoiceCloudRoutes.CreatorAnalytics) },
+                    onVerification = { open(VoiceCloudRoutes.CreatorVerification) },
                     onSwitchToVoiceCloud = authViewModel::switchToUserPortal,
                 )
             }
@@ -814,7 +820,8 @@ fun VoiceCloudNavHost(
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
-                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onLive = { open(VoiceCloudRoutes.Rooms) },
+                onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
                 onCommunities = { open(VoiceCloudRoutes.Communities) },
                 onMessages = { open(VoiceCloudRoutes.Messages) },
@@ -837,7 +844,8 @@ fun VoiceCloudNavHost(
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
-                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onLive = { open(VoiceCloudRoutes.Rooms) },
+                onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
                 onCommunities = { open(VoiceCloudRoutes.Communities) },
                 onEvents = { open(VoiceCloudRoutes.Events) },
@@ -932,7 +940,8 @@ fun VoiceCloudNavHost(
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
-                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onLive = { open(VoiceCloudRoutes.Rooms) },
+                onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
             )
         }
@@ -967,7 +976,8 @@ fun VoiceCloudNavHost(
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
-                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onLive = { open(VoiceCloudRoutes.Rooms) },
+                onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
             )
         }
@@ -1012,7 +1022,8 @@ fun VoiceCloudNavHost(
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
-                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onLive = { open(VoiceCloudRoutes.Rooms) },
+                onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
             )
         }
@@ -1058,7 +1069,8 @@ fun VoiceCloudNavHost(
                 onHome = { open(VoiceCloudRoutes.Home) },
                 onExplore = { open(VoiceCloudRoutes.Explore) },
                 onSearch = { open(VoiceCloudRoutes.Search) },
-                onFriends = { open(VoiceCloudRoutes.Friends) },
+                onLive = { open(VoiceCloudRoutes.Rooms) },
+                onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
             )
         }

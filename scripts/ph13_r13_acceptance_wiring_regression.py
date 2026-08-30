@@ -1,0 +1,22 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+acc=(ROOT/'scripts/VC-ANDROID-PH13-R13-ACCEPTANCE.cmd').read_text(encoding='utf-8')
+diag=(ROOT/'scripts/VC-ANDROID-PH13-R13-SOURCE-DIAGNOSTIC.ps1').read_text(encoding='utf-8')
+checks=[]
+def ck(label,cond): checks.append(bool(cond)); print(('[PASS] ' if cond else '[FAIL] ')+label)
+ck('R13 source diagnostic wired','VC-ANDROID-PH13-R13-SOURCE-DIAGNOSTIC.ps1' in acc)
+ck('R13 corrected device/test closure wired','VC-ANDROID-PH13-R13-DEVICE-CLOSURE.ps1' in acc)
+ck('R13 delivery integrity wired','ph13_r13_delivery_integrity.py' in acc)
+ck('R13 palette regression wired','ph13_r13_instrumentation_palette_regression.py' in diag)
+ck('R13 product preservation wired','ph13_r13_product_preservation_regression.py' in diag)
+ck('R13 workstation contamination regression wired','ph13_r13_workstation_artifact_regression.py' in diag)
+ck('R13 device closure regression wired','ph13_r13_device_closure_regression.py' in diag)
+ck('R09 full UI compile-risk authority retained','ph13_r09_full_ui_compile_risk_regression.py' in diag)
+ck('R13 does not rerun staging/release/lint/full test chain',all(x not in acc for x in ['compileStagingKotlin','compileReleaseKotlin','lintDebug','lintStaging','lintRelease','assembleRelease','testDebugUnitTest']))
+ck('Windows delayed expansion retained','EnableDelayedExpansion' in acc)
+ck('device exit code captured using delayed expansion','set "VC_DEVICE_RC=!ERRORLEVEL!"' in acc)
+ck('device pending remains nonfatal','VC_DEVICE_PENDING=1' in acc and '[PENDING]' in acc)
+ck('genuine instrumentation failure remains fail-closed','set /a VC_FAILURE_GROUPS+=1' in acc and 'corrected instrumentation/device closure failed' in acc)
+ck('final full-device success path retained','Build-proven production app preserved and corrected premium-palette instrumentation passed on device' in acc)
+if not all(checks): raise SystemExit(1)
+print(f'[PASS] VC-ANDROID-PH13-R13 acceptance wiring: {len(checks)}/{len(checks)} PASS')
