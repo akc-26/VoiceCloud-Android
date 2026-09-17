@@ -8,7 +8,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,8 +19,10 @@ import androidx.navigation.compose.rememberNavController
 import app.voicecloud.android.navigation.ConsumerDestinations
 import app.voicecloud.android.ui.consumer.ConsumerExploreUiState
 import app.voicecloud.android.ui.consumer.ConsumerHomeUiState
+import app.voicecloud.android.ui.consumer.ConsumerSearchUiState
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
+import app.voicecloud.android.ui.consumer.SearchScreen
 import app.voicecloud.core.designsystem.component.VCCommandBar
 import app.voicecloud.core.designsystem.component.VCNavDestination
 import app.voicecloud.core.designsystem.component.VCScaffold
@@ -38,6 +42,7 @@ fun ConsumerShell(
     val motionEnabled = rememberVoiceCloudMotionEnabled()
     val homeState = remember { ConsumerHomeUiState() }
     val exploreState = remember { ConsumerExploreUiState() }
+    var searchState by remember { mutableStateOf(ConsumerSearchUiState()) }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -45,6 +50,9 @@ fun ConsumerShell(
             VCNavDestination(ConsumerDestinations.Messages, "Messages", VoiceCloudIcons.Messages, VoiceCloudIcons.MessagesSelected),
             VCNavDestination(ConsumerDestinations.Profile, "Profile", VoiceCloudIcons.Profile, VoiceCloudIcons.ProfileSelected),
         )
+    }
+    val openSearch = {
+        navController.navigate(ConsumerDestinations.Search) { launchSingleTop = true }
     }
 
     VCScaffold(
@@ -68,10 +76,25 @@ fun ConsumerShell(
             exitTransition = { if (motionEnabled) fadeOut(tween(VoiceCloudMotion.FastMs)) else ExitTransition.None },
         ) {
             composable(ConsumerDestinations.Home) {
-                HomeScreen(state = homeState)
+                HomeScreen(state = homeState, onOpenSearch = openSearch)
             }
             composable(ConsumerDestinations.Discover) {
-                ExploreScreen(state = exploreState)
+                ExploreScreen(state = exploreState, onOpenSearch = openSearch)
+            }
+            composable(ConsumerDestinations.Search) {
+                SearchScreen(
+                    state = searchState,
+                    onQueryChange = { query ->
+                        searchState = searchState.copy(query = query, errorMessage = null)
+                    },
+                    onSearch = {
+                        searchState = searchState.copy(
+                            isSearching = searchState.query.isNotBlank(),
+                            isLoading = false,
+                        )
+                    },
+                    onBack = { navController.popBackStack() },
+                )
             }
             composable(ConsumerDestinations.Live) {
                 ShellSection(
