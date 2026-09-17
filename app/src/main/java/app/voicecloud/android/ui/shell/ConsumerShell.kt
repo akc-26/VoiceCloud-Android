@@ -23,6 +23,9 @@ import app.voicecloud.android.ui.consumer.ConsumerSearchUiState
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.android.ui.consumer.SearchScreen
+import app.voicecloud.android.ui.room.RoomPreviewScreen
+import app.voicecloud.android.ui.room.RoomPreviewUiState
+import app.voicecloud.core.designsystem.component.VCRoomUiModel
 import app.voicecloud.core.designsystem.component.VCCommandBar
 import app.voicecloud.core.designsystem.component.VCNavDestination
 import app.voicecloud.core.designsystem.component.VCScaffold
@@ -43,6 +46,7 @@ fun ConsumerShell(
     val homeState = remember { ConsumerHomeUiState() }
     val exploreState = remember { ConsumerExploreUiState() }
     var searchState by remember { mutableStateOf(ConsumerSearchUiState()) }
+    var roomPreviewState by remember { mutableStateOf<RoomPreviewUiState?>(null) }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -54,18 +58,28 @@ fun ConsumerShell(
     val openSearch = {
         navController.navigate(ConsumerDestinations.Search) { launchSingleTop = true }
     }
+    val openRoomPreview: (VCRoomUiModel) -> Unit = { room ->
+        roomPreviewState = RoomPreviewUiState.fromRoom(room)
+        navController.navigate(ConsumerDestinations.RoomPreview) { launchSingleTop = true }
+    }
+    val joinRoom = {
+        navController.navigateTab(ConsumerDestinations.Live)
+    }
+    val showBottomBar = route != ConsumerDestinations.RoomPreview
 
     VCScaffold(
         modifier = modifier,
         bottomBar = {
-            VCCommandBar(
-                sideDestinations = sides,
-                selectedRoute = route,
-                onSelect = { destination -> navController.navigateTab(destination.route) },
-                onLiveClick = { navController.navigateTab(ConsumerDestinations.Live) },
-                liveSelected = liveSelected,
-                liveContentDescription = "Live",
-            )
+            if (showBottomBar) {
+                VCCommandBar(
+                    sideDestinations = sides,
+                    selectedRoute = route,
+                    onSelect = { destination -> navController.navigateTab(destination.route) },
+                    onLiveClick = { navController.navigateTab(ConsumerDestinations.Live) },
+                    liveSelected = liveSelected,
+                    liveContentDescription = "Live",
+                )
+            }
         },
     ) { padding ->
         NavHost(
@@ -76,10 +90,10 @@ fun ConsumerShell(
             exitTransition = { if (motionEnabled) fadeOut(tween(VoiceCloudMotion.FastMs)) else ExitTransition.None },
         ) {
             composable(ConsumerDestinations.Home) {
-                HomeScreen(state = homeState, onOpenSearch = openSearch)
+                HomeScreen(state = homeState, onOpenSearch = openSearch, onRoomClick = openRoomPreview)
             }
             composable(ConsumerDestinations.Discover) {
-                ExploreScreen(state = exploreState, onOpenSearch = openSearch)
+                ExploreScreen(state = exploreState, onOpenSearch = openSearch, onRoomClick = openRoomPreview)
             }
             composable(ConsumerDestinations.Search) {
                 SearchScreen(
@@ -94,7 +108,17 @@ fun ConsumerShell(
                         )
                     },
                     onBack = { navController.popBackStack() },
+                    onRoomClick = openRoomPreview,
                 )
+            }
+            composable(ConsumerDestinations.RoomPreview) {
+                roomPreviewState?.let { preview ->
+                    RoomPreviewScreen(
+                        state = preview,
+                        onBack = { navController.popBackStack() },
+                        onJoinRoom = joinRoom,
+                    )
+                }
             }
             composable(ConsumerDestinations.Live) {
                 ShellSection(

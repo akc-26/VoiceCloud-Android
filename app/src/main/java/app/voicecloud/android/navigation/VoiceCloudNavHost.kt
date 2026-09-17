@@ -34,6 +34,7 @@ object ConsumerDestinations {
     const val Home = "user/home"
     const val Discover = "user/discover"
     const val Search = "user/search"
+    const val RoomPreview = "user/room/preview"
     const val Live = "user/live"
     const val Messages = "user/messages"
     const val Profile = "user/profile"
