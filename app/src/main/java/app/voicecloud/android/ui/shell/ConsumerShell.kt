@@ -5,32 +5,23 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.voicecloud.android.navigation.ConsumerDestinations
+import app.voicecloud.android.ui.consumer.ConsumerExploreUiState
 import app.voicecloud.android.ui.consumer.ConsumerHomeUiState
+import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
-import app.voicecloud.core.designsystem.VoiceCloud
 import app.voicecloud.core.designsystem.component.VCCommandBar
-import app.voicecloud.core.designsystem.component.VCEmptyState
-import app.voicecloud.core.designsystem.component.VCIconButton
 import app.voicecloud.core.designsystem.component.VCNavDestination
-import app.voicecloud.core.designsystem.component.VCPageHeader
 import app.voicecloud.core.designsystem.component.VCScaffold
-import app.voicecloud.core.designsystem.component.VCSearchField
 import app.voicecloud.core.designsystem.icon.VoiceCloudIcons
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 import app.voicecloud.core.designsystem.theme.rememberVoiceCloudMotionEnabled
@@ -46,6 +37,7 @@ fun ConsumerShell(
     val liveSelected = route == ConsumerDestinations.Live
     val motionEnabled = rememberVoiceCloudMotionEnabled()
     val homeState = remember { ConsumerHomeUiState() }
+    val exploreState = remember { ConsumerExploreUiState() }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -78,7 +70,9 @@ fun ConsumerShell(
             composable(ConsumerDestinations.Home) {
                 HomeScreen(state = homeState)
             }
-            composable(ConsumerDestinations.Discover) { DiscoverSection() }
+            composable(ConsumerDestinations.Discover) {
+                ExploreScreen(state = exploreState)
+            }
             composable(ConsumerDestinations.Live) {
                 ShellSection(
                     title = "Live",
@@ -103,37 +97,5 @@ fun ConsumerShell(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun DiscoverSection() {
-    val spacing = VoiceCloud.spacing
-    var query by rememberSaveable { mutableStateOf("") }
-    Column(Modifier.fillMaxSize()) {
-        VCPageHeader(
-            title = "Discover",
-            subtitle = "Find rooms and people",
-            actions = {
-                VCIconButton(
-                    icon = VoiceCloudIcons.Search,
-                    contentDescription = "Search",
-                    onClick = {},
-                )
-            },
-        )
-        VCSearchField(
-            query = query,
-            onQueryChange = { query = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.pageGutter),
-            placeholder = "Search VoiceCloud",
-            onSearch = {},
-        )
-        VCEmptyState(
-            title = "Nothing to show yet",
-            message = "Search results and discovery feeds will use live VoiceCloud data when this experience is connected.",
-        )
     }
 }
