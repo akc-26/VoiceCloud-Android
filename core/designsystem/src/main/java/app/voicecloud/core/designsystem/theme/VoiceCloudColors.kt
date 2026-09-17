@@ -2,7 +2,11 @@ package app.voicecloud.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
-/** Exact Android translation of finalized R06 shared/branding presentation authority. */
+/**
+ * Raw VoiceCloud palettes.
+ * Components must use [VoiceCloudSemanticColors] via [app.voicecloud.core.designsystem.VoiceCloud.colors]
+ * rather than these values directly.
+ */
 object ConsumerColors {
     val Sapphire = Color(0xFF0B7C86)
     val SapphireDeep = Color(0xFF075762)
@@ -61,4 +65,10 @@ object CommonColors {
     val Error = Color(0xFFEF4444)
     val Info = Color(0xFF38BDF8)
     val LogoBlue = Color(0xFF2563EB)
+    val Live = Color(0xFFE11D48)
+    val LiveSoft = Color(0xFFFFE4EA)
+    val Coin = Color(0xFFF97316)
+    val Premium = Color(0xFFF6C85F)
+    val Navy = Color(0xFF0B1224)
+    val NavySoft = Color(0xFF162033)
 }
