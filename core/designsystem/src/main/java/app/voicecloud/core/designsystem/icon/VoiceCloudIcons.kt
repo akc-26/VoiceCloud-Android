@@ -19,7 +19,12 @@ import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.SpaceDashboard
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -33,6 +38,8 @@ object VoiceCloudIcons {
     val Live: ImageVector get() = Icons.Outlined.GraphicEq
     val Messages: ImageVector get() = Icons.Outlined.ChatBubbleOutline
     val Profile: ImageVector get() = Icons.Outlined.PersonOutline
+    val Dashboard: ImageVector get() = Icons.Outlined.SpaceDashboard
+    val DashboardSelected: ImageVector get() = Icons.Filled.SpaceDashboard
     val Search: ImageVector get() = Icons.Outlined.Search
     val Chat: ImageVector get() = Icons.Outlined.ChatBubbleOutline
     val RaiseHand: ImageVector get() = Icons.Outlined.BackHand
@@ -46,6 +53,9 @@ object VoiceCloudIcons {
     val Notifications: ImageVector get() = Icons.Outlined.NotificationsNone
     val Wallet: ImageVector get() = Icons.Outlined.AccountBalanceWallet
     val Analytics: ImageVector get() = Icons.Outlined.Analytics
+    val AnalyticsSelected: ImageVector get() = Icons.Filled.Analytics
     val Audience: ImageVector get() = Icons.Outlined.Groups
+    val AudienceSelected: ImageVector get() = Icons.Filled.Groups
     val CreatorTools: ImageVector get() = Icons.Outlined.Tune
+    val CreatorToolsSelected: ImageVector get() = Icons.Filled.Tune
 }

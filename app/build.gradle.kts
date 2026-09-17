@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.animation)
     implementation(libs.hilt.android)
     implementation(libs.moshi.kotlin)
     ksp(libs.hilt.compiler)

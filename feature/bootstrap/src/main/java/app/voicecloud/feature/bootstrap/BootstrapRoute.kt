@@ -45,12 +45,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.voicecloud.core.designsystem.component.VCSecondaryButton
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 
 @Composable
-fun BootstrapRoute(viewModel: BootstrapViewModel = hiltViewModel()) {
+fun BootstrapRoute(
+    viewModel: BootstrapViewModel = hiltViewModel(),
+    onOpenCreatorWorkspace: () -> Unit = {},
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     AnimatedContent(
         targetState = state,
@@ -79,6 +83,7 @@ fun BootstrapRoute(viewModel: BootstrapViewModel = hiltViewModel()) {
                 liveKitAvailable = current.config.availableRtcProviders.any {
                     it.providerType?.contains("livekit", ignoreCase = true) == true
                 },
+                onOpenCreatorWorkspace = onOpenCreatorWorkspace,
             )
         }
     }
@@ -163,7 +168,11 @@ private fun ForceUpdateScreen(state: BootstrapState.ForceUpdate) {
 }
 
 @Composable
-private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: Boolean) {
+private fun FoundationReadyScreen(
+    loginMethods: List<String>,
+    liveKitAvailable: Boolean,
+    onOpenCreatorWorkspace: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -195,9 +204,14 @@ private fun FoundationReadyScreen(loginMethods: List<String>, liveKitAvailable: 
                     StatusRow("Live audio", if (liveKitAvailable) "Available" else "Backend controlled")
                     HorizontalDivider()
                     Text(
-                        "User and Creator authentication begin in PH02. This PH01 screen intentionally contains no account/business workflow.",
+                        "User and Creator authentication begin in PH02. The creator workspace below is presentation chrome only.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    VCSecondaryButton(
+                        text = "Creator workspace",
+                        onClick = onOpenCreatorWorkspace,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
