@@ -21,6 +21,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.voicecloud.android.navigation.ConsumerDestinations
+import app.voicecloud.android.ui.consumer.ConsumerHomeUiState
+import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.core.designsystem.VoiceCloud
 import app.voicecloud.core.designsystem.component.VCCommandBar
 import app.voicecloud.core.designsystem.component.VCEmptyState
@@ -43,6 +45,7 @@ fun ConsumerShell(
     val route = current?.destination?.route
     val liveSelected = route == ConsumerDestinations.Live
     val motionEnabled = rememberVoiceCloudMotionEnabled()
+    val homeState = remember { ConsumerHomeUiState() }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -73,11 +76,7 @@ fun ConsumerShell(
             exitTransition = { if (motionEnabled) fadeOut(tween(VoiceCloudMotion.FastMs)) else ExitTransition.None },
         ) {
             composable(ConsumerDestinations.Home) {
-                ShellSection(
-                    title = "Home",
-                    subtitle = "Listen in",
-                    message = "Live rooms and recommendations will appear here from VoiceCloud when this experience is connected.",
-                )
+                HomeScreen(state = homeState)
             }
             composable(ConsumerDestinations.Discover) { DiscoverSection() }
             composable(ConsumerDestinations.Live) {
