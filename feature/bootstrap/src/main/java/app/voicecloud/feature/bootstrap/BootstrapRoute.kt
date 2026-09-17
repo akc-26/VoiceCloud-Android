@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.voicecloud.core.designsystem.component.VCPrimaryButton
 import app.voicecloud.core.designsystem.component.VCSecondaryButton
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerColors
@@ -53,6 +54,7 @@ import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 @Composable
 fun BootstrapRoute(
     viewModel: BootstrapViewModel = hiltViewModel(),
+    onContinueToConsumer: () -> Unit = {},
     onOpenCreatorWorkspace: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -83,6 +85,7 @@ fun BootstrapRoute(
                 liveKitAvailable = current.config.availableRtcProviders.any {
                     it.providerType?.contains("livekit", ignoreCase = true) == true
                 },
+                onContinueToConsumer = onContinueToConsumer,
                 onOpenCreatorWorkspace = onOpenCreatorWorkspace,
             )
         }
@@ -171,6 +174,7 @@ private fun ForceUpdateScreen(state: BootstrapState.ForceUpdate) {
 private fun FoundationReadyScreen(
     loginMethods: List<String>,
     liveKitAvailable: Boolean,
+    onContinueToConsumer: () -> Unit,
     onOpenCreatorWorkspace: () -> Unit,
 ) {
     Box(
@@ -204,9 +208,14 @@ private fun FoundationReadyScreen(
                     StatusRow("Live audio", if (liveKitAvailable) "Available" else "Backend controlled")
                     HorizontalDivider()
                     Text(
-                        "User and Creator authentication begin in PH02. The creator workspace below is presentation chrome only.",
+                        "User and Creator authentication begin in PH02. These workspaces are presentation shells until those experiences are connected.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    VCPrimaryButton(
+                        text = "Continue to VoiceCloud",
+                        onClick = onContinueToConsumer,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     VCSecondaryButton(
                         text = "Creator workspace",

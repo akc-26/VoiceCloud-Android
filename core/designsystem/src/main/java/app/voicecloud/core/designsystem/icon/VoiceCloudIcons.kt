@@ -20,7 +20,11 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.SpaceDashboard
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -34,10 +38,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
  */
 object VoiceCloudIcons {
     val Home: ImageVector get() = Icons.Outlined.Home
+    val HomeSelected: ImageVector get() = Icons.Filled.Home
     val Explore: ImageVector get() = Icons.Outlined.Explore
+    val ExploreSelected: ImageVector get() = Icons.Filled.Explore
     val Live: ImageVector get() = Icons.Outlined.GraphicEq
     val Messages: ImageVector get() = Icons.Outlined.ChatBubbleOutline
+    val MessagesSelected: ImageVector get() = Icons.Filled.ChatBubble
     val Profile: ImageVector get() = Icons.Outlined.PersonOutline
+    val ProfileSelected: ImageVector get() = Icons.Filled.Person
     val Dashboard: ImageVector get() = Icons.Outlined.SpaceDashboard
     val DashboardSelected: ImageVector get() = Icons.Filled.SpaceDashboard
     val Search: ImageVector get() = Icons.Outlined.Search
