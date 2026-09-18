@@ -34,6 +34,7 @@ data class VoiceCloudUser(
     val phone: String? = null,
     val role: String? = null,
     val avatarUrl: String? = null,
+    val bio: String? = null,
     val isRestricted: Boolean = false,
     val isSuspended: Boolean = false,
 ) {

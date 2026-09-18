@@ -29,6 +29,7 @@ import app.voicecloud.core.designsystem.VoiceCloud
 
 @Immutable
 data class VCRoomUiModel(
+    val id: String = "",
     val title: String,
     val subtitle: String? = null,
     val metaLabel: String? = null,

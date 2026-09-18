@@ -15,33 +15,35 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.voicecloud.android.navigation.ConsumerDestinations
-import app.voicecloud.android.ui.consumer.ConsumerExploreUiState
-import app.voicecloud.android.ui.consumer.ConsumerHomeUiState
-import app.voicecloud.android.ui.consumer.ConsumerSearchUiState
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.android.ui.consumer.SearchScreen
 import app.voicecloud.android.ui.live.HostLiveMode
 import app.voicecloud.android.ui.live.HostLiveScreen
-import app.voicecloud.android.ui.live.HostLiveUiState
-import app.voicecloud.android.ui.economy.ConsumerEconomyUiState
 import app.voicecloud.android.ui.economy.EconomyScreen
-import app.voicecloud.android.ui.messaging.ConsumerConversationUiState
-import app.voicecloud.android.ui.messaging.ConsumerMessagesUiState
 import app.voicecloud.android.ui.messaging.ConversationScreen
 import app.voicecloud.android.ui.messaging.MessagesScreen
 import app.voicecloud.android.ui.messaging.VCConversationUiModel
-import app.voicecloud.android.ui.profile.ConsumerProfileUiState
 import app.voicecloud.android.ui.profile.ProfileScreen
 import app.voicecloud.android.ui.settings.SettingsScreen
 import app.voicecloud.android.ui.settings.SettingsUiState
 import app.voicecloud.android.ui.room.RoomPreviewScreen
 import app.voicecloud.android.ui.room.RoomPreviewUiState
+import app.voicecloud.android.viewmodel.ConversationViewModel
+import app.voicecloud.android.viewmodel.EconomyViewModel
+import app.voicecloud.android.viewmodel.ExploreViewModel
+import app.voicecloud.android.viewmodel.HomeViewModel
+import app.voicecloud.android.viewmodel.HostLiveViewModel
+import app.voicecloud.android.viewmodel.MessagesViewModel
+import app.voicecloud.android.viewmodel.ProfileViewModel
+import app.voicecloud.android.viewmodel.SearchViewModel
 import app.voicecloud.core.designsystem.component.VCRoomUiModel
 import app.voicecloud.core.designsystem.component.VCGiftUiModel
 import app.voicecloud.core.designsystem.component.VCCommandBar
@@ -64,16 +66,24 @@ fun ConsumerShell(
     val route = current?.destination?.route
     val liveSelected = route == ConsumerDestinations.Live
     val motionEnabled = rememberVoiceCloudMotionEnabled()
-    val homeState = remember { ConsumerHomeUiState() }
-    val exploreState = remember { ConsumerExploreUiState() }
-    var searchState by remember { mutableStateOf(ConsumerSearchUiState()) }
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val exploreViewModel: ExploreViewModel = hiltViewModel()
+    val searchViewModel: SearchViewModel = hiltViewModel()
+    val messagesViewModel: MessagesViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val economyViewModel: EconomyViewModel = hiltViewModel()
+    val hostLiveViewModel: HostLiveViewModel = hiltViewModel()
+    val homeState by homeViewModel.state.collectAsStateWithLifecycle()
+    val exploreState by exploreViewModel.state.collectAsStateWithLifecycle()
+    val searchState by searchViewModel.state.collectAsStateWithLifecycle()
+    val messagesState by messagesViewModel.state.collectAsStateWithLifecycle()
+    val profileState by profileViewModel.state.collectAsStateWithLifecycle()
+    val economyState by economyViewModel.state.collectAsStateWithLifecycle()
+    val hostLiveState by hostLiveViewModel.state.collectAsStateWithLifecycle()
     var roomPreviewState by remember { mutableStateOf<RoomPreviewUiState?>(null) }
-    var profileState by remember { mutableStateOf(ConsumerProfileUiState()) }
-    var messagesState by remember { mutableStateOf(ConsumerMessagesUiState()) }
     var messagesQuery by remember { mutableStateOf("") }
-    var conversationState by remember { mutableStateOf<ConsumerConversationUiState?>(null) }
-    var economyState by remember { mutableStateOf(ConsumerEconomyUiState()) }
-    var hostLiveState by remember { mutableStateOf(HostLiveUiState()) }
+    var activeConversation by remember { mutableStateOf<VCConversationUiModel?>(null) }
+    var pendingLiveRoomId by remember { mutableStateOf<String?>(null) }
     var selectedGift by remember { mutableStateOf<VCGiftUiModel?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -82,6 +92,13 @@ fun ConsumerShell(
     LaunchedEffect(preferences) {
         preferences.theme.collect { theme ->
             settingsState = settingsState.copy(themePreference = theme)
+        }
+    }
+    LaunchedEffect(route, pendingLiveRoomId) {
+        val roomId = pendingLiveRoomId
+        if (route == ConsumerDestinations.Live && !roomId.isNullOrBlank()) {
+            hostLiveViewModel.joinRoom(roomId)
+            pendingLiveRoomId = null
         }
     }
     val sides = remember {
@@ -100,13 +117,11 @@ fun ConsumerShell(
         navController.navigate(ConsumerDestinations.RoomPreview) { launchSingleTop = true }
     }
     val joinRoom = {
+        pendingLiveRoomId = roomPreviewState?.room?.id?.takeIf { it.isNotBlank() }
         navController.navigateTab(ConsumerDestinations.Live)
     }
     val openConversation: (VCConversationUiModel) -> Unit = { conversation ->
-        conversationState = ConsumerConversationUiState(
-            conversationId = conversation.id,
-            title = conversation.title,
-        )
+        activeConversation = conversation
         navController.navigate(ConsumerDestinations.MessageThread) { launchSingleTop = true }
     }
     val openWallet = {
@@ -151,15 +166,8 @@ fun ConsumerShell(
             composable(ConsumerDestinations.Search) {
                 SearchScreen(
                     state = searchState,
-                    onQueryChange = { query ->
-                        searchState = searchState.copy(query = query, errorMessage = null)
-                    },
-                    onSearch = {
-                        searchState = searchState.copy(
-                            isSearching = searchState.query.isNotBlank(),
-                            isLoading = false,
-                        )
-                    },
+                    onQueryChange = searchViewModel::onQueryChange,
+                    onSearch = searchViewModel::search,
                     onBack = { navController.popBackStack() },
                     onRoomClick = openRoomPreview,
                 )
@@ -188,16 +196,17 @@ fun ConsumerShell(
                 )
             }
             composable(ConsumerDestinations.MessageThread) {
-                conversationState?.let { thread ->
+                val conversationViewModel: ConversationViewModel = hiltViewModel()
+                val threadState by conversationViewModel.state.collectAsStateWithLifecycle()
+                LaunchedEffect(activeConversation?.id) {
+                    activeConversation?.let { conversationViewModel.bind(it.id, it.title) }
+                }
+                threadState?.let { thread ->
                     ConversationScreen(
                         state = thread,
                         onBack = { navController.popBackStack() },
-                        onComposerChange = { text ->
-                            conversationState = conversationState?.copy(composerText = text)
-                        },
-                        onSend = {
-                            conversationState = conversationState?.copy(composerText = "")
-                        },
+                        onComposerChange = conversationViewModel::onComposerChange,
+                        onSend = conversationViewModel::send,
                     )
                 }
             }

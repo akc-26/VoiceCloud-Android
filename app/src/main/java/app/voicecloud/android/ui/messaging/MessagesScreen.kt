@@ -63,7 +63,7 @@ fun MessagesScreen(
             }
             state.conversations.isEmpty() -> VCEmptyState(
                 title = "No conversations yet",
-                message = "Conversations will appear here from VoiceCloud when messaging is connected.",
+                message = "No conversations yet. Start a chat from a profile when someone messages you on VoiceCloud.",
             )
             else -> AnimatedVisibility(
                 visible = true,

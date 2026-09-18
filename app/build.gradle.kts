@@ -92,6 +92,7 @@ dependencies {
     implementation(project(":core:logging"))
     implementation(project(":core:realtime"))
     implementation(project(":feature:bootstrap"))
+    implementation(project(":core:data"))
     implementation(project(":feature:auth"))
 
     implementation(libs.androidx.core.ktx)

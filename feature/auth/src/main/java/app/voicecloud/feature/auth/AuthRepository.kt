@@ -74,6 +74,35 @@ class AuthRepository(
         AuthResult.Success(Unit)
     }
 
+    suspend fun guestLogin(): AuthResult<AuthTokenBundle> = tokenCall { api.guestLogin() }
+
+    suspend fun sendOtp(phone: String): AuthResult<Unit> = try {
+        val response = api.sendOtp(app.voicecloud.core.model.PhoneSendOtpRequest(phone))
+        if (response.isSuccessful) AuthResult.Success(Unit) else AuthResult.Failure(errorParser.parse(response))
+    } catch (_: Throwable) {
+        AuthResult.Failure(ApiError(message = "Could not send verification code.", retryable = true))
+    }
+
+    suspend fun phoneLogin(phone: String, code: String): AuthResult<AuthTokenBundle> =
+        tokenCall { api.phoneLogin(app.voicecloud.core.model.PhoneLoginRequest(phone, code)) }
+
+    suspend fun forgotPassword(email: String): AuthResult<Unit> = try {
+        val response = api.forgotPassword(app.voicecloud.core.model.ForgotPasswordRequest(email))
+        if (response.isSuccessful) AuthResult.Success(Unit) else AuthResult.Failure(errorParser.parse(response))
+    } catch (_: Throwable) {
+        AuthResult.Failure(ApiError(message = "Could not send reset instructions.", retryable = true))
+    }
+
+    suspend fun resetPassword(token: String, password: String): AuthResult<Unit> = try {
+        val response = api.resetPassword(app.voicecloud.core.model.ResetPasswordRequest(token, password))
+        if (response.isSuccessful) AuthResult.Success(Unit) else AuthResult.Failure(errorParser.parse(response))
+    } catch (_: Throwable) {
+        AuthResult.Failure(ApiError(message = "Could not reset password.", retryable = true))
+    }
+
+    suspend fun googleLogin(idToken: String): AuthResult<AuthTokenBundle> =
+        tokenCall { api.googleLogin(app.voicecloud.core.model.GoogleLoginRequest(idToken)) }
+
     private suspend inline fun <reified T> tokenCall(crossinline call: suspend () -> retrofit2.Response<T>): AuthResult<T> {
         return try {
             val response = call()

@@ -50,6 +50,9 @@ interface AuthApi {
     @POST("auth/phone/login")
     suspend fun phoneLogin(@Body body: PhoneLoginRequest): Response<AuthTokenBundle>
 
+    @POST("auth/phone/verify-otp")
+    suspend fun verifyOtp(@Body body: PhoneLoginRequest): Response<AuthTokenBundle>
+
     @POST("auth/google/login")
     suspend fun googleLogin(@Body body: GoogleLoginRequest): Response<AuthTokenBundle>
 

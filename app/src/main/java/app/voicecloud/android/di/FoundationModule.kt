@@ -10,6 +10,15 @@ import app.voicecloud.core.model.AppIdentity
 import app.voicecloud.core.network.ApiClientFactory
 import app.voicecloud.core.network.AuthApi
 import app.voicecloud.core.network.BootstrapApi
+import app.voicecloud.core.network.ChatApi
+import app.voicecloud.core.network.CreatorAccessApi
+import app.voicecloud.core.network.DiscoveryApi
+import app.voicecloud.core.network.RoomsApi
+import app.voicecloud.core.network.RtcApi
+import app.voicecloud.core.network.SearchApi
+import app.voicecloud.core.network.SessionApi
+import app.voicecloud.core.network.UsersApi
+import app.voicecloud.core.network.WalletApi
 import app.voicecloud.core.network.SafeApiErrorParser
 import app.voicecloud.core.network.VoiceCloudApiServices
 import app.voicecloud.core.preferences.VoiceCloudPreferences
@@ -53,6 +62,24 @@ object FoundationModule {
     @Provides @Singleton fun bootstrapApi(services: VoiceCloudApiServices): BootstrapApi = services.bootstrap
 
     @Provides @Singleton fun authApi(services: VoiceCloudApiServices): AuthApi = services.auth
+
+    @Provides @Singleton fun discoveryApi(services: VoiceCloudApiServices): DiscoveryApi = services.discovery
+
+    @Provides @Singleton fun searchApi(services: VoiceCloudApiServices): SearchApi = services.search
+
+    @Provides @Singleton fun usersApi(services: VoiceCloudApiServices): UsersApi = services.users
+
+    @Provides @Singleton fun chatApi(services: VoiceCloudApiServices): ChatApi = services.chat
+
+    @Provides @Singleton fun walletApi(services: VoiceCloudApiServices): WalletApi = services.wallet
+
+    @Provides @Singleton fun roomsApi(services: VoiceCloudApiServices): RoomsApi = services.rooms
+
+    @Provides @Singleton fun rtcApi(services: VoiceCloudApiServices): RtcApi = services.rtc
+
+    @Provides @Singleton fun sessionApi(services: VoiceCloudApiServices): SessionApi = services.session
+
+    @Provides @Singleton fun creatorAccessApi(services: VoiceCloudApiServices): CreatorAccessApi = services.creatorAccess
 
     @Provides @Singleton
     fun realtimeClient(

@@ -6,7 +6,7 @@ import app.voicecloud.core.designsystem.component.VCEventUiModel
 import app.voicecloud.core.designsystem.component.VCPersonUiModel
 import app.voicecloud.core.designsystem.component.VCRoomUiModel
 
-/** Presentation-only Home feed. Lists stay empty until a real discovery source is connected. */
+/** Home feed backed by VoiceCloud discovery APIs. */
 @Immutable
 data class ConsumerHomeUiState(
     val isLoading: Boolean = false,
