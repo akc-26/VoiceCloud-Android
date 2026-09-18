@@ -76,7 +76,7 @@ fun ConsumerShell(
     var selectedGift by remember { mutableStateOf<VCGiftUiModel?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val preferences = remember { VoiceCloudPreferences(context) }
+    val preferences = remember { VoiceCloudPreferences(context.applicationContext) }
     var settingsState by remember { mutableStateOf(SettingsUiState()) }
     LaunchedEffect(preferences) {
         preferences.theme.collect { theme ->

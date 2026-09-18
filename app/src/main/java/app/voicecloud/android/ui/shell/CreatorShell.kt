@@ -39,6 +39,8 @@ import app.voicecloud.core.designsystem.component.VCCommandBar
 import app.voicecloud.core.designsystem.component.VCNavDestination
 import app.voicecloud.core.designsystem.component.VCScaffold
 import app.voicecloud.core.designsystem.icon.VoiceCloudIcons
+import app.voicecloud.android.ui.theme.VoiceCloudSystemBarAppearance
+import app.voicecloud.android.ui.theme.rememberVoiceCloudDarkTheme
 import app.voicecloud.core.designsystem.theme.PortalTheme
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 import app.voicecloud.core.designsystem.theme.VoiceCloudTheme
@@ -51,7 +53,9 @@ fun CreatorShell(
     onLeaveWorkspace: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = false) {
+    val darkTheme = rememberVoiceCloudDarkTheme()
+    VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = darkTheme) {
+        VoiceCloudSystemBarAppearance(darkTheme)
         CreatorWorkspace(
             onLeaveWorkspace = onLeaveWorkspace,
             modifier = modifier,
@@ -76,7 +80,7 @@ private fun CreatorWorkspace(
     val workspaceState = remember { CreatorWorkspaceToolsUiState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val preferences = remember { VoiceCloudPreferences(context) }
+    val preferences = remember { VoiceCloudPreferences(context.applicationContext) }
     var settingsState by remember { mutableStateOf(SettingsUiState()) }
     LaunchedEffect(preferences) {
         preferences.theme.collect { theme ->

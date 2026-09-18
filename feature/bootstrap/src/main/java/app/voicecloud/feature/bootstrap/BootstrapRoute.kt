@@ -50,6 +50,7 @@ import app.voicecloud.core.designsystem.component.VCSecondaryButton
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
+import app.voicecloud.core.designsystem.theme.rememberVoiceCloudMotionEnabled
 
 @Composable
 fun BootstrapRoute(
@@ -94,13 +95,18 @@ fun BootstrapRoute(
 
 @Composable
 private fun LoadingScreen() {
-    val transition = rememberInfiniteTransition(label = "brandPulse")
-    val pulse by transition.animateFloat(
-        initialValue = .94f,
-        targetValue = 1.04f,
-        animationSpec = infiniteRepeatable(tween(1100), RepeatMode.Reverse),
-        label = "pulse",
-    )
+    val motionEnabled = rememberVoiceCloudMotionEnabled()
+    val pulse = if (motionEnabled) {
+        val transition = rememberInfiniteTransition(label = "brandPulse")
+        transition.animateFloat(
+            initialValue = .94f,
+            targetValue = 1.04f,
+            animationSpec = infiniteRepeatable(tween(1100), RepeatMode.Reverse),
+            label = "pulse",
+        ).value
+    } else {
+        1f
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
