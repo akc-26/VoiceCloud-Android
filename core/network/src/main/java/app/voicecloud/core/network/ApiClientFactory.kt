@@ -14,12 +14,16 @@ object ApiClientFactory {
     fun createOkHttpClient(
         tokenVault: TokenVault,
         authenticator: TokenRefreshAuthenticator? = null,
+        sessionExpiredListener: SessionExpiredListener? = null,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .addInterceptor(AuthTokenInterceptor(tokenVault))
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+        if (sessionExpiredListener != null) {
+            builder.addNetworkInterceptor(SessionExpiryResponseInterceptor(tokenVault, sessionExpiredListener))
+        }
         if (authenticator != null) {
             builder.authenticator(authenticator)
         }

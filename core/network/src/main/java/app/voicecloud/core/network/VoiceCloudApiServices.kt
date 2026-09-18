@@ -18,6 +18,10 @@ data class VoiceCloudApiServices(
     val session: SessionApi,
     val creatorAccess: CreatorAccessApi,
     val notifications: NotificationsApi,
+    val blocks: BlocksApi,
+    val rankings: RankingsApi,
+    val referrals: ReferralsApi,
+    val tasksAchievements: TasksAchievementsApi,
 ) {
     companion object {
         fun create(
@@ -27,7 +31,7 @@ data class VoiceCloudApiServices(
             sessionExpiredListener: SessionExpiredListener? = null,
         ): VoiceCloudApiServices {
             val authenticator = TokenRefreshAuthenticator(baseUrl, moshi, tokenVault, sessionExpiredListener)
-            val client = ApiClientFactory.createOkHttpClient(tokenVault, authenticator)
+            val client = ApiClientFactory.createOkHttpClient(tokenVault, authenticator, sessionExpiredListener)
             val retrofit: Retrofit = ApiClientFactory.createRetrofit(baseUrl, moshi, client)
             return VoiceCloudApiServices(
                 bootstrap = retrofit.create(BootstrapApi::class.java),
@@ -42,6 +46,10 @@ data class VoiceCloudApiServices(
                 session = retrofit.create(SessionApi::class.java),
                 creatorAccess = retrofit.create(CreatorAccessApi::class.java),
                 notifications = retrofit.create(NotificationsApi::class.java),
+                blocks = retrofit.create(BlocksApi::class.java),
+                rankings = retrofit.create(RankingsApi::class.java),
+                referrals = retrofit.create(ReferralsApi::class.java),
+                tasksAchievements = retrofit.create(TasksAchievementsApi::class.java),
             )
         }
     }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,7 +30,9 @@ import app.voicecloud.core.designsystem.component.VCTextButton
 import app.voicecloud.core.designsystem.component.VCEmptyState
 import app.voicecloud.feature.auth.AuthDeviceItem
 import app.voicecloud.feature.auth.AuthSessionItem
+import app.voicecloud.feature.auth.DeviceDetailViewModel
 import app.voicecloud.feature.auth.DeviceListViewModel
+import app.voicecloud.feature.auth.SessionDetailViewModel
 import app.voicecloud.feature.auth.CreatorAccessViewModel
 import app.voicecloud.feature.auth.ForgotPasswordViewModel
 import app.voicecloud.feature.auth.PhoneAuthViewModel
@@ -97,7 +100,7 @@ fun LoginHistoryScreen(
             state.items.isEmpty() -> VCEmptyState(title = "No activity yet", message = "Sign-in history will appear after VoiceCloud records account activity.")
             else -> LazyColumn(contentPadding = PaddingValues(bottom = VoiceCloud.spacing.xxl)) {
                 items(state.items, key = { it.id }) { item ->
-                    SessionRow(item, canRevoke = false, onRevoke = {})
+                    SessionRow(item, canRevoke = false, onOpen = {}, onRevoke = {})
                 }
             }
         }
@@ -108,6 +111,7 @@ fun LoginHistoryScreen(
 fun DeviceListScreen(
     viewModel: DeviceListViewModel,
     onBack: () -> Unit,
+    onDeviceClick: (String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Column(Modifier.fillMaxSize()) {
@@ -127,11 +131,7 @@ fun DeviceListScreen(
                                 append("This device")
                             }
                         }.ifBlank { null },
-                        onClick = if (!item.isCurrent) {
-                            { viewModel.revoke(item.id) }
-                        } else {
-                            null
-                        },
+                        onClick = { onDeviceClick(item.id) },
                     )
                 }
             }
@@ -240,6 +240,7 @@ fun SessionListScreen(
     onBack: () -> Unit,
     revokeEnabled: Boolean = true,
     onLogoutAll: (() -> Unit)? = null,
+    onSessionClick: (String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Column(Modifier.fillMaxSize()) {
@@ -250,7 +251,9 @@ fun SessionListScreen(
             state.items.isEmpty() -> VCEmptyState(title = "No sessions", message = "You have no other active VoiceCloud sessions.")
             else -> LazyColumn(contentPadding = PaddingValues(bottom = VoiceCloud.spacing.xxl)) {
                 items(state.items, key = { it.id }) { item ->
-                    SessionRow(item, revokeEnabled && !item.isCurrent) { viewModel.revoke(item.id) }
+                    SessionRow(item, revokeEnabled && !item.isCurrent, onOpen = { onSessionClick(item.id) }) {
+                        viewModel.revoke(item.id)
+                    }
                 }
             }
         }
@@ -267,7 +270,12 @@ fun SessionListScreen(
 }
 
 @Composable
-private fun SessionRow(item: AuthSessionItem, canRevoke: Boolean, onRevoke: () -> Unit) {
+private fun SessionRow(
+    item: AuthSessionItem,
+    canRevoke: Boolean,
+    onOpen: () -> Unit,
+    onRevoke: () -> Unit,
+) {
     VCSettingsRow(
         title = item.label,
         subtitle = buildString {
@@ -277,8 +285,92 @@ private fun SessionRow(item: AuthSessionItem, canRevoke: Boolean, onRevoke: () -
                 append("Current session")
             }
         }.ifBlank { null },
-        onClick = if (canRevoke) onRevoke else null,
+        onClick = onOpen,
     )
+    if (canRevoke) {
+        VCTextButton(
+            text = "Revoke",
+            onClick = onRevoke,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = VoiceCloud.spacing.pageGutter),
+        )
+    }
+}
+
+@Composable
+fun SessionDetailScreen(
+    viewModel: SessionDetailViewModel,
+    sessionId: String,
+    onBack: () -> Unit,
+    onRevoked: () -> Unit,
+) {
+    val session by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+    LaunchedEffect(sessionId) { viewModel.load(sessionId) }
+    Column(Modifier.fillMaxSize()) {
+        VCPageHeader(title = "Session details", onBack = onBack, applyStatusBarPadding = true)
+        when {
+            isLoading -> Column(Modifier.padding(VoiceCloud.spacing.pageGutter)) { VCSkeleton(); VCSkeleton() }
+            error != null -> VCErrorState(title = "Couldn't load session", message = error)
+            session == null -> VCEmptyState(title = "Session not found", message = "This session is no longer available.")
+            else -> {
+                val item = session!!
+                Column(Modifier.padding(horizontal = VoiceCloud.spacing.pageGutter), verticalArrangement = Arrangement.spacedBy(VoiceCloud.spacing.md)) {
+                    Text(item.label, style = VoiceCloud.typography.screenTitle, color = VoiceCloud.colors.textPrimary)
+                    item.meta?.let { Text(it, style = VoiceCloud.typography.bodySecondary, color = VoiceCloud.colors.textSecondary) }
+                    item.detailMeta?.let { Text(it, style = VoiceCloud.typography.caption, color = VoiceCloud.colors.textMuted) }
+                    if (item.isCurrent) {
+                        Text("This is your current VoiceCloud session.", style = VoiceCloud.typography.bodySecondary, color = VoiceCloud.colors.textSecondary)
+                    } else {
+                        VCSecondaryButton(
+                            text = "Revoke session",
+                            onClick = { viewModel.revoke(sessionId, onRevoked) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeviceDetailScreen(
+    viewModel: DeviceDetailViewModel,
+    deviceId: String,
+    onBack: () -> Unit,
+    onRevoked: () -> Unit,
+) {
+    val device by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+    LaunchedEffect(deviceId) { viewModel.load(deviceId) }
+    Column(Modifier.fillMaxSize()) {
+        VCPageHeader(title = "Device details", onBack = onBack, applyStatusBarPadding = true)
+        when {
+            isLoading -> Column(Modifier.padding(VoiceCloud.spacing.pageGutter)) { VCSkeleton(); VCSkeleton() }
+            error != null -> VCErrorState(title = "Couldn't load device", message = error)
+            device == null -> VCEmptyState(title = "Device not found", message = "This device is no longer registered.")
+            else -> {
+                val item = device!!
+                Column(Modifier.padding(horizontal = VoiceCloud.spacing.pageGutter), verticalArrangement = Arrangement.spacedBy(VoiceCloud.spacing.md)) {
+                    Text(item.label, style = VoiceCloud.typography.screenTitle, color = VoiceCloud.colors.textPrimary)
+                    item.meta?.let { Text(it, style = VoiceCloud.typography.bodySecondary, color = VoiceCloud.colors.textSecondary) }
+                    if (item.isCurrent) {
+                        Text("This is the device you are using now.", style = VoiceCloud.typography.bodySecondary, color = VoiceCloud.colors.textSecondary)
+                    } else {
+                        VCSecondaryButton(
+                            text = "Remove device",
+                            onClick = { viewModel.revoke(deviceId, onRevoked) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

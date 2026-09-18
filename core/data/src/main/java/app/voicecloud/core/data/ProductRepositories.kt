@@ -1,5 +1,6 @@
 package app.voicecloud.core.data
 
+import app.voicecloud.core.data.mapper.toRoomUiModel
 import app.voicecloud.core.data.mapper.toBalanceLabel
 import app.voicecloud.core.data.mapper.toLineLabel
 import app.voicecloud.core.model.ApiResult
@@ -58,6 +59,14 @@ class RoomRepository @Inject constructor(
         }
         is ApiResult.Failure -> result
     }
+
+    suspend fun savedRooms(): ApiResult<List<app.voicecloud.core.designsystem.component.VCRoomUiModel>> =
+        when (val result = apiCall({ api.savedRooms() }, parser)) {
+            is ApiResult.Success -> ApiResult.Success(
+                result.data.data.orEmpty().mapNotNull { it.toRoomUiModel() },
+            )
+            is ApiResult.Failure -> result
+        }
 }
 
 @Singleton

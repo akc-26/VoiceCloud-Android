@@ -5,19 +5,11 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+import java.net.URI
+
 android {
     namespace = "app.voicecloud.android"
     compileSdk = 37
-
-    defaultConfig {
-        applicationId = "app.voicecloud.android"
-        minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0-ph01"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-    }
 
     buildFeatures {
         compose = true
@@ -42,10 +34,24 @@ android {
     val releaseSocketUrl = property("VOICECLOUD_RELEASE_SOCKET_BASE_URL").ifBlank { debugSocketUrl }
     val releaseWebUrl = property("VOICECLOUD_RELEASE_WEB_BASE_URL").ifBlank { debugWebUrl }
 
+    fun webHost(url: String): String = runCatching { URI(url).host.orEmpty() }.getOrDefault("")
+
+    val debugWebHost = webHost(debugWebUrl)
     val googleWebClientIdDebug = property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID_DEBUG")
         .ifBlank { property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID") }
     val googleWebClientIdRelease = property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID_RELEASE")
         .ifBlank { googleWebClientIdDebug }
+
+    defaultConfig {
+        applicationId = "app.voicecloud.android"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0.0-ph01"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        manifestPlaceholders["voicecloudWebHost"] = debugWebHost
+    }
 
     buildTypes {
         debug {
@@ -68,6 +74,7 @@ android {
             buildConfigField("String", "WEB_BASE_URL", quoted(stagingWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"staging\"")
             buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientIdDebug))
+            manifestPlaceholders["voicecloudWebHost"] = webHost(stagingWebUrl).ifBlank { debugWebHost }
         }
         release {
             isMinifyEnabled = true
@@ -77,6 +84,7 @@ android {
             buildConfigField("String", "WEB_BASE_URL", quoted(releaseWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"release\"")
             buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientIdRelease))
+            manifestPlaceholders["voicecloudWebHost"] = webHost(releaseWebUrl).ifBlank { debugWebHost }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -123,6 +131,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     testImplementation(libs.junit4)
+    testImplementation("org.robolectric:robolectric:4.14.1")
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)

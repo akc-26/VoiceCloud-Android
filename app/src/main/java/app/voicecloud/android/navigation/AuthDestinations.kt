@@ -24,6 +24,11 @@ object AuthDestinations {
 
 object SecurityDestinations {
     const val Sessions = "user/security/sessions"
+    const val SessionDetail = "user/security/sessions/{sessionId}"
     const val LoginHistory = "user/security/login-history"
     const val Devices = "user/security/devices"
+    const val DeviceDetail = "user/security/devices/{deviceId}"
+
+    const val SessionIdArg = "sessionId"
+    const val DeviceIdArg = "deviceId"
 }

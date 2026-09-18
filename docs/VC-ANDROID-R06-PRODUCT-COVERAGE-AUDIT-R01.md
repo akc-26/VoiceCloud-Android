@@ -1,12 +1,6 @@
 # VoiceCloud Android — R06 Product Coverage Audit R01
 
-Generated: 2026-09-18 15:27 UTC
-
-## Authority
-- Master plan: `docs/VC-ANDROID-R06-MASTER-DEVELOPMENT-PLAN-R01.md`
-- Screen parity: `contracts/screens/VC-ANDROID-R06-SCREEN-PARITY-R01.json`
-- API contract: `contracts/api/VC-ANDROID-R06-API-CONTRACT-R01.json`
-- Realtime contract: `contracts/realtime/VC-ANDROID-R06-SOCKET-EVENTS-R01.json`
+Generated: 2026-09-18 (voicecloud-ui-redesign recovery batch)
 
 ## Executive summary
 
@@ -16,12 +10,12 @@ Generated: 2026-09-18 15:27 UTC
 | Backend operations in contract | 700 |
 | Realtime inbound subscribe messages | 60 |
 | Realtime outbound emit literals | 102 |
-| Android navigation routes (current) | 19 |
-| Pages with partial UI shell only | 13 |
-| Auth/account pages (PH02 scope) | 5 |
-| Pages with no Android implementation | 78 |
+| Android navigation routes (current) | 35+ |
+| Auth/security detail routes | 4 |
+| Consumer social/discovery routes (PH03) | 10 |
+| Pages with no Android implementation | 60+ |
 
-**Status:** Android is **not** product-complete. Current branch delivers PH01 foundation + redesigned presentation shells for a subset of routes. Backend API/realtime wiring, auth lifecycle, live room authority, economy settlement, and the majority of parity pages remain to be implemented per master plan phases PH02–PH14.
+**Status:** Android is **not** product-complete. PH02 auth gaps largely closed (session/device detail, HTTPS reset App Link parser + mobile config store, session-expiry interceptor). PH03 consumer social/discovery expanded with end-to-end public profile, social lists, saved rooms, rankings, blocks, referrals, tasks hub, and People/Search/Home profile navigation. PH04+ (communities, messaging depth, full realtime room, creator/economy) remain in progress.
 
 ## A. Discovered screens/features (parity sources)
 

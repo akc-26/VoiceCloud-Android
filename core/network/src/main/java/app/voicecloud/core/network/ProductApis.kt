@@ -17,6 +17,10 @@ import app.voicecloud.core.model.RtcJoinResponse
 import app.voicecloud.core.model.SearchResultsDto
 import app.voicecloud.core.model.NotificationDto
 import app.voicecloud.core.model.NotificationUnreadDto
+import app.voicecloud.core.model.FollowStatsDto
+import app.voicecloud.core.model.ReferralSummaryDto
+import app.voicecloud.core.model.TaskItemDto
+import app.voicecloud.core.model.AchievementItemDto
 import app.voicecloud.core.model.UpdateUserProfileRequest
 import app.voicecloud.core.model.UserProfileDto
 import app.voicecloud.core.model.WalletBalanceDto
@@ -91,6 +95,44 @@ interface UsersApi {
 
     @GET("users/{userId}/following")
     suspend fun following(@Path("userId") userId: String): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("users/{userId}/follow-stats")
+    suspend fun followStats(@Path("userId") userId: String): Response<DataEnvelope<FollowStatsDto>>
+}
+
+interface BlocksApi {
+    @GET("blocks")
+    suspend fun blockedUsers(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @POST("blocks/{userId}")
+    suspend fun block(@Path("userId") userId: String): Response<Unit>
+
+    @DELETE("blocks/{userId}")
+    suspend fun unblock(@Path("userId") userId: String): Response<Unit>
+}
+
+interface RankingsApi {
+    @GET("rankings/leaderboard/users")
+    suspend fun userLeaderboard(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("rankings/trending/users")
+    suspend fun trendingUsers(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+}
+
+interface ReferralsApi {
+    @GET("referrals/summary")
+    suspend fun summary(): Response<DataEnvelope<ReferralSummaryDto>>
+
+    @GET("referrals/history")
+    suspend fun history(): Response<DataEnvelope<List<Any>>>
+}
+
+interface TasksAchievementsApi {
+    @GET("tasks-achievements/tasks")
+    suspend fun tasks(): Response<DataEnvelope<List<TaskItemDto>>>
+
+    @GET("tasks-achievements/achievements")
+    suspend fun achievements(): Response<DataEnvelope<List<AchievementItemDto>>>
 }
 
 interface ChatApi {

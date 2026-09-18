@@ -550,3 +550,78 @@ data class DeviceListUiState(
     val items: List<AuthDeviceItem> = emptyList(),
     val errorMessage: String? = null,
 )
+
+@HiltViewModel
+class SessionDetailViewModel @Inject constructor(
+    private val sessionRepository: SessionRepository,
+) : ViewModel() {
+    private val _state = MutableStateFlow<AuthSessionItem?>(null)
+    val state: StateFlow<AuthSessionItem?> = _state.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _error.asStateFlow()
+    private val _loading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    fun load(sessionId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            _error.value = null
+            when (val result = sessionRepository.session(sessionId)) {
+                is app.voicecloud.core.model.ApiResult.Success -> {
+                    _state.value = result.data
+                    _loading.value = false
+                }
+                is app.voicecloud.core.model.ApiResult.Failure -> {
+                    _error.value = result.error.message
+                    _loading.value = false
+                }
+            }
+        }
+    }
+
+    fun revoke(sessionId: String, onRevoked: () -> Unit) {
+        viewModelScope.launch {
+            when (sessionRepository.revokeSession(sessionId)) {
+                is app.voicecloud.core.model.ApiResult.Success -> onRevoked()
+                is app.voicecloud.core.model.ApiResult.Failure -> _error.value = "Could not revoke session."
+            }
+        }
+    }
+}
+
+@HiltViewModel
+class DeviceDetailViewModel @Inject constructor(
+    private val sessionRepository: SessionRepository,
+) : ViewModel() {
+    private val _state = MutableStateFlow<AuthDeviceItem?>(null)
+    val state: StateFlow<AuthDeviceItem?> = _state.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _error.asStateFlow()
+    private val _loading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    fun load(deviceId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            when (val result = sessionRepository.device(deviceId)) {
+                is app.voicecloud.core.model.ApiResult.Success -> {
+                    _state.value = result.data
+                    _loading.value = false
+                }
+                is app.voicecloud.core.model.ApiResult.Failure -> {
+                    _error.value = result.error.message
+                    _loading.value = false
+                }
+            }
+        }
+    }
+
+    fun revoke(deviceId: String, onRevoked: () -> Unit) {
+        viewModelScope.launch {
+            when (sessionRepository.revokeDevice(deviceId)) {
+                is app.voicecloud.core.model.ApiResult.Success -> onRevoked()
+                is app.voicecloud.core.model.ApiResult.Failure -> _error.value = "Could not remove device."
+            }
+        }
+    }
+}

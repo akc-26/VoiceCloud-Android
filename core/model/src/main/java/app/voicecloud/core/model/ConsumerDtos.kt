@@ -190,6 +190,40 @@ data class UpdateUserProfileRequest(
     val username: String? = null,
 )
 
+data class FollowStatsDto(
+    val followerCount: Int? = null,
+    val followingCount: Int? = null,
+    val isFollowing: Boolean? = null,
+)
+
+data class ReferralSummaryDto(
+    val code: String? = null,
+    val totalReferrals: Int? = null,
+    val rewardsEarned: Int? = null,
+)
+
+data class TaskItemDto(
+    val id: String? = null,
+    val taskId: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val progress: Int? = null,
+    val target: Int? = null,
+    val completed: Boolean? = null,
+) {
+    val resolvedId: String? get() = id ?: taskId
+}
+
+data class AchievementItemDto(
+    val id: String? = null,
+    val achievementId: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val unlocked: Boolean? = null,
+) {
+    val resolvedId: String? get() = id ?: achievementId
+}
+
 data class CreatorAccessApplicationRequest(
     val displayName: String? = null,
     val bio: String? = null,

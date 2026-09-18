@@ -18,6 +18,10 @@ import app.voicecloud.core.network.RtcApi
 import app.voicecloud.core.network.SearchApi
 import app.voicecloud.core.network.SessionApi
 import app.voicecloud.core.network.NotificationsApi
+import app.voicecloud.core.network.BlocksApi
+import app.voicecloud.core.network.RankingsApi
+import app.voicecloud.core.network.ReferralsApi
+import app.voicecloud.core.network.TasksAchievementsApi
 import app.voicecloud.core.network.UsersApi
 import app.voicecloud.core.network.WalletApi
 import app.voicecloud.core.network.SafeApiErrorParser
@@ -89,6 +93,14 @@ object FoundationModule {
     @Provides @Singleton fun notificationsApi(services: VoiceCloudApiServices): NotificationsApi = services.notifications
 
     @Provides @Singleton fun creatorAccessApi(services: VoiceCloudApiServices): CreatorAccessApi = services.creatorAccess
+
+    @Provides @Singleton fun blocksApi(services: VoiceCloudApiServices): BlocksApi = services.blocks
+
+    @Provides @Singleton fun rankingsApi(services: VoiceCloudApiServices): RankingsApi = services.rankings
+
+    @Provides @Singleton fun referralsApi(services: VoiceCloudApiServices): ReferralsApi = services.referrals
+
+    @Provides @Singleton fun tasksAchievementsApi(services: VoiceCloudApiServices): TasksAchievementsApi = services.tasksAchievements
 
     @Provides @Singleton
     fun realtimeClient(

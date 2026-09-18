@@ -17,11 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import app.voicecloud.android.navigation.ConsumerDestinations
+import app.voicecloud.android.navigation.hidesConsumerBottomBar
+import app.voicecloud.android.navigation.navigateToDeviceDetail
+import app.voicecloud.android.navigation.navigateToPersonProfile
+import app.voicecloud.android.navigation.navigateToPublicProfile
+import app.voicecloud.android.navigation.navigateToSessionDetail
+import app.voicecloud.android.navigation.navigateToSocialList
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.android.ui.consumer.SearchScreen
@@ -58,15 +66,33 @@ import app.voicecloud.feature.auth.AuthGateViewModel
 import app.voicecloud.feature.auth.AuthSessionState
 import app.voicecloud.feature.auth.LoginHistoryViewModel
 import app.voicecloud.feature.auth.SessionListViewModel
+import app.voicecloud.android.ui.consumer.BlockedUsersScreen
 import app.voicecloud.android.ui.consumer.EditProfileScreen
 import app.voicecloud.android.ui.consumer.NotificationsScreen
 import app.voicecloud.android.ui.consumer.PeopleScreen
+import app.voicecloud.android.ui.consumer.PublicProfileScreen
+import app.voicecloud.android.ui.consumer.RankingsScreen
+import app.voicecloud.android.ui.consumer.ReferralsScreen
+import app.voicecloud.android.ui.consumer.SavedRoomsScreen
+import app.voicecloud.android.ui.consumer.SocialListScreen
+import app.voicecloud.android.ui.consumer.TasksHubScreen
+import app.voicecloud.android.viewmodel.BlockedUsersViewModel
 import app.voicecloud.android.viewmodel.EditProfileViewModel
 import app.voicecloud.android.viewmodel.NotificationsViewModel
 import app.voicecloud.android.viewmodel.PeopleViewModel
+import app.voicecloud.android.viewmodel.PublicProfileViewModel
+import app.voicecloud.android.viewmodel.RankingsViewModel
+import app.voicecloud.android.viewmodel.ReferralsViewModel
+import app.voicecloud.android.viewmodel.SavedRoomsViewModel
+import app.voicecloud.android.viewmodel.SocialListViewModel
+import app.voicecloud.android.viewmodel.TasksHubViewModel
+import app.voicecloud.feature.auth.DeviceDetailViewModel
 import app.voicecloud.feature.auth.DeviceListViewModel
+import app.voicecloud.feature.auth.SessionDetailViewModel
+import app.voicecloud.feature.auth.ui.DeviceDetailScreen
 import app.voicecloud.feature.auth.ui.DeviceListScreen
 import app.voicecloud.feature.auth.ui.LoginHistoryScreen
+import app.voicecloud.feature.auth.ui.SessionDetailScreen
 import app.voicecloud.feature.auth.ui.SessionListScreen
 import app.voicecloud.core.preferences.VoiceCloudPreferences
 import kotlinx.coroutines.launch
@@ -163,16 +189,10 @@ fun ConsumerShell(
     val openSettings = {
         navController.navigate(ConsumerDestinations.Settings) { launchSingleTop = true }
     }
-    val showBottomBar = route != ConsumerDestinations.RoomPreview &&
-        route != ConsumerDestinations.MessageThread &&
-        route != ConsumerDestinations.Wallet &&
-        route != ConsumerDestinations.Settings &&
-        route != ConsumerDestinations.People &&
-        route != ConsumerDestinations.Notifications &&
-        route != ConsumerDestinations.EditProfile &&
-        route != SecurityDestinations.Sessions &&
-        route != SecurityDestinations.LoginHistory &&
-        route != SecurityDestinations.Devices
+    val openPersonProfile: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit = { person ->
+        navController.navigateToPersonProfile(person)
+    }
+    val showBottomBar = !route.hidesConsumerBottomBar()
 
     VCScaffold(
         modifier = modifier,
@@ -197,10 +217,20 @@ fun ConsumerShell(
             exitTransition = { if (motionEnabled) fadeOut(tween(VoiceCloudMotion.FastMs)) else ExitTransition.None },
         ) {
             composable(ConsumerDestinations.Home) {
-                HomeScreen(state = homeState, onOpenSearch = openSearch, onRoomClick = openRoomPreview)
+                HomeScreen(
+                    state = homeState,
+                    onOpenSearch = openSearch,
+                    onRoomClick = openRoomPreview,
+                    onPersonClick = openPersonProfile,
+                )
             }
             composable(ConsumerDestinations.Discover) {
-                ExploreScreen(state = exploreState, onOpenSearch = openSearch, onRoomClick = openRoomPreview)
+                ExploreScreen(
+                    state = exploreState,
+                    onOpenSearch = openSearch,
+                    onRoomClick = openRoomPreview,
+                    onPersonClick = openPersonProfile,
+                )
             }
             composable(ConsumerDestinations.Search) {
                 SearchScreen(
@@ -209,6 +239,7 @@ fun ConsumerShell(
                     onSearch = searchViewModel::search,
                     onBack = { navController.popBackStack() },
                     onRoomClick = openRoomPreview,
+                    onPersonClick = openPersonProfile,
                 )
             }
             composable(ConsumerDestinations.RoomPreview) {
@@ -264,13 +295,29 @@ fun ConsumerShell(
                     onNotificationsClick = {
                         navController.navigate(ConsumerDestinations.Notifications) { launchSingleTop = true }
                     },
+                    onPersonClick = openPersonProfile,
+                    onOpenSavedRooms = {
+                        navController.navigate(ConsumerDestinations.SavedRooms) { launchSingleTop = true }
+                    },
+                    onOpenRankings = {
+                        navController.navigate(ConsumerDestinations.Rankings) { launchSingleTop = true }
+                    },
+                    onOpenBlockedUsers = {
+                        navController.navigate(ConsumerDestinations.BlockedUsers) { launchSingleTop = true }
+                    },
+                    onOpenReferrals = {
+                        navController.navigate(ConsumerDestinations.Referrals) { launchSingleTop = true }
+                    },
+                    onOpenTasks = {
+                        navController.navigate(ConsumerDestinations.TasksHub) { launchSingleTop = true }
+                    },
                 )
             }
             composable(ConsumerDestinations.People) {
                 PeopleScreen(
                     state = peopleState,
                     onBack = { navController.popBackStack() },
-                    onPersonClick = { /* PH03: public profile route */ },
+                    onPersonClick = openPersonProfile,
                 )
             }
             composable(ConsumerDestinations.Notifications) {
@@ -323,6 +370,19 @@ fun ConsumerShell(
                     viewModel = hiltViewModel<SessionListViewModel>(),
                     onBack = { navController.popBackStack() },
                     revokeEnabled = true,
+                    onSessionClick = { sessionId -> navController.navigateToSessionDetail(sessionId) },
+                )
+            }
+            composable(
+                route = SecurityDestinations.SessionDetail,
+                arguments = listOf(navArgument(SecurityDestinations.SessionIdArg) { type = NavType.StringType }),
+            ) { entry ->
+                val sessionId = entry.arguments?.getString(SecurityDestinations.SessionIdArg).orEmpty()
+                SessionDetailScreen(
+                    viewModel = hiltViewModel<SessionDetailViewModel>(),
+                    sessionId = sessionId,
+                    onBack = { navController.popBackStack() },
+                    onRevoked = { navController.popBackStack() },
                 )
             }
             composable(SecurityDestinations.LoginHistory) {
@@ -334,6 +394,111 @@ fun ConsumerShell(
             composable(SecurityDestinations.Devices) {
                 DeviceListScreen(
                     viewModel = hiltViewModel<DeviceListViewModel>(),
+                    onBack = { navController.popBackStack() },
+                    onDeviceClick = { deviceId -> navController.navigateToDeviceDetail(deviceId) },
+                )
+            }
+            composable(
+                route = SecurityDestinations.DeviceDetail,
+                arguments = listOf(navArgument(SecurityDestinations.DeviceIdArg) { type = NavType.StringType }),
+            ) { entry ->
+                val deviceId = entry.arguments?.getString(SecurityDestinations.DeviceIdArg).orEmpty()
+                DeviceDetailScreen(
+                    viewModel = hiltViewModel<DeviceDetailViewModel>(),
+                    deviceId = deviceId,
+                    onBack = { navController.popBackStack() },
+                    onRevoked = {
+                        navController.popBackStack(SecurityDestinations.Devices, inclusive = false)
+                    },
+                )
+            }
+            composable(
+                route = ConsumerDestinations.PublicProfile,
+                arguments = listOf(navArgument(ConsumerDestinations.UserIdArg) { type = NavType.StringType }),
+            ) { entry ->
+                val userId = entry.arguments?.getString(ConsumerDestinations.UserIdArg).orEmpty()
+                val publicProfileViewModel: PublicProfileViewModel = hiltViewModel()
+                val publicProfileState by publicProfileViewModel.state.collectAsStateWithLifecycle()
+                LaunchedEffect(userId) { if (userId.isNotBlank()) publicProfileViewModel.load(userId) }
+                PublicProfileScreen(
+                    state = publicProfileState,
+                    onBack = { navController.popBackStack() },
+                    onFollowersClick = { id -> navController.navigateToSocialList(id, "followers") },
+                    onFollowingClick = { id -> navController.navigateToSocialList(id, "following") },
+                    onToggleFollow = publicProfileViewModel::toggleFollow,
+                    onBlock = { id ->
+                        publicProfileViewModel.block(id) { navController.popBackStack() }
+                    },
+                )
+            }
+            composable(
+                route = ConsumerDestinations.SocialList,
+                arguments = listOf(
+                    navArgument(ConsumerDestinations.UserIdArg) { type = NavType.StringType },
+                    navArgument(ConsumerDestinations.SocialListTypeArg) { type = NavType.StringType },
+                ),
+            ) { entry ->
+                val userId = entry.arguments?.getString(ConsumerDestinations.UserIdArg).orEmpty()
+                val listType = entry.arguments?.getString(ConsumerDestinations.SocialListTypeArg).orEmpty()
+                val socialListViewModel: SocialListViewModel = hiltViewModel()
+                val socialListState by socialListViewModel.state.collectAsStateWithLifecycle()
+                LaunchedEffect(userId, listType) {
+                    when (listType.lowercase()) {
+                        "following" -> socialListViewModel.loadFollowing(userId)
+                        else -> socialListViewModel.loadFollowers(userId)
+                    }
+                }
+                val title = when (listType.lowercase()) {
+                    "following" -> "Following"
+                    else -> "Followers"
+                }
+                SocialListScreen(
+                    title = title,
+                    state = socialListState,
+                    onBack = { navController.popBackStack() },
+                    onPersonClick = openPersonProfile,
+                )
+            }
+            composable(ConsumerDestinations.SavedRooms) {
+                val savedRoomsViewModel: SavedRoomsViewModel = hiltViewModel()
+                val savedRoomsState by savedRoomsViewModel.state.collectAsStateWithLifecycle()
+                SavedRoomsScreen(
+                    state = savedRoomsState,
+                    onBack = { navController.popBackStack() },
+                    onRoomClick = openRoomPreview,
+                )
+            }
+            composable(ConsumerDestinations.Rankings) {
+                val rankingsViewModel: RankingsViewModel = hiltViewModel()
+                val rankingsState by rankingsViewModel.state.collectAsStateWithLifecycle()
+                RankingsScreen(
+                    state = rankingsState,
+                    onBack = { navController.popBackStack() },
+                    onPersonClick = openPersonProfile,
+                )
+            }
+            composable(ConsumerDestinations.BlockedUsers) {
+                val blockedUsersViewModel: BlockedUsersViewModel = hiltViewModel()
+                val blockedState by blockedUsersViewModel.state.collectAsStateWithLifecycle()
+                BlockedUsersScreen(
+                    state = blockedState,
+                    onBack = { navController.popBackStack() },
+                    onUnblock = blockedUsersViewModel::unblock,
+                )
+            }
+            composable(ConsumerDestinations.Referrals) {
+                val referralsViewModel: ReferralsViewModel = hiltViewModel()
+                val referralsState by referralsViewModel.state.collectAsStateWithLifecycle()
+                ReferralsScreen(
+                    state = referralsState,
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable(ConsumerDestinations.TasksHub) {
+                val tasksViewModel: TasksHubViewModel = hiltViewModel()
+                val tasksState by tasksViewModel.state.collectAsStateWithLifecycle()
+                TasksHubScreen(
+                    state = tasksState,
                     onBack = { navController.popBackStack() },
                 )
             }

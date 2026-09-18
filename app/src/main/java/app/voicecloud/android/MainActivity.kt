@@ -6,11 +6,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import app.voicecloud.android.config.VoiceCloudMobileConfigStore
+import app.voicecloud.android.deeplink.PasswordResetDeepLinkParser
 import app.voicecloud.android.ui.VoiceCloudRoot
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject lateinit var mobileConfigStore: VoiceCloudMobileConfigStore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -24,14 +29,11 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
     }
 
-    private fun extractResetToken(intent: Intent?): String? {
-        val data: Uri = intent?.data ?: return null
-        val path = data.path.orEmpty()
-        val isResetPath = data.host.equals("reset-password", ignoreCase = true) ||
-            path.contains("reset-password", ignoreCase = true)
-        if (isResetPath) {
-            return data.getQueryParameter("token")?.trim()?.takeIf { it.isNotEmpty() }
-        }
-        return null
+    fun extractResetToken(intent: Intent?): String? {
+        return PasswordResetDeepLinkParser.extractToken(
+            data = intent?.data,
+            mobileConfig = mobileConfigStore.config,
+            webBaseUrl = BuildConfig.WEB_BASE_URL,
+        )
     }
 }

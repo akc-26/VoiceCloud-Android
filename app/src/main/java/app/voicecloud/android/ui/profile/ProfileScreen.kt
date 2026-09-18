@@ -44,6 +44,11 @@ fun ProfileScreen(
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit = {},
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit = {},
     onEventClick: (app.voicecloud.core.designsystem.component.VCEventUiModel) -> Unit = {},
+    onOpenSavedRooms: (() -> Unit)? = null,
+    onOpenRankings: (() -> Unit)? = null,
+    onOpenBlockedUsers: (() -> Unit)? = null,
+    onOpenReferrals: (() -> Unit)? = null,
+    onOpenTasks: (() -> Unit)? = null,
 ) {
     val spacing = VoiceCloud.spacing
     val motionEnabled = rememberVoiceCloudMotionEnabled()
@@ -76,6 +81,11 @@ fun ProfileScreen(
                     onPersonClick = onPersonClick,
                     onCommunityClick = onCommunityClick,
                     onEventClick = onEventClick,
+                    onOpenSavedRooms = onOpenSavedRooms,
+                    onOpenRankings = onOpenRankings,
+                    onOpenBlockedUsers = onOpenBlockedUsers,
+                    onOpenReferrals = onOpenReferrals,
+                    onOpenTasks = onOpenTasks,
                 )
             }
         }
@@ -94,6 +104,11 @@ private fun ProfileContent(
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit,
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit,
     onEventClick: (app.voicecloud.core.designsystem.component.VCEventUiModel) -> Unit,
+    onOpenSavedRooms: (() -> Unit)?,
+    onOpenRankings: (() -> Unit)?,
+    onOpenBlockedUsers: (() -> Unit)?,
+    onOpenReferrals: (() -> Unit)?,
+    onOpenTasks: (() -> Unit)?,
 ) {
     val spacing = VoiceCloud.spacing
     val identityName = state.displayName ?: "Your profile"
@@ -107,11 +122,7 @@ private fun ProfileContent(
             VCProfileHeader(
                 name = identityName,
                 handle = state.handle,
-                bio = state.bio ?: if (!hasIdentity) {
-                    "Your profile will use your VoiceCloud account when authentication is connected."
-                } else {
-                    null
-                },
+                bio = state.bio,
             )
         }
         if (state.stats.isNotEmpty()) {
@@ -134,14 +145,20 @@ private fun ProfileContent(
         }
         item { VCSectionHeader(title = "Social") }
         if (state.people.isEmpty()) {
-            item { ProfileMuted("People and creators you follow will appear here when social is connected.") }
+            item {
+                VCEmptyState(
+                    title = "No connections yet",
+                    message = "Follow creators and friends to see them here.",
+                    modifier = Modifier.padding(horizontal = spacing.pageGutter),
+                )
+            }
         } else {
             items(state.people, key = { it.name }) { person ->
                 VCPersonRow(person = person, onClick = { onPersonClick(person) })
             }
         }
         if (state.communities.isEmpty()) {
-            item { ProfileMuted("Communities will appear here when this experience is connected.") }
+            item { ProfileMuted("You are not in any communities yet.") }
         } else {
             items(state.communities, key = { it.name }) { community ->
                 VCCommunityCard(
@@ -180,6 +197,31 @@ private fun ProfileContent(
                     icon = VoiceCloudIcons.Explore,
                     onClick = onOpenPeople,
                 )
+            }
+        }
+        onOpenSavedRooms?.let { open ->
+            item {
+                VCSettingsRow(title = "Saved rooms", subtitle = "Rooms you bookmarked", icon = VoiceCloudIcons.Explore, onClick = open)
+            }
+        }
+        onOpenRankings?.let { open ->
+            item {
+                VCSettingsRow(title = "Rankings", subtitle = "Leaderboard and trending members", icon = VoiceCloudIcons.Explore, onClick = open)
+            }
+        }
+        onOpenReferrals?.let { open ->
+            item {
+                VCSettingsRow(title = "Referrals", subtitle = "Invite friends to VoiceCloud", icon = VoiceCloudIcons.Profile, onClick = open)
+            }
+        }
+        onOpenTasks?.let { open ->
+            item {
+                VCSettingsRow(title = "Tasks & achievements", subtitle = "Progress and milestones", icon = VoiceCloudIcons.Profile, onClick = open)
+            }
+        }
+        onOpenBlockedUsers?.let { open ->
+            item {
+                VCSettingsRow(title = "Blocked users", subtitle = "Manage blocked members", icon = VoiceCloudIcons.Settings, onClick = open)
             }
         }
         if (state.notificationsAvailable && onNotificationsClick != null) {

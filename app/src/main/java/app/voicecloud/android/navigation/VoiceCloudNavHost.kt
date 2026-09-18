@@ -58,6 +58,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import app.voicecloud.android.di.VoiceCloudMobileConfigEntryPoint
 import app.voicecloud.android.di.VoiceCloudSessionBridgeEntryPoint
 import app.voicecloud.android.session.VoiceCloudSessionNavEvent
 import dagger.hilt.android.EntryPointAccessors
@@ -94,6 +95,16 @@ object ConsumerDestinations {
     const val Notifications = "user/notifications"
     const val Wallet = "user/wallet"
     const val Settings = "user/settings"
+    const val PublicProfile = "user/profile/user/{userId}"
+    const val SocialList = "user/profile/user/{userId}/social/{listType}"
+    const val SavedRooms = "user/saved-rooms"
+    const val Rankings = "user/rankings"
+    const val BlockedUsers = "user/blocked"
+    const val Referrals = "user/referrals"
+    const val TasksHub = "user/tasks"
+
+    const val UserIdArg = "userId"
+    const val SocialListTypeArg = "listType"
 }
 
 @Composable
@@ -202,6 +213,10 @@ fun VoiceCloudNavHost(
                 },
                 onConfigReady = { config ->
                     mobileConfig = config
+                    EntryPointAccessors.fromApplication(
+                        context.applicationContext,
+                        VoiceCloudMobileConfigEntryPoint::class.java,
+                    ).mobileConfigStore().update(config)
                     if (!sessionRestoreStarted) {
                         sessionRestoreStarted = true
                         authGateViewModel.restore(onComplete = {})
