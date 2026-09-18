@@ -30,6 +30,7 @@ fun CreatorWorkspaceScreen(
     state: CreatorWorkspaceToolsUiState,
     onLeaveWorkspace: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenSettings: (() -> Unit)? = null,
 ) {
     val spacing = VoiceCloud.spacing
     val motionEnabled = rememberVoiceCloudMotionEnabled()
@@ -104,7 +105,7 @@ fun CreatorWorkspaceScreen(
                             title = "Creator settings",
                             subtitle = "Profile, safety, and studio preferences",
                             icon = VoiceCloudIcons.Settings,
-                            onClick = null,
+                            onClick = onOpenSettings,
                         )
                     }
                     item {

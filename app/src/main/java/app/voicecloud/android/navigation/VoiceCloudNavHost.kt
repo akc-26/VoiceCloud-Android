@@ -28,6 +28,7 @@ object CreatorDestinations {
     const val LiveStudio = "creator/live"
     const val Analytics = "creator/analytics"
     const val Workspace = "creator/workspace"
+    const val Settings = "creator/settings"
 }
 
 object ConsumerDestinations {
@@ -40,6 +41,7 @@ object ConsumerDestinations {
     const val MessageThread = "user/messages/thread"
     const val Profile = "user/profile"
     const val Wallet = "user/wallet"
+    const val Settings = "user/settings"
 }
 
 @Composable

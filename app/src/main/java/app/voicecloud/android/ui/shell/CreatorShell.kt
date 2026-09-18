@@ -6,9 +6,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.padding
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -25,6 +30,8 @@ import app.voicecloud.android.ui.creator.CreatorDashboardScreen
 import app.voicecloud.android.ui.creator.CreatorDashboardUiState
 import app.voicecloud.android.ui.creator.CreatorWorkspaceScreen
 import app.voicecloud.android.ui.creator.CreatorWorkspaceToolsUiState
+import app.voicecloud.android.ui.settings.SettingsScreen
+import app.voicecloud.android.ui.settings.SettingsUiState
 import app.voicecloud.android.ui.live.HostLiveMode
 import app.voicecloud.android.ui.live.HostLiveScreen
 import app.voicecloud.android.ui.live.HostLiveUiState
@@ -36,6 +43,8 @@ import app.voicecloud.core.designsystem.theme.PortalTheme
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 import app.voicecloud.core.designsystem.theme.VoiceCloudTheme
 import app.voicecloud.core.designsystem.theme.rememberVoiceCloudMotionEnabled
+import app.voicecloud.core.preferences.VoiceCloudPreferences
+import kotlinx.coroutines.launch
 
 @Composable
 fun CreatorShell(
@@ -65,9 +74,22 @@ private fun CreatorWorkspace(
     val audienceState = remember { CreatorAudienceUiState() }
     val analyticsState = remember { CreatorAnalyticsUiState() }
     val workspaceState = remember { CreatorWorkspaceToolsUiState() }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val preferences = remember { VoiceCloudPreferences(context) }
+    var settingsState by remember { mutableStateOf(SettingsUiState()) }
+    LaunchedEffect(preferences) {
+        preferences.theme.collect { theme ->
+            settingsState = settingsState.copy(themePreference = theme)
+        }
+    }
     val openLiveStudio = {
         navController.navigateCreatorTab(CreatorDestinations.LiveStudio)
     }
+    val openSettings = {
+        navController.navigate(CreatorDestinations.Settings) { launchSingleTop = true }
+    }
+    val showBottomBar = route != CreatorDestinations.Settings
     val sides = remember {
         listOf(
             VCNavDestination(
@@ -100,14 +122,16 @@ private fun CreatorWorkspace(
     VCScaffold(
         modifier = modifier,
         bottomBar = {
-            VCCommandBar(
-                sideDestinations = sides,
-                selectedRoute = route,
-                onSelect = { destination -> navController.navigateCreatorTab(destination.route) },
-                onLiveClick = openLiveStudio,
-                liveSelected = liveSelected,
-                liveContentDescription = "Live Studio",
-            )
+            if (showBottomBar) {
+                VCCommandBar(
+                    sideDestinations = sides,
+                    selectedRoute = route,
+                    onSelect = { destination -> navController.navigateCreatorTab(destination.route) },
+                    onLiveClick = openLiveStudio,
+                    liveSelected = liveSelected,
+                    liveContentDescription = "Live Studio",
+                )
+            }
         },
     ) { padding ->
         NavHost(
@@ -142,6 +166,17 @@ private fun CreatorWorkspace(
                 CreatorWorkspaceScreen(
                     state = workspaceState,
                     onLeaveWorkspace = onLeaveWorkspace,
+                    onOpenSettings = openSettings,
+                )
+            }
+            composable(CreatorDestinations.Settings) {
+                SettingsScreen(
+                    state = settingsState,
+                    onBack = { navController.popBackStack() },
+                    onThemeSelected = { theme ->
+                        settingsState = settingsState.copy(themePreference = theme)
+                        scope.launch { preferences.setTheme(theme) }
+                    },
                 )
             }
         }

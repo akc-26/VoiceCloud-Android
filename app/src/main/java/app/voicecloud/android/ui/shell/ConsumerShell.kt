@@ -7,11 +7,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,6 +38,8 @@ import app.voicecloud.android.ui.messaging.MessagesScreen
 import app.voicecloud.android.ui.messaging.VCConversationUiModel
 import app.voicecloud.android.ui.profile.ConsumerProfileUiState
 import app.voicecloud.android.ui.profile.ProfileScreen
+import app.voicecloud.android.ui.settings.SettingsScreen
+import app.voicecloud.android.ui.settings.SettingsUiState
 import app.voicecloud.android.ui.room.RoomPreviewScreen
 import app.voicecloud.android.ui.room.RoomPreviewUiState
 import app.voicecloud.core.designsystem.component.VCRoomUiModel
@@ -45,6 +50,8 @@ import app.voicecloud.core.designsystem.component.VCScaffold
 import app.voicecloud.core.designsystem.icon.VoiceCloudIcons
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 import app.voicecloud.core.designsystem.theme.rememberVoiceCloudMotionEnabled
+import app.voicecloud.core.preferences.VoiceCloudPreferences
+import kotlinx.coroutines.launch
 
 @Composable
 fun ConsumerShell(
@@ -67,6 +74,15 @@ fun ConsumerShell(
     var economyState by remember { mutableStateOf(ConsumerEconomyUiState()) }
     var hostLiveState by remember { mutableStateOf(HostLiveUiState()) }
     var selectedGift by remember { mutableStateOf<VCGiftUiModel?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val preferences = remember { VoiceCloudPreferences(context) }
+    var settingsState by remember { mutableStateOf(SettingsUiState()) }
+    LaunchedEffect(preferences) {
+        preferences.theme.collect { theme ->
+            settingsState = settingsState.copy(themePreference = theme)
+        }
+    }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -95,9 +111,13 @@ fun ConsumerShell(
     val openWallet = {
         navController.navigate(ConsumerDestinations.Wallet) { launchSingleTop = true }
     }
+    val openSettings = {
+        navController.navigate(ConsumerDestinations.Settings) { launchSingleTop = true }
+    }
     val showBottomBar = route != ConsumerDestinations.RoomPreview &&
         route != ConsumerDestinations.MessageThread &&
-        route != ConsumerDestinations.Wallet
+        route != ConsumerDestinations.Wallet &&
+        route != ConsumerDestinations.Settings
 
     VCScaffold(
         modifier = modifier,
@@ -185,6 +205,18 @@ fun ConsumerShell(
                     state = profileState,
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
                     onOpenWallet = openWallet,
+                    onOpenSettings = openSettings,
+                )
+            }
+            composable(ConsumerDestinations.Settings) {
+                SettingsScreen(
+                    state = settingsState,
+                    onBack = { navController.popBackStack() },
+                    onThemeSelected = { theme ->
+                        settingsState = settingsState.copy(themePreference = theme)
+                        scope.launch { preferences.setTheme(theme) }
+                    },
+                    onOpenCreatorWorkspace = onOpenCreatorWorkspace,
                 )
             }
             composable(ConsumerDestinations.Wallet) {

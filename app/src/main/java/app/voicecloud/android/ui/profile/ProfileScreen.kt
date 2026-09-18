@@ -37,6 +37,7 @@ fun ProfileScreen(
     onOpenCreatorWorkspace: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenWallet: (() -> Unit)? = null,
+    onOpenSettings: (() -> Unit)? = null,
     onNotificationsClick: (() -> Unit)? = null,
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit = {},
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit = {},
@@ -67,6 +68,7 @@ fun ProfileScreen(
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
                     onNotificationsClick = onNotificationsClick,
                     onOpenWallet = onOpenWallet,
+                    onOpenSettings = onOpenSettings,
                     onPersonClick = onPersonClick,
                     onCommunityClick = onCommunityClick,
                     onEventClick = onEventClick,
@@ -82,6 +84,7 @@ private fun ProfileContent(
     onOpenCreatorWorkspace: () -> Unit,
     onNotificationsClick: (() -> Unit)?,
     onOpenWallet: (() -> Unit)?,
+    onOpenSettings: (() -> Unit)?,
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit,
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit,
     onEventClick: (app.voicecloud.core.designsystem.component.VCEventUiModel) -> Unit,
@@ -160,6 +163,16 @@ private fun ProfileContent(
                     subtitle = "Social and room alerts",
                     icon = VoiceCloudIcons.Notifications,
                     onClick = onNotificationsClick,
+                )
+            }
+        }
+        if (onOpenSettings != null) {
+            item {
+                VCSettingsRow(
+                    title = "Settings",
+                    subtitle = "Account, experience, and safety",
+                    icon = VoiceCloudIcons.Settings,
+                    onClick = onOpenSettings,
                 )
             }
         }
