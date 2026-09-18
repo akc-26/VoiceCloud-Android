@@ -18,6 +18,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import app.voicecloud.android.ui.live.HostLiveMode
+import app.voicecloud.android.ui.live.HostLiveScreen
+import app.voicecloud.android.ui.live.HostLiveUiState
 import app.voicecloud.android.navigation.CreatorDestinations
 import app.voicecloud.core.designsystem.component.VCCommandBar
 import app.voicecloud.core.designsystem.component.VCEmptyState
@@ -53,6 +56,7 @@ private fun CreatorWorkspace(
     val route = current?.destination?.route
     val liveSelected = route == CreatorDestinations.LiveStudio
     val motionEnabled = rememberVoiceCloudMotionEnabled()
+    val hostLiveState = remember { HostLiveUiState() }
     val sides = remember {
         listOf(
             VCNavDestination(
@@ -117,10 +121,9 @@ private fun CreatorWorkspace(
                 )
             }
             composable(CreatorDestinations.LiveStudio) {
-                CreatorSection(
-                    title = "Live Studio",
-                    subtitle = "Host controls",
-                    message = "Hosting and stage controls use the existing realtime stack when Live Studio is connected. No live session is active in this shell.",
+                HostLiveScreen(
+                    state = hostLiveState,
+                    mode = HostLiveMode.Host,
                 )
             }
             composable(CreatorDestinations.Analytics) {

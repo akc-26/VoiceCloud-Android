@@ -23,6 +23,9 @@ import app.voicecloud.android.ui.consumer.ConsumerSearchUiState
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.android.ui.consumer.SearchScreen
+import app.voicecloud.android.ui.live.HostLiveMode
+import app.voicecloud.android.ui.live.HostLiveScreen
+import app.voicecloud.android.ui.live.HostLiveUiState
 import app.voicecloud.android.ui.economy.ConsumerEconomyUiState
 import app.voicecloud.android.ui.economy.EconomyScreen
 import app.voicecloud.android.ui.messaging.ConsumerConversationUiState
@@ -62,6 +65,7 @@ fun ConsumerShell(
     var messagesQuery by remember { mutableStateOf("") }
     var conversationState by remember { mutableStateOf<ConsumerConversationUiState?>(null) }
     var economyState by remember { mutableStateOf(ConsumerEconomyUiState()) }
+    var hostLiveState by remember { mutableStateOf(HostLiveUiState()) }
     var selectedGift by remember { mutableStateOf<VCGiftUiModel?>(null) }
     val sides = remember {
         listOf(
@@ -149,10 +153,9 @@ fun ConsumerShell(
                 }
             }
             composable(ConsumerDestinations.Live) {
-                ShellSection(
-                    title = "Live",
-                    subtitle = "Rooms",
-                    message = "Joining and hosting live audio uses the existing realtime stack when that experience is connected. No room is active in this shell.",
+                HostLiveScreen(
+                    state = hostLiveState,
+                    mode = HostLiveMode.Audience,
                 )
             }
             composable(ConsumerDestinations.Messages) {
