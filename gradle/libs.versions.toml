@@ -18,6 +18,9 @@ junit4 = "4.13.2"
 androidxJunit = "1.3.0"
 espresso = "3.7.0"
 socketIoJava = "2.1.2"
+credentials = "1.3.0"
+googleid = "1.1.1"
+playServices = "18.9.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -54,6 +57,10 @@ junit4 = { module = "junit:junit", version.ref = "junit4" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 socketio-client = { module = "io.socket:socket.io-client", version.ref = "socketIoJava" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

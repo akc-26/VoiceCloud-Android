@@ -138,9 +138,56 @@ data class AuthSessionDto(
     val id: String? = null,
     val sessionId: String? = null,
     val deviceName: String? = null,
+    val deviceId: String? = null,
     val ipAddress: String? = null,
     val lastActiveAt: String? = null,
+    val createdAt: String? = null,
     val current: Boolean? = null,
+    val userAgent: String? = null,
+)
+
+data class AuthDeviceDto(
+    val id: String? = null,
+    val deviceId: String? = null,
+    val name: String? = null,
+    val deviceName: String? = null,
+    val platform: String? = null,
+    val lastActiveAt: String? = null,
+    val createdAt: String? = null,
+    val current: Boolean? = null,
+) {
+    val resolvedId: String? get() = id ?: deviceId
+    val resolvedName: String get() = deviceName ?: name ?: "VoiceCloud device"
+}
+
+data class NotificationDto(
+    val id: String? = null,
+    val notificationId: String? = null,
+    val title: String? = null,
+    val body: String? = null,
+    val message: String? = null,
+    val type: String? = null,
+    val read: Boolean? = null,
+    val isRead: Boolean? = null,
+    val createdAt: String? = null,
+) {
+    val resolvedId: String? get() = id ?: notificationId
+    val resolvedTitle: String get() = title ?: type ?: "Notification"
+    val resolvedBody: String? get() = body ?: message
+    val resolvedRead: Boolean get() = read == true || isRead == true
+}
+
+data class NotificationUnreadDto(
+    val count: Int? = null,
+    val unread: Int? = null,
+) {
+    val resolvedCount: Int get() = count ?: unread ?: 0
+}
+
+data class UpdateUserProfileRequest(
+    val displayName: String? = null,
+    val bio: String? = null,
+    val username: String? = null,
 )
 
 data class CreatorAccessApplicationRequest(

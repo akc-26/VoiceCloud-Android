@@ -16,6 +16,14 @@ data class AuthSessionItem(
     val label: String,
     val meta: String?,
     val isCurrent: Boolean,
+    val detailMeta: String? = null,
+)
+
+data class AuthDeviceItem(
+    val id: String,
+    val label: String,
+    val meta: String?,
+    val isCurrent: Boolean,
 )
 
 @Singleton
@@ -27,6 +35,38 @@ class SessionRepository @Inject constructor(
         is ApiResult.Success -> ApiResult.Success(
             result.data.data.orEmpty().mapNotNull { it.toItem() },
         )
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun session(sessionId: String): ApiResult<AuthSessionItem> = when (
+        val result = apiCall({ api.session(sessionId) }, parser)
+    ) {
+        is ApiResult.Success -> {
+            val item = result.data.data?.toItem()
+            if (item != null) ApiResult.Success(item) else ApiResult.Failure(ApiError(message = "Session not found", retryable = false))
+        }
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun devices(): ApiResult<List<AuthDeviceItem>> = when (val result = apiCall({ api.devices() }, parser)) {
+        is ApiResult.Success -> ApiResult.Success(result.data.data.orEmpty().mapNotNull { it.toDeviceItem() })
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun device(deviceId: String): ApiResult<AuthDeviceItem> = when (
+        val result = apiCall({ api.device(deviceId) }, parser)
+    ) {
+        is ApiResult.Success -> {
+            val item = result.data.data?.toDeviceItem()
+            if (item != null) ApiResult.Success(item) else ApiResult.Failure(ApiError(message = "Device not found", retryable = false))
+        }
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun revokeDevice(deviceId: String): ApiResult<Unit> = when (
+        val result = apiCall({ api.revokeDevice(deviceId) }, parser)
+    ) {
+        is ApiResult.Success -> ApiResult.Success(Unit)
         is ApiResult.Failure -> result
     }
 
@@ -48,7 +88,20 @@ class SessionRepository @Inject constructor(
         val id = id ?: sessionId ?: return null
         val label = deviceName ?: "VoiceCloud session"
         val meta = listOfNotNull(ipAddress, lastActiveAt?.let { "Last active $it" }).joinToString(" · ")
-        return AuthSessionItem(id = id, label = label, meta = meta.ifBlank { null }, isCurrent = current == true)
+        val detail = listOfNotNull(userAgent, createdAt?.let { "Started $it" }).joinToString(" · ")
+        return AuthSessionItem(
+            id = id,
+            label = label,
+            meta = meta.ifBlank { null },
+            isCurrent = current == true,
+            detailMeta = detail.ifBlank { null },
+        )
+    }
+
+    private fun app.voicecloud.core.model.AuthDeviceDto.toDeviceItem(): AuthDeviceItem? {
+        val id = resolvedId ?: return null
+        val meta = listOfNotNull(platform, lastActiveAt?.let { "Last active $it" }).joinToString(" · ")
+        return AuthDeviceItem(id = id, label = resolvedName, meta = meta.ifBlank { null }, isCurrent = current == true)
     }
 
     private fun AuthSessionDto.toHistoryItem(): AuthSessionItem? {

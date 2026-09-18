@@ -19,6 +19,7 @@ import app.voicecloud.core.designsystem.foundation.vcTouchTarget
 
 @Immutable
 data class VCPersonUiModel(
+    val userId: String? = null,
     val name: String,
     val subtitle: String? = null,
     val metaLabel: String? = null,

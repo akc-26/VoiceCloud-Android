@@ -5,7 +5,10 @@ import app.voicecloud.core.data.mapper.toMessageUi
 import app.voicecloud.core.data.model.ConversationSummary
 import app.voicecloud.core.data.model.MessageItem
 import app.voicecloud.core.model.ApiResult
+import app.voicecloud.core.model.UpdateUserProfileRequest
 import app.voicecloud.core.model.VoiceCloudUser
+import app.voicecloud.core.data.mapper.toPersonUiModel
+import app.voicecloud.core.designsystem.component.VCPersonUiModel
 import app.voicecloud.core.network.ChatApi
 import app.voicecloud.core.network.SendMessageRequest
 import app.voicecloud.core.network.SafeApiErrorParser
@@ -108,6 +111,64 @@ class ProfileRepository @Inject constructor(
 
     suspend fun unfollow(userId: String): ApiResult<Unit> = when (val result = apiCall({ api.unfollow(userId) }, parser)) {
         is ApiResult.Success -> ApiResult.Success(Unit)
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun updateProfile(displayName: String?, bio: String?): ApiResult<VoiceCloudUser> = when (
+        val result = apiCall(
+            { api.updateProfile(UpdateUserProfileRequest(displayName = displayName, bio = bio)) },
+            parser,
+        )
+    ) {
+        is ApiResult.Success -> {
+            val profile = result.data.data
+            if (profile == null) {
+                ApiResult.Failure(app.voicecloud.core.model.ApiError(message = "Profile update failed."))
+            } else {
+                ApiResult.Success(
+                    VoiceCloudUser(
+                        id = profile.resolvedId.orEmpty(),
+                        username = profile.username,
+                        displayName = profile.displayName,
+                        bio = profile.bio,
+                        avatarUrl = profile.avatarUrl,
+                        role = profile.role,
+                    ),
+                )
+            }
+        }
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun loadProfile(userId: String): ApiResult<VoiceCloudUser> = when (val result = apiCall({ api.profile(userId) }, parser)) {
+        is ApiResult.Success -> {
+            val profile = result.data.data
+            if (profile == null) {
+                ApiResult.Failure(app.voicecloud.core.model.ApiError(message = "Profile unavailable."))
+            } else {
+                ApiResult.Success(
+                    VoiceCloudUser(
+                        id = profile.resolvedId.orEmpty(),
+                        username = profile.username,
+                        displayName = profile.displayName,
+                        bio = profile.bio,
+                        avatarUrl = profile.avatarUrl,
+                        role = profile.role,
+                    ),
+                )
+            }
+        }
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun followers(userId: String): ApiResult<List<VCPersonUiModel>> = loadPeople { api.followers(userId) }
+
+    suspend fun following(userId: String): ApiResult<List<VCPersonUiModel>> = loadPeople { api.following(userId) }
+
+    private suspend fun loadPeople(
+        call: suspend () -> retrofit2.Response<app.voicecloud.core.model.DataEnvelope<List<app.voicecloud.core.model.DiscoveryUserDto>>>,
+    ): ApiResult<List<VCPersonUiModel>> = when (val result = apiCall(call, parser)) {
+        is ApiResult.Success -> ApiResult.Success(result.data.data.orEmpty().mapNotNull { it.toPersonUiModel() })
         is ApiResult.Failure -> result
     }
 }

@@ -31,6 +31,7 @@ fun DiscoveryRoomDto.toRoomUiModel(): VCRoomUiModel? {
 fun DiscoveryUserDto.toPersonUiModel(): VCPersonUiModel? {
     val personId = resolvedId ?: username ?: return null
     return VCPersonUiModel(
+        userId = resolvedId,
         name = resolvedName,
         subtitle = username?.let { "@$it" },
         metaLabel = if (isOnline == true) "Online now" else null,

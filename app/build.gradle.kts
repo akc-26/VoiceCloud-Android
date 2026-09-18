@@ -42,6 +42,11 @@ android {
     val releaseSocketUrl = property("VOICECLOUD_RELEASE_SOCKET_BASE_URL").ifBlank { debugSocketUrl }
     val releaseWebUrl = property("VOICECLOUD_RELEASE_WEB_BASE_URL").ifBlank { debugWebUrl }
 
+    val googleWebClientIdDebug = property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID_DEBUG")
+        .ifBlank { property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID") }
+    val googleWebClientIdRelease = property("VOICECLOUD_GOOGLE_WEB_CLIENT_ID_RELEASE")
+        .ifBlank { googleWebClientIdDebug }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -51,6 +56,7 @@ android {
             buildConfigField("String", "SOCKET_BASE_URL", quoted(debugSocketUrl))
             buildConfigField("String", "WEB_BASE_URL", quoted(debugWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"debug\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientIdDebug))
         }
         create("staging") {
             initWith(getByName("debug"))
@@ -61,6 +67,7 @@ android {
             buildConfigField("String", "SOCKET_BASE_URL", quoted(stagingSocketUrl))
             buildConfigField("String", "WEB_BASE_URL", quoted(stagingWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"staging\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientIdDebug))
         }
         release {
             isMinifyEnabled = true
@@ -69,6 +76,7 @@ android {
             buildConfigField("String", "SOCKET_BASE_URL", quoted(releaseSocketUrl))
             buildConfigField("String", "WEB_BASE_URL", quoted(releaseWebUrl))
             buildConfigField("String", "ENVIRONMENT", "\"release\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", quoted(googleWebClientIdRelease))
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

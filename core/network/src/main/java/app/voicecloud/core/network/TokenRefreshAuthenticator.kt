@@ -24,6 +24,7 @@ class TokenRefreshAuthenticator(
     private val baseUrl: String,
     private val moshi: Moshi,
     private val tokenVault: TokenVault,
+    private val sessionExpiredListener: SessionExpiredListener? = null,
 ) : Authenticator {
     private val lock = ReentrantLock()
     private val refreshApi: AuthApi by lazy {
@@ -44,6 +45,7 @@ class TokenRefreshAuthenticator(
         if (responseCount(response) >= 2) return null
         val refreshToken = tokenVault.refreshToken()?.takeIf { it.isNotBlank() } ?: run {
             tokenVault.clear()
+            sessionExpiredListener?.onSessionExpired()
             return null
         }
         return lock.withLock {
@@ -60,6 +62,7 @@ class TokenRefreshAuthenticator(
             val body: RefreshTokenResponse? = refreshResponse.body()
             if (!refreshResponse.isSuccessful || body == null) {
                 tokenVault.clear()
+                sessionExpiredListener?.onSessionExpired()
                 return@withLock null
             }
             tokenVault.save(body.accessToken, body.refreshToken)

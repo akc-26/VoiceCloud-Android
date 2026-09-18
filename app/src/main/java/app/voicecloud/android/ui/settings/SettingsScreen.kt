@@ -44,6 +44,7 @@ fun SettingsScreen(
     onOpenGuestUpgrade: (() -> Unit)? = null,
     onOpenSessions: (() -> Unit)? = null,
     onOpenLoginHistory: (() -> Unit)? = null,
+    onOpenDevices: (() -> Unit)? = null,
     onSignOut: (() -> Unit)? = null,
 ) {
     val spacing = VoiceCloud.spacing
@@ -183,6 +184,13 @@ fun SettingsScreen(
                             title = "Login activity",
                             subtitle = "Recent sign-ins on your account",
                             onClick = onOpenLoginHistory,
+                        )
+                    }
+                    item {
+                        VCSettingsRow(
+                            title = "Registered devices",
+                            subtitle = "Phones and tablets using your account",
+                            onClick = onOpenDevices,
                         )
                     }
                     item { VCSectionHeader(title = "Safety") }

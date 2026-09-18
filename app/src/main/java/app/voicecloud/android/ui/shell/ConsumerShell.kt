@@ -58,6 +58,14 @@ import app.voicecloud.feature.auth.AuthGateViewModel
 import app.voicecloud.feature.auth.AuthSessionState
 import app.voicecloud.feature.auth.LoginHistoryViewModel
 import app.voicecloud.feature.auth.SessionListViewModel
+import app.voicecloud.android.ui.consumer.EditProfileScreen
+import app.voicecloud.android.ui.consumer.NotificationsScreen
+import app.voicecloud.android.ui.consumer.PeopleScreen
+import app.voicecloud.android.viewmodel.EditProfileViewModel
+import app.voicecloud.android.viewmodel.NotificationsViewModel
+import app.voicecloud.android.viewmodel.PeopleViewModel
+import app.voicecloud.feature.auth.DeviceListViewModel
+import app.voicecloud.feature.auth.ui.DeviceListScreen
 import app.voicecloud.feature.auth.ui.LoginHistoryScreen
 import app.voicecloud.feature.auth.ui.SessionListScreen
 import app.voicecloud.core.preferences.VoiceCloudPreferences
@@ -80,6 +88,9 @@ fun ConsumerShell(
     val searchViewModel: SearchViewModel = hiltViewModel()
     val messagesViewModel: MessagesViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
+    val peopleViewModel: PeopleViewModel = hiltViewModel()
+    val notificationsViewModel: NotificationsViewModel = hiltViewModel()
+    val editProfileViewModel: EditProfileViewModel = hiltViewModel()
     val economyViewModel: EconomyViewModel = hiltViewModel()
     val hostLiveViewModel: HostLiveViewModel = hiltViewModel()
     val authGateViewModel: AuthGateViewModel = hiltViewModel()
@@ -89,6 +100,9 @@ fun ConsumerShell(
     val searchState by searchViewModel.state.collectAsStateWithLifecycle()
     val messagesState by messagesViewModel.state.collectAsStateWithLifecycle()
     val profileState by profileViewModel.state.collectAsStateWithLifecycle()
+    val peopleState by peopleViewModel.state.collectAsStateWithLifecycle()
+    val notificationsState by notificationsViewModel.state.collectAsStateWithLifecycle()
+    val editProfileState by editProfileViewModel.state.collectAsStateWithLifecycle()
     val economyState by economyViewModel.state.collectAsStateWithLifecycle()
     val hostLiveState by hostLiveViewModel.state.collectAsStateWithLifecycle()
     var roomPreviewState by remember { mutableStateOf<RoomPreviewUiState?>(null) }
@@ -153,8 +167,12 @@ fun ConsumerShell(
         route != ConsumerDestinations.MessageThread &&
         route != ConsumerDestinations.Wallet &&
         route != ConsumerDestinations.Settings &&
+        route != ConsumerDestinations.People &&
+        route != ConsumerDestinations.Notifications &&
+        route != ConsumerDestinations.EditProfile &&
         route != SecurityDestinations.Sessions &&
-        route != SecurityDestinations.LoginHistory
+        route != SecurityDestinations.LoginHistory &&
+        route != SecurityDestinations.Devices
 
     VCScaffold(
         modifier = modifier,
@@ -237,6 +255,44 @@ fun ConsumerShell(
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
                     onOpenWallet = openWallet,
                     onOpenSettings = openSettings,
+                    onEditProfile = {
+                        navController.navigate(ConsumerDestinations.EditProfile) { launchSingleTop = true }
+                    },
+                    onOpenPeople = {
+                        navController.navigate(ConsumerDestinations.People) { launchSingleTop = true }
+                    },
+                    onNotificationsClick = {
+                        navController.navigate(ConsumerDestinations.Notifications) { launchSingleTop = true }
+                    },
+                )
+            }
+            composable(ConsumerDestinations.People) {
+                PeopleScreen(
+                    state = peopleState,
+                    onBack = { navController.popBackStack() },
+                    onPersonClick = { /* PH03: public profile route */ },
+                )
+            }
+            composable(ConsumerDestinations.Notifications) {
+                NotificationsScreen(
+                    state = notificationsState,
+                    onBack = { navController.popBackStack() },
+                    onMarkAllRead = notificationsViewModel::markAllRead,
+                    onOpenNotification = notificationsViewModel::markRead,
+                )
+            }
+            composable(ConsumerDestinations.EditProfile) {
+                EditProfileScreen(
+                    state = editProfileState,
+                    onBack = { navController.popBackStack() },
+                    onDisplayNameChange = editProfileViewModel::onDisplayNameChange,
+                    onBioChange = editProfileViewModel::onBioChange,
+                    onSave = {
+                        editProfileViewModel.save {
+                            profileViewModel.refresh()
+                            navController.popBackStack()
+                        }
+                    },
                 )
             }
             composable(ConsumerDestinations.Settings) {
@@ -255,6 +311,9 @@ fun ConsumerShell(
                     onOpenLoginHistory = {
                         navController.navigate(SecurityDestinations.LoginHistory) { launchSingleTop = true }
                     },
+                    onOpenDevices = {
+                        navController.navigate(SecurityDestinations.Devices) { launchSingleTop = true }
+                    },
                     onSignOut = onSignOut,
                 )
             }
@@ -269,6 +328,12 @@ fun ConsumerShell(
             composable(SecurityDestinations.LoginHistory) {
                 LoginHistoryScreen(
                     viewModel = hiltViewModel<LoginHistoryViewModel>(),
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable(SecurityDestinations.Devices) {
+                DeviceListScreen(
+                    viewModel = hiltViewModel<DeviceListViewModel>(),
                     onBack = { navController.popBackStack() },
                 )
             }

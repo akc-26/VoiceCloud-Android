@@ -24,6 +24,14 @@ class DiscoveryRepository @Inject constructor(
 
     suspend fun popularPeople(): ApiResult<List<VCPersonUiModel>> = loadPeople { api.popularUsers() }
 
+    suspend fun onlinePeople(): ApiResult<List<VCPersonUiModel>> = loadPeople { api.onlineUsers() }
+
+    suspend fun suggestedPeople(): ApiResult<List<VCPersonUiModel>> = loadPeople { api.suggestedUsers() }
+
+    suspend fun trendingPeople(): ApiResult<List<VCPersonUiModel>> = loadPeople { api.trendingUsers() }
+
+    suspend fun trendingHosts(): ApiResult<List<VCPersonUiModel>> = loadPeople { api.trendingHosts() }
+
     private suspend fun loadRooms(
         call: suspend () -> retrofit2.Response<app.voicecloud.core.model.DataEnvelope<List<app.voicecloud.core.model.DiscoveryRoomDto>>>,
     ): ApiResult<List<VCRoomUiModel>> = when (val result = apiCall(call, parser)) {

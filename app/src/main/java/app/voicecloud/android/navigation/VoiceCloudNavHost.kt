@@ -58,6 +58,9 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import app.voicecloud.android.di.VoiceCloudSessionBridgeEntryPoint
+import app.voicecloud.android.session.VoiceCloudSessionNavEvent
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
 /** PH01 start remains bootstrap. PH02 adds auth gates before portal graphs. */
@@ -81,11 +84,14 @@ object ConsumerDestinations {
     const val Home = "user/home"
     const val Discover = "user/discover"
     const val Search = "user/search"
+    const val People = "user/people"
     const val RoomPreview = "user/room/preview"
     const val Live = "user/live"
     const val Messages = "user/messages"
     const val MessageThread = "user/messages/thread"
     const val Profile = "user/profile"
+    const val EditProfile = "user/profile/edit"
+    const val Notifications = "user/notifications"
     const val Wallet = "user/wallet"
     const val Settings = "user/settings"
 }
@@ -141,6 +147,26 @@ fun VoiceCloudNavHost(
                 "${AuthDestinations.ResetPasswordRoute}?${AuthDestinations.ResetTokenArg}=${Uri.encode(token)}",
             ) {
                 launchSingleTop = true
+            }
+        }
+    }
+
+    val sessionBridge = remember(context.applicationContext) {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            VoiceCloudSessionBridgeEntryPoint::class.java,
+        ).sessionNavigationBridge()
+    }
+    LaunchedEffect(sessionBridge) {
+        sessionBridge.events.collect { event ->
+            when (event) {
+                VoiceCloudSessionNavEvent.SessionExpired -> {
+                    sessionController.markSessionExpired()
+                    navController.navigate(AuthDestinations.SessionExpired) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             }
         }
     }

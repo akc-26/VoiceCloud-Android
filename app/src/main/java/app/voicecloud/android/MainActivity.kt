@@ -26,7 +26,10 @@ class MainActivity : ComponentActivity() {
 
     private fun extractResetToken(intent: Intent?): String? {
         val data: Uri = intent?.data ?: return null
-        if (data.host.equals("reset-password", ignoreCase = true) || data.path?.contains("reset-password") == true) {
+        val path = data.path.orEmpty()
+        val isResetPath = data.host.equals("reset-password", ignoreCase = true) ||
+            path.contains("reset-password", ignoreCase = true)
+        if (isResetPath) {
             return data.getQueryParameter("token")?.trim()?.takeIf { it.isNotEmpty() }
         }
         return null

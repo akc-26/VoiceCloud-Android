@@ -23,10 +23,13 @@ import app.voicecloud.core.designsystem.component.VCPageHeader
 import app.voicecloud.core.designsystem.component.VCPrimaryButton
 import app.voicecloud.core.designsystem.component.VCSecondaryButton
 import app.voicecloud.core.designsystem.component.VCSettingsRow
+import androidx.compose.ui.platform.LocalContext
 import app.voicecloud.core.designsystem.component.VCSkeleton
 import app.voicecloud.core.designsystem.component.VCTextButton
 import app.voicecloud.core.designsystem.component.VCEmptyState
+import app.voicecloud.feature.auth.AuthDeviceItem
 import app.voicecloud.feature.auth.AuthSessionItem
+import app.voicecloud.feature.auth.DeviceListViewModel
 import app.voicecloud.feature.auth.CreatorAccessViewModel
 import app.voicecloud.feature.auth.ForgotPasswordViewModel
 import app.voicecloud.feature.auth.PhoneAuthViewModel
@@ -44,6 +47,7 @@ fun GoogleSignInScreen(
     onAuthenticated: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     Column(Modifier.fillMaxSize().padding(VoiceCloud.spacing.pageGutter), verticalArrangement = Arrangement.spacedBy(VoiceCloud.spacing.md)) {
         VCPageHeader(
             title = "Google Sign-In",
@@ -51,16 +55,29 @@ fun GoogleSignInScreen(
             onBack = onBack,
             applyStatusBarPadding = true,
         )
-        Text(
-            "Complete Google Sign-In from a build that includes the OAuth client configuration from VoiceCloud mobile config.",
-            style = VoiceCloud.typography.bodySecondary,
-            color = VoiceCloud.colors.textSecondary,
-        )
-        state.errorMessage?.let { VCErrorState(title = "Google Sign-In unavailable", message = it) }
+        if (!state.isConfigured) {
+            VCErrorState(
+                title = "Configuration required",
+                message = "Set VOICECLOUD_GOOGLE_WEB_CLIENT_ID_DEBUG (or _RELEASE) in gradle.properties with your Google Cloud OAuth Web client ID.",
+            )
+        } else {
+            Text(
+                "VoiceCloud verifies your Google account securely and creates your session through the VoiceCloud backend.",
+                style = VoiceCloud.typography.bodySecondary,
+                color = VoiceCloud.colors.textSecondary,
+            )
+        }
+        state.infoMessage?.let {
+            Text(it, style = VoiceCloud.typography.bodySecondary, color = VoiceCloud.colors.textSecondary)
+        }
+        state.errorMessage?.let { VCErrorState(title = "Google Sign-In failed", message = it) }
+        if (state.isSubmitting) {
+            VCSkeleton()
+        }
         VCPrimaryButton(
-            text = if (state.isSubmitting) "Please wait…" else "Continue with Google",
-            onClick = { viewModel.signInWithIdToken(idToken = "", onAuthenticated = onAuthenticated) },
-            enabled = !state.isSubmitting,
+            text = if (state.isSubmitting) "Signing in with Google…" else "Continue with Google",
+            onClick = { viewModel.signIn(context, onAuthenticated) },
+            enabled = state.isConfigured && !state.isSubmitting,
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -81,6 +98,41 @@ fun LoginHistoryScreen(
             else -> LazyColumn(contentPadding = PaddingValues(bottom = VoiceCloud.spacing.xxl)) {
                 items(state.items, key = { it.id }) { item ->
                     SessionRow(item, canRevoke = false, onRevoke = {})
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeviceListScreen(
+    viewModel: DeviceListViewModel,
+    onBack: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    Column(Modifier.fillMaxSize()) {
+        VCPageHeader(title = "Registered devices", subtitle = "Devices signed in to VoiceCloud", onBack = onBack, applyStatusBarPadding = true)
+        when {
+            state.isLoading -> Column(Modifier.padding(VoiceCloud.spacing.pageGutter)) { VCSkeleton(); VCSkeleton() }
+            state.errorMessage != null -> VCErrorState(title = "Couldn't load devices", message = state.errorMessage)
+            state.items.isEmpty() -> VCEmptyState(title = "No devices", message = "VoiceCloud has no registered devices for your account.")
+            else -> LazyColumn(contentPadding = PaddingValues(bottom = VoiceCloud.spacing.xxl)) {
+                items(state.items, key = { it.id }) { item ->
+                    VCSettingsRow(
+                        title = item.label,
+                        subtitle = buildString {
+                            item.meta?.let { append(it) }
+                            if (item.isCurrent) {
+                                if (isNotEmpty()) append(" · ")
+                                append("This device")
+                            }
+                        }.ifBlank { null },
+                        onClick = if (!item.isCurrent) {
+                            { viewModel.revoke(item.id) }
+                        } else {
+                            null
+                        },
+                    )
                 }
             }
         }

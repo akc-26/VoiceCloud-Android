@@ -6,6 +6,7 @@ import app.voicecloud.core.model.CreatorAccessApplicationRequest
 import app.voicecloud.core.model.DataEnvelope
 import app.voicecloud.core.model.DiscoveryRoomDto
 import app.voicecloud.core.model.DiscoveryUserDto
+import app.voicecloud.core.model.AuthDeviceDto
 import app.voicecloud.core.model.AuthSessionDto
 import app.voicecloud.core.model.PaginatedItems
 import app.voicecloud.core.model.PhoneSendOtpRequest
@@ -14,6 +15,9 @@ import app.voicecloud.core.model.RoomDetailDto
 import app.voicecloud.core.model.RtcJoinRequest
 import app.voicecloud.core.model.RtcJoinResponse
 import app.voicecloud.core.model.SearchResultsDto
+import app.voicecloud.core.model.NotificationDto
+import app.voicecloud.core.model.NotificationUnreadDto
+import app.voicecloud.core.model.UpdateUserProfileRequest
 import app.voicecloud.core.model.UserProfileDto
 import app.voicecloud.core.model.WalletBalanceDto
 import app.voicecloud.core.model.WalletTransactionDto
@@ -21,6 +25,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -40,6 +45,15 @@ interface DiscoveryApi {
 
     @GET("discovery/users/online")
     suspend fun onlineUsers(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("discovery/users/suggested")
+    suspend fun suggestedUsers(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("discovery/users/trending")
+    suspend fun trendingUsers(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("discovery/hosts/trending")
+    suspend fun trendingHosts(): Response<DataEnvelope<List<DiscoveryUserDto>>>
 }
 
 interface SearchApi {
@@ -68,6 +82,15 @@ interface UsersApi {
 
     @DELETE("users/{userId}/follow")
     suspend fun unfollow(@Path("userId") userId: String): Response<Unit>
+
+    @PATCH("users/profile")
+    suspend fun updateProfile(@Body body: UpdateUserProfileRequest): Response<DataEnvelope<UserProfileDto>>
+
+    @GET("users/{userId}/followers")
+    suspend fun followers(@Path("userId") userId: String): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("users/{userId}/following")
+    suspend fun following(@Path("userId") userId: String): Response<DataEnvelope<List<DiscoveryUserDto>>>
 }
 
 interface ChatApi {
@@ -129,6 +152,18 @@ interface SessionApi {
     @DELETE("auth/sessions/{sessionId}")
     suspend fun revokeSession(@Path("sessionId") sessionId: String): Response<Unit>
 
+    @GET("auth/sessions/{sessionId}")
+    suspend fun session(@Path("sessionId") sessionId: String): Response<DataEnvelope<AuthSessionDto>>
+
+    @GET("auth/devices")
+    suspend fun devices(): Response<DataEnvelope<List<AuthDeviceDto>>>
+
+    @GET("auth/devices/{deviceId}")
+    suspend fun device(@Path("deviceId") deviceId: String): Response<DataEnvelope<AuthDeviceDto>>
+
+    @DELETE("auth/devices/{deviceId}")
+    suspend fun revokeDevice(@Path("deviceId") deviceId: String): Response<Unit>
+
     @GET("auth/history")
     suspend fun loginHistory(): Response<DataEnvelope<List<AuthSessionDto>>>
 }
@@ -136,4 +171,18 @@ interface SessionApi {
 interface CreatorAccessApi {
     @POST("creator-access/applications")
     suspend fun apply(@Body body: CreatorAccessApplicationRequest): Response<Unit>
+}
+
+interface NotificationsApi {
+    @GET("notifications")
+    suspend fun notifications(): Response<DataEnvelope<List<NotificationDto>>>
+
+    @GET("notifications/unread-count")
+    suspend fun unreadCount(): Response<DataEnvelope<NotificationUnreadDto>>
+
+    @POST("notifications/read-all")
+    suspend fun readAll(): Response<Unit>
+
+    @POST("notifications/{notificationId}/read")
+    suspend fun markRead(@Path("notificationId") notificationId: String): Response<Unit>
 }

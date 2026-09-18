@@ -457,34 +457,96 @@ data class AuthEntryUiState(
 class GoogleSignInViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val sessionController: AuthSessionController,
+    private val googleSignInGateway: app.voicecloud.feature.auth.google.GoogleSignInGateway,
+    private val googleSignInConfig: app.voicecloud.core.model.GoogleSignInConfig,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(GoogleSignInUiState())
+    private val _state = MutableStateFlow(GoogleSignInUiState(isConfigured = googleSignInConfig.isConfigured))
     val state: StateFlow<GoogleSignInUiState> = _state.asStateFlow()
 
-    fun signInWithIdToken(idToken: String, onAuthenticated: () -> Unit) {
-        if (idToken.isBlank()) {
-            _state.value = _state.value.copy(
-                errorMessage = "Google Sign-In is not configured on this build. Use email or phone sign-in.",
-            )
-            return
-        }
+    fun signIn(context: android.content.Context, onAuthenticated: () -> Unit) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isSubmitting = true, errorMessage = null)
-            when (val result = authRepository.googleLogin(idToken)) {
-                is AuthResult.Success -> {
-                    sessionController.onAuthenticated(result.value.user)
-                    _state.value = _state.value.copy(isSubmitting = false)
-                    onAuthenticated()
+            _state.value = _state.value.copy(isSubmitting = true, errorMessage = null, infoMessage = null)
+            when (val outcome = googleSignInGateway.signIn(context)) {
+                is app.voicecloud.feature.auth.google.GoogleSignInOutcome.Success -> {
+                    exchangeIdToken(outcome.idToken, onAuthenticated)
                 }
-                is AuthResult.Failure -> {
-                    _state.value = _state.value.copy(isSubmitting = false, errorMessage = result.error.message)
+                app.voicecloud.feature.auth.google.GoogleSignInOutcome.Cancelled -> {
+                    _state.value = _state.value.copy(
+                        isSubmitting = false,
+                        infoMessage = "Google Sign-In was cancelled.",
+                    )
                 }
+                is app.voicecloud.feature.auth.google.GoogleSignInOutcome.Failure -> {
+                    _state.value = _state.value.copy(
+                        isSubmitting = false,
+                        errorMessage = outcome.message,
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun exchangeIdToken(idToken: String, onAuthenticated: () -> Unit) {
+        when (val result = authRepository.googleLogin(idToken)) {
+            is AuthResult.Success -> {
+                sessionController.onAuthenticated(result.value.user)
+                _state.value = _state.value.copy(isSubmitting = false, errorMessage = null)
+                onAuthenticated()
+            }
+            is AuthResult.Failure -> {
+                _state.value = _state.value.copy(
+                    isSubmitting = false,
+                    errorMessage = result.error.message,
+                )
             }
         }
     }
 }
 
 data class GoogleSignInUiState(
+    val isConfigured: Boolean = false,
     val isSubmitting: Boolean = false,
+    val errorMessage: String? = null,
+    val infoMessage: String? = null,
+)
+
+@HiltViewModel
+class DeviceListViewModel @Inject constructor(
+    private val sessionRepository: SessionRepository,
+) : ViewModel() {
+    private val _state = MutableStateFlow(DeviceListUiState())
+    val state: StateFlow<DeviceListUiState> = _state.asStateFlow()
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            when (val result = sessionRepository.devices()) {
+                is app.voicecloud.core.model.ApiResult.Success -> {
+                    _state.value = _state.value.copy(isLoading = false, items = result.data)
+                }
+                is app.voicecloud.core.model.ApiResult.Failure -> {
+                    _state.value = _state.value.copy(isLoading = false, errorMessage = result.error.message)
+                }
+            }
+        }
+    }
+
+    fun revoke(deviceId: String) {
+        viewModelScope.launch {
+            when (sessionRepository.revokeDevice(deviceId)) {
+                is app.voicecloud.core.model.ApiResult.Success -> refresh()
+                is app.voicecloud.core.model.ApiResult.Failure -> Unit
+            }
+        }
+    }
+}
+
+data class DeviceListUiState(
+    val isLoading: Boolean = true,
+    val items: List<AuthDeviceItem> = emptyList(),
     val errorMessage: String? = null,
 )

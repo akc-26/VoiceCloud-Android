@@ -17,6 +17,7 @@ import app.voicecloud.core.network.RoomsApi
 import app.voicecloud.core.network.RtcApi
 import app.voicecloud.core.network.SearchApi
 import app.voicecloud.core.network.SessionApi
+import app.voicecloud.core.network.NotificationsApi
 import app.voicecloud.core.network.UsersApi
 import app.voicecloud.core.network.WalletApi
 import app.voicecloud.core.network.SafeApiErrorParser
@@ -57,7 +58,13 @@ object FoundationModule {
         endpoints: app.voicecloud.android.network.VoiceCloudEndpoints,
         moshi: Moshi,
         tokenVault: TokenVault,
-    ): VoiceCloudApiServices = VoiceCloudApiServices.create(endpoints.apiBaseUrl, moshi, tokenVault)
+        sessionExpiredListener: app.voicecloud.core.network.SessionExpiredListener,
+    ): VoiceCloudApiServices = VoiceCloudApiServices.create(
+        endpoints.apiBaseUrl,
+        moshi,
+        tokenVault,
+        sessionExpiredListener,
+    )
 
     @Provides @Singleton fun bootstrapApi(services: VoiceCloudApiServices): BootstrapApi = services.bootstrap
 
@@ -78,6 +85,8 @@ object FoundationModule {
     @Provides @Singleton fun rtcApi(services: VoiceCloudApiServices): RtcApi = services.rtc
 
     @Provides @Singleton fun sessionApi(services: VoiceCloudApiServices): SessionApi = services.session
+
+    @Provides @Singleton fun notificationsApi(services: VoiceCloudApiServices): NotificationsApi = services.notifications
 
     @Provides @Singleton fun creatorAccessApi(services: VoiceCloudApiServices): CreatorAccessApi = services.creatorAccess
 

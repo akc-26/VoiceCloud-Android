@@ -38,6 +38,8 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onOpenWallet: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
+    onEditProfile: (() -> Unit)? = null,
+    onOpenPeople: (() -> Unit)? = null,
     onNotificationsClick: (() -> Unit)? = null,
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit = {},
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit = {},
@@ -69,6 +71,8 @@ fun ProfileScreen(
                     onNotificationsClick = onNotificationsClick,
                     onOpenWallet = onOpenWallet,
                     onOpenSettings = onOpenSettings,
+                    onEditProfile = onEditProfile,
+                    onOpenPeople = onOpenPeople,
                     onPersonClick = onPersonClick,
                     onCommunityClick = onCommunityClick,
                     onEventClick = onEventClick,
@@ -85,6 +89,8 @@ private fun ProfileContent(
     onNotificationsClick: (() -> Unit)?,
     onOpenWallet: (() -> Unit)?,
     onOpenSettings: (() -> Unit)?,
+    onEditProfile: (() -> Unit)?,
+    onOpenPeople: (() -> Unit)?,
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit,
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit,
     onEventClick: (app.voicecloud.core.designsystem.component.VCEventUiModel) -> Unit,
@@ -146,13 +152,33 @@ private fun ProfileContent(
             }
         }
         if (state.events.isEmpty()) {
-            item { ProfileMuted("Events will appear here when this experience is connected.") }
+            item { ProfileMuted("No upcoming events on your profile.") }
         } else {
             items(state.events, key = { it.title }) { event ->
                 VCEventCard(
                     event = event,
                     onClick = { onEventClick(event) },
                     modifier = Modifier.padding(horizontal = spacing.pageGutter),
+                )
+            }
+        }
+        if (onEditProfile != null) {
+            item {
+                VCSettingsRow(
+                    title = "Edit profile",
+                    subtitle = "Display name and bio",
+                    icon = VoiceCloudIcons.Profile,
+                    onClick = onEditProfile,
+                )
+            }
+        }
+        if (onOpenPeople != null) {
+            item {
+                VCSettingsRow(
+                    title = "Discover people",
+                    subtitle = "Suggested and trending members",
+                    icon = VoiceCloudIcons.Explore,
+                    onClick = onOpenPeople,
                 )
             }
         }
@@ -199,8 +225,8 @@ private fun ProfileContent(
         if (!hasIdentity && state.stats.isEmpty() && state.people.isEmpty()) {
             item {
                 VCEmptyState(
-                    title = "Profile is ready",
-                    message = "Identity, social connections, and stats will appear from VoiceCloud when your account is connected.",
+                    title = "Build your profile",
+                    message = "Edit your profile to add a bio and help others find you on VoiceCloud.",
                 )
             }
         }

@@ -17,10 +17,16 @@ data class VoiceCloudApiServices(
     val rtc: RtcApi,
     val session: SessionApi,
     val creatorAccess: CreatorAccessApi,
+    val notifications: NotificationsApi,
 ) {
     companion object {
-        fun create(baseUrl: String, moshi: Moshi, tokenVault: TokenVault): VoiceCloudApiServices {
-            val authenticator = TokenRefreshAuthenticator(baseUrl, moshi, tokenVault)
+        fun create(
+            baseUrl: String,
+            moshi: Moshi,
+            tokenVault: TokenVault,
+            sessionExpiredListener: SessionExpiredListener? = null,
+        ): VoiceCloudApiServices {
+            val authenticator = TokenRefreshAuthenticator(baseUrl, moshi, tokenVault, sessionExpiredListener)
             val client = ApiClientFactory.createOkHttpClient(tokenVault, authenticator)
             val retrofit: Retrofit = ApiClientFactory.createRetrofit(baseUrl, moshi, client)
             return VoiceCloudApiServices(
@@ -35,6 +41,7 @@ data class VoiceCloudApiServices(
                 rtc = retrofit.create(RtcApi::class.java),
                 session = retrofit.create(SessionApi::class.java),
                 creatorAccess = retrofit.create(CreatorAccessApi::class.java),
+                notifications = retrofit.create(NotificationsApi::class.java),
             )
         }
     }
