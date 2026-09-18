@@ -37,6 +37,7 @@ object ConsumerDestinations {
     const val RoomPreview = "user/room/preview"
     const val Live = "user/live"
     const val Messages = "user/messages"
+    const val MessageThread = "user/messages/thread"
     const val Profile = "user/profile"
 }
 

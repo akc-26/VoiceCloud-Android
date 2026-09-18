@@ -87,6 +87,7 @@ fun RoomPreviewScreen(
                     onReport = onReport,
                 )
             }
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -51,7 +51,7 @@ fun VCSettingsRow(
             if (trailing != null) {
                 trailing()
             } else if (onClick != null) {
-                Icon(Icons.AutoMirrored.Outlined.ChevronRight, contentDescription = null, tint = colors.textMuted)
+                Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = colors.textMuted)
             }
         }
         if (showDivider) {

@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import app.voicecloud.core.designsystem.VoiceCloud
 
 @Composable
-internal fun Modifier.vcTouchTarget(): Modifier {
+fun Modifier.vcTouchTarget(): Modifier {
     val touch = VoiceCloud.spacing.touch
     return defaultMinSize(minWidth = touch, minHeight = touch)
 }

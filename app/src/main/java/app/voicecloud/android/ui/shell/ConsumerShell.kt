@@ -23,6 +23,13 @@ import app.voicecloud.android.ui.consumer.ConsumerSearchUiState
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.android.ui.consumer.SearchScreen
+import app.voicecloud.android.ui.messaging.ConsumerConversationUiState
+import app.voicecloud.android.ui.messaging.ConsumerMessagesUiState
+import app.voicecloud.android.ui.messaging.ConversationScreen
+import app.voicecloud.android.ui.messaging.MessagesScreen
+import app.voicecloud.android.ui.messaging.VCConversationUiModel
+import app.voicecloud.android.ui.profile.ConsumerProfileUiState
+import app.voicecloud.android.ui.profile.ProfileScreen
 import app.voicecloud.android.ui.room.RoomPreviewScreen
 import app.voicecloud.android.ui.room.RoomPreviewUiState
 import app.voicecloud.core.designsystem.component.VCRoomUiModel
@@ -47,6 +54,10 @@ fun ConsumerShell(
     val exploreState = remember { ConsumerExploreUiState() }
     var searchState by remember { mutableStateOf(ConsumerSearchUiState()) }
     var roomPreviewState by remember { mutableStateOf<RoomPreviewUiState?>(null) }
+    var profileState by remember { mutableStateOf(ConsumerProfileUiState()) }
+    var messagesState by remember { mutableStateOf(ConsumerMessagesUiState()) }
+    var messagesQuery by remember { mutableStateOf("") }
+    var conversationState by remember { mutableStateOf<ConsumerConversationUiState?>(null) }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -65,7 +76,15 @@ fun ConsumerShell(
     val joinRoom = {
         navController.navigateTab(ConsumerDestinations.Live)
     }
-    val showBottomBar = route != ConsumerDestinations.RoomPreview
+    val openConversation: (VCConversationUiModel) -> Unit = { conversation ->
+        conversationState = ConsumerConversationUiState(
+            conversationId = conversation.id,
+            title = conversation.title,
+        )
+        navController.navigate(ConsumerDestinations.MessageThread) { launchSingleTop = true }
+    }
+    val showBottomBar = route != ConsumerDestinations.RoomPreview &&
+        route != ConsumerDestinations.MessageThread
 
     VCScaffold(
         modifier = modifier,
@@ -128,19 +147,31 @@ fun ConsumerShell(
                 )
             }
             composable(ConsumerDestinations.Messages) {
-                ShellSection(
-                    title = "Messages",
-                    subtitle = "Conversations",
-                    message = "Conversations will appear here from VoiceCloud when messaging is connected.",
+                MessagesScreen(
+                    state = messagesState,
+                    query = messagesQuery,
+                    onQueryChange = { messagesQuery = it },
+                    onConversationClick = openConversation,
                 )
             }
+            composable(ConsumerDestinations.MessageThread) {
+                conversationState?.let { thread ->
+                    ConversationScreen(
+                        state = thread,
+                        onBack = { navController.popBackStack() },
+                        onComposerChange = { text ->
+                            conversationState = conversationState?.copy(composerText = text)
+                        },
+                        onSend = {
+                            conversationState = conversationState?.copy(composerText = "")
+                        },
+                    )
+                }
+            }
             composable(ConsumerDestinations.Profile) {
-                ShellSection(
-                    title = "Profile",
-                    subtitle = "You",
-                    message = "Your profile will use your VoiceCloud account when authentication is connected.",
-                    actionLabel = "Creator workspace",
-                    onAction = onOpenCreatorWorkspace,
+                ProfileScreen(
+                    state = profileState,
+                    onOpenCreatorWorkspace = onOpenCreatorWorkspace,
                 )
             }
         }
