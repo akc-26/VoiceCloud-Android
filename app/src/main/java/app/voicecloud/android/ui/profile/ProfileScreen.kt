@@ -49,6 +49,11 @@ fun ProfileScreen(
     onOpenBlockedUsers: (() -> Unit)? = null,
     onOpenReferrals: (() -> Unit)? = null,
     onOpenTasks: (() -> Unit)? = null,
+    onOpenFriends: (() -> Unit)? = null,
+    onOpenProfileVisitors: (() -> Unit)? = null,
+    onOpenActivityHistory: (() -> Unit)? = null,
+    onOpenCommunities: (() -> Unit)? = null,
+    onOpenEvents: (() -> Unit)? = null,
 ) {
     val spacing = VoiceCloud.spacing
     val motionEnabled = rememberVoiceCloudMotionEnabled()
@@ -86,6 +91,11 @@ fun ProfileScreen(
                     onOpenBlockedUsers = onOpenBlockedUsers,
                     onOpenReferrals = onOpenReferrals,
                     onOpenTasks = onOpenTasks,
+                    onOpenFriends = onOpenFriends,
+                    onOpenProfileVisitors = onOpenProfileVisitors,
+                    onOpenActivityHistory = onOpenActivityHistory,
+                    onOpenCommunities = onOpenCommunities,
+                    onOpenEvents = onOpenEvents,
                 )
             }
         }
@@ -109,6 +119,11 @@ private fun ProfileContent(
     onOpenBlockedUsers: (() -> Unit)?,
     onOpenReferrals: (() -> Unit)?,
     onOpenTasks: (() -> Unit)?,
+    onOpenFriends: (() -> Unit)?,
+    onOpenProfileVisitors: (() -> Unit)?,
+    onOpenActivityHistory: (() -> Unit)?,
+    onOpenCommunities: (() -> Unit)?,
+    onOpenEvents: (() -> Unit)?,
 ) {
     val spacing = VoiceCloud.spacing
     val identityName = state.displayName ?: "Your profile"
@@ -223,6 +238,21 @@ private fun ProfileContent(
             item {
                 VCSettingsRow(title = "Blocked users", subtitle = "Manage blocked members", icon = VoiceCloudIcons.Settings, onClick = open)
             }
+        }
+        onOpenFriends?.let { open ->
+            item { VCSettingsRow(title = "Friends", subtitle = "Requests and connections", icon = VoiceCloudIcons.Profile, onClick = open) }
+        }
+        onOpenProfileVisitors?.let { open ->
+            item { VCSettingsRow(title = "Profile visitors", subtitle = "See who viewed your profile", icon = VoiceCloudIcons.Profile, onClick = open) }
+        }
+        onOpenActivityHistory?.let { open ->
+            item { VCSettingsRow(title = "Activity history", subtitle = "Rooms you joined", icon = VoiceCloudIcons.Explore, onClick = open) }
+        }
+        onOpenCommunities?.let { open ->
+            item { VCSettingsRow(title = "Communities", subtitle = "VoiceCloud clubs", icon = VoiceCloudIcons.Explore, onClick = open) }
+        }
+        onOpenEvents?.let { open ->
+            item { VCSettingsRow(title = "Events", subtitle = "Scheduled rooms and tickets", icon = VoiceCloudIcons.Live, onClick = open) }
         }
         if (state.notificationsAvailable && onNotificationsClick != null) {
             item {

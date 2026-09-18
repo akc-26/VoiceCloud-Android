@@ -68,6 +68,30 @@ class ChatRepository @Inject constructor(
         is ApiResult.Failure -> result
     }
 
+    suspend fun sendTyping(conversationId: String): ApiResult<Unit> = when (
+        val result = apiCall({ api.typing(conversationId) }, parser)
+    ) {
+        is ApiResult.Success -> ApiResult.Success(Unit)
+        is ApiResult.Failure -> result
+    }
+
+    suspend fun startConversation(participantUserId: String): ApiResult<ConversationSummary> = when (
+        val result = apiCall(
+            { api.createConversation(app.voicecloud.core.model.CreateConversationRequest(participantUserId = participantUserId, userId = participantUserId)) },
+            parser,
+        )
+    ) {
+        is ApiResult.Success -> {
+            val dto = result.data.data
+            if (dto == null) {
+                ApiResult.Failure(app.voicecloud.core.model.ApiError(message = "Conversation could not be created."))
+            } else {
+                ApiResult.Success(dto.toConversationUi())
+            }
+        }
+        is ApiResult.Failure -> result
+    }
+
     private suspend fun currentUserId(): String? {
         cachedUserId?.let { return it }
         val me = apiCall({ usersApi.myProfile() }, parser)

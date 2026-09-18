@@ -13,6 +13,7 @@ import app.voicecloud.android.ui.profile.ConsumerProfileUiState
 import app.voicecloud.core.data.ChatRepository
 import app.voicecloud.core.data.DiscoveryRepository
 import app.voicecloud.core.data.ProfileRepository
+import app.voicecloud.core.data.EventsRepository
 import app.voicecloud.core.data.SearchRepository
 import app.voicecloud.android.ui.economy.EconomyTransactionUiModel
 import app.voicecloud.core.data.WalletRepository
@@ -39,13 +40,14 @@ class HomeViewModel @Inject constructor(
             val live = discovery.liveRooms()
             val trending = discovery.trendingRooms()
             val people = discovery.popularPeople()
-            val error = listOf(live, trending, people).filterIsInstance<ApiResult.Failure>().firstOrNull()?.error?.message
+            val hosts = discovery.trendingHosts()
+            val error = listOf(live, trending, people, hosts).filterIsInstance<ApiResult.Failure>().firstOrNull()?.error?.message
             _state.value = ConsumerHomeUiState(
                 isLoading = false,
                 errorMessage = error,
                 liveRooms = (live as? ApiResult.Success)?.data.orEmpty(),
                 recommendedRooms = (trending as? ApiResult.Success)?.data.orEmpty(),
-                people = (people as? ApiResult.Success)?.data.orEmpty(),
+                people = ((people as? ApiResult.Success)?.data.orEmpty() + (hosts as? ApiResult.Success)?.data.orEmpty()).distinctBy { it.userId ?: it.name },
             )
         }
     }
@@ -54,6 +56,7 @@ class HomeViewModel @Inject constructor(
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
     private val discovery: DiscoveryRepository,
+    private val eventsRepository: EventsRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ConsumerExploreUiState(isLoading = true))
     val state: StateFlow<ConsumerExploreUiState> = _state.asStateFlow()
@@ -66,13 +69,18 @@ class ExploreViewModel @Inject constructor(
             val popular = discovery.popularRooms()
             val live = discovery.liveRooms()
             val people = discovery.popularPeople()
-            val error = listOf(popular, live, people).filterIsInstance<ApiResult.Failure>().firstOrNull()?.error?.message
+            val hosts = discovery.trendingHosts()
+            val trendingPeople = discovery.trendingPeople()
+            val events = eventsRepository.list()
+            val error = listOf(popular, live, people, hosts, trendingPeople, events).filterIsInstance<ApiResult.Failure>().firstOrNull()?.error?.message
             _state.value = ConsumerExploreUiState(
                 isLoading = false,
                 errorMessage = error,
                 liveRooms = (live as? ApiResult.Success)?.data.orEmpty(),
                 trendingRooms = (popular as? ApiResult.Success)?.data.orEmpty(),
-                people = (people as? ApiResult.Success)?.data.orEmpty(),
+                people = ((people as? ApiResult.Success)?.data.orEmpty() + (hosts as? ApiResult.Success)?.data.orEmpty() + (trendingPeople as? ApiResult.Success)?.data.orEmpty())
+                    .distinctBy { it.userId ?: it.name },
+                events = (events as? ApiResult.Success)?.data.orEmpty(),
             )
         }
     }
@@ -156,7 +164,11 @@ class ConversationViewModel @Inject constructor(
     }
 
     fun onComposerChange(text: String) {
-        _state.value = _state.value?.copy(composerText = text)
+        val current = _state.value ?: return
+        _state.value = current.copy(composerText = text)
+        if (text.isNotBlank()) {
+            viewModelScope.launch { chatRepository.sendTyping(current.conversationId) }
+        }
     }
 
     fun send() {
@@ -164,6 +176,7 @@ class ConversationViewModel @Inject constructor(
         val text = current.composerText.trim()
         if (text.isBlank()) return
         viewModelScope.launch {
+            _state.value = current.copy(isSending = true, errorMessage = null)
             when (val result = chatRepository.sendMessage(current.conversationId, text)) {
                 is ApiResult.Success -> {
                     val updated = current.messages + app.voicecloud.android.ui.messaging.VCMessageUiModel(
@@ -172,11 +185,17 @@ class ConversationViewModel @Inject constructor(
                         outgoing = result.data.outgoing,
                         metaLabel = result.data.metaLabel,
                     )
-                    _state.value = current.copy(messages = updated, composerText = "")
+                    _state.value = current.copy(messages = updated, composerText = "", isSending = false)
+                    chatRepository.sendTyping(current.conversationId)
                 }
-                is ApiResult.Failure -> _state.value = current.copy(errorMessage = result.error.message)
+                is ApiResult.Failure -> _state.value = current.copy(isSending = false, errorMessage = result.error.message)
             }
         }
+    }
+
+    fun retryLoad() {
+        val id = _state.value?.conversationId ?: return
+        load(id)
     }
 
     private fun load(conversationId: String) {

@@ -68,7 +68,7 @@ fun NotificationsScreen(
     state: app.voicecloud.android.viewmodel.NotificationsUiState,
     onBack: () -> Unit,
     onMarkAllRead: () -> Unit,
-    onOpenNotification: (String) -> Unit,
+    onOpenNotification: (String, app.voicecloud.android.navigation.NotificationDestination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.fillMaxSize()) {
@@ -100,7 +100,9 @@ fun NotificationsScreen(
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .clickable { onOpenNotification(item.id) }
+                                .clickable {
+                                    onOpenNotification(item.id, item.destination)
+                                }
                             .padding(horizontal = VoiceCloud.spacing.pageGutter, vertical = VoiceCloud.spacing.sm),
                     ) {
                         Text(item.title, style = VoiceCloud.typography.actionLabel, color = VoiceCloud.colors.textPrimary)

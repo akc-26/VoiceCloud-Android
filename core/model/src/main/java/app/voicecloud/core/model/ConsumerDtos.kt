@@ -170,6 +170,14 @@ data class NotificationDto(
     val read: Boolean? = null,
     val isRead: Boolean? = null,
     val createdAt: String? = null,
+    val targetType: String? = null,
+    val targetId: String? = null,
+    val actionUrl: String? = null,
+    val link: String? = null,
+    val conversationId: String? = null,
+    val roomId: String? = null,
+    val userId: String? = null,
+    val clubId: String? = null,
 ) {
     val resolvedId: String? get() = id ?: notificationId
     val resolvedTitle: String get() = title ?: type ?: "Notification"
@@ -228,4 +236,116 @@ data class CreatorAccessApplicationRequest(
     val displayName: String? = null,
     val bio: String? = null,
     val reason: String? = null,
+)
+
+data class FriendRequestDto(
+    val id: String? = null,
+    val requestId: String? = null,
+    val userId: String? = null,
+    val fromUserId: String? = null,
+    val user: DiscoveryUserDto? = null,
+    val fromUser: DiscoveryUserDto? = null,
+) {
+    val resolvedId: String? get() = id ?: requestId
+}
+
+data class FriendRequestBody(val userId: String)
+
+data class ProfileVisitorDto(
+    val id: String? = null,
+    val visitorId: String? = null,
+    val userId: String? = null,
+    val visitedAt: String? = null,
+    val createdAt: String? = null,
+    val visitor: DiscoveryUserDto? = null,
+    val user: DiscoveryUserDto? = null,
+) {
+    val resolvedPerson: DiscoveryUserDto? get() = visitor ?: user
+    val resolvedVisitedAt: String? get() = visitedAt ?: createdAt
+}
+
+data class ProfileVisitorStatsDto(
+    val totalVisitors: Int? = null,
+    val recentCount: Int? = null,
+    val count: Int? = null,
+) {
+    val resolvedTotal: Int get() = totalVisitors ?: count ?: recentCount ?: 0
+}
+
+data class RoomActivityItemDto(
+    val id: String? = null,
+    val roomId: String? = null,
+    val roomTitle: String? = null,
+    val title: String? = null,
+    val joinedAt: String? = null,
+    val leftAt: String? = null,
+    val createdAt: String? = null,
+    val durationSeconds: Int? = null,
+) {
+    val resolvedTitle: String get() = roomTitle ?: title ?: "VoiceCloud room"
+    val resolvedWhen: String? get() = joinedAt ?: leftAt ?: createdAt
+}
+
+data class UserSettingsDto(
+    val pushEnabled: Boolean? = null,
+    val emailEnabled: Boolean? = null,
+    val socialNotifications: Boolean? = null,
+    val messageNotifications: Boolean? = null,
+    val roomNotifications: Boolean? = null,
+    val marketingNotifications: Boolean? = null,
+)
+
+data class UpdateUserSettingsRequest(
+    val pushEnabled: Boolean? = null,
+    val emailEnabled: Boolean? = null,
+    val socialNotifications: Boolean? = null,
+    val messageNotifications: Boolean? = null,
+    val roomNotifications: Boolean? = null,
+    val marketingNotifications: Boolean? = null,
+)
+
+data class ClubDto(
+    val id: String? = null,
+    val clubId: String? = null,
+    val name: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val memberCount: Int? = null,
+    val membersCount: Int? = null,
+    val coverImageUrl: String? = null,
+) {
+    val resolvedId: String? get() = id ?: clubId
+    val resolvedName: String get() = name ?: title ?: "VoiceCloud community"
+}
+
+data class CreateClubRequest(
+    val name: String,
+    val description: String? = null,
+)
+
+data class UpdateClubRequest(
+    val name: String? = null,
+    val description: String? = null,
+)
+
+data class ScheduledRoomDto(
+    val id: String? = null,
+    val scheduledRoomId: String? = null,
+    val title: String? = null,
+    val name: String? = null,
+    val description: String? = null,
+    val startsAt: String? = null,
+    val scheduledAt: String? = null,
+    val startTime: String? = null,
+    val location: String? = null,
+    val hostName: String? = null,
+) {
+    val resolvedId: String? get() = id ?: scheduledRoomId
+    val resolvedTitle: String get() = title ?: name ?: "VoiceCloud event"
+    val resolvedTime: String? get() = startsAt ?: scheduledAt ?: startTime
+}
+
+data class CreateConversationRequest(
+    val participantUserId: String? = null,
+    val userId: String? = null,
 )

@@ -89,7 +89,7 @@ object ConsumerDestinations {
     const val RoomPreview = "user/room/preview"
     const val Live = "user/live"
     const val Messages = "user/messages"
-    const val MessageThread = "user/messages/thread"
+    const val MessageThread = "user/messages/thread/{conversationId}"
     const val Profile = "user/profile"
     const val EditProfile = "user/profile/edit"
     const val Notifications = "user/notifications"
@@ -102,9 +102,22 @@ object ConsumerDestinations {
     const val BlockedUsers = "user/blocked"
     const val Referrals = "user/referrals"
     const val TasksHub = "user/tasks"
+    const val Friends = "user/friends"
+    const val ProfileVisitors = "user/profile/visitors"
+    const val ActivityHistory = "user/activity"
+    const val NotificationPreferences = "user/settings/notifications"
+    const val Communities = "user/communities"
+    const val CommunityDetail = "user/communities/{clubId}"
+    const val CommunityMembers = "user/communities/{clubId}/members"
+    const val CreateCommunity = "user/communities/create"
+    const val Events = "user/events"
+    const val EventDetail = "user/events/{eventId}"
 
     const val UserIdArg = "userId"
     const val SocialListTypeArg = "listType"
+    const val ClubIdArg = "clubId"
+    const val EventIdArg = "eventId"
+    const val ConversationIdArg = "conversationId"
 }
 
 @Composable

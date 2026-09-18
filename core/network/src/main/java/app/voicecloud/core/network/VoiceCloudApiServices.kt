@@ -22,6 +22,12 @@ data class VoiceCloudApiServices(
     val rankings: RankingsApi,
     val referrals: ReferralsApi,
     val tasksAchievements: TasksAchievementsApi,
+    val friends: FriendsApi,
+    val visitors: VisitorsApi,
+    val userSettings: UserSettingsApi,
+    val roomActivity: RoomActivityApi,
+    val clubs: ClubsApi,
+    val scheduledRooms: ScheduledRoomsApi,
 ) {
     companion object {
         fun create(
@@ -50,6 +56,12 @@ data class VoiceCloudApiServices(
                 rankings = retrofit.create(RankingsApi::class.java),
                 referrals = retrofit.create(ReferralsApi::class.java),
                 tasksAchievements = retrofit.create(TasksAchievementsApi::class.java),
+                friends = retrofit.create(FriendsApi::class.java),
+                visitors = retrofit.create(VisitorsApi::class.java),
+                userSettings = retrofit.create(UserSettingsApi::class.java),
+                roomActivity = retrofit.create(RoomActivityApi::class.java),
+                clubs = retrofit.create(ClubsApi::class.java),
+                scheduledRooms = retrofit.create(ScheduledRoomsApi::class.java),
             )
         }
     }

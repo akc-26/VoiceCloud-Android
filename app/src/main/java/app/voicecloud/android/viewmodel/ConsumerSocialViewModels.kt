@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.voicecloud.core.data.BlocksRepository
 import app.voicecloud.core.data.DiscoveryRepository
+import app.voicecloud.android.navigation.resolveDestination
 import app.voicecloud.core.data.NotificationsRepository
 import app.voicecloud.core.data.ProfileRepository
 import app.voicecloud.core.data.PublicProfileData
@@ -66,6 +67,7 @@ data class NotificationItemUi(
     val body: String?,
     val isRead: Boolean,
     val meta: String?,
+    val destination: app.voicecloud.android.navigation.NotificationDestination = app.voicecloud.android.navigation.NotificationDestination.Unknown,
 )
 
 data class NotificationsUiState(
@@ -103,6 +105,7 @@ class NotificationsViewModel @Inject constructor(
                         body = it.body,
                         isRead = it.isRead,
                         meta = it.createdAt,
+                        destination = it.resolveDestination(),
                     )
                 },
             )

@@ -99,6 +99,7 @@ fun VCRankingRow(
 
 @Immutable
 data class VCEventUiModel(
+    val id: String? = null,
     val title: String,
     val timeLabel: String,
     val placeLabel: String? = null,
@@ -131,6 +132,7 @@ fun VCEventCard(
 
 @Immutable
 data class VCCommunityUiModel(
+    val id: String? = null,
     val name: String,
     val metaLabel: String? = null,
     val description: String? = null,

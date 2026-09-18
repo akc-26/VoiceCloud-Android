@@ -22,6 +22,12 @@ import app.voicecloud.core.network.BlocksApi
 import app.voicecloud.core.network.RankingsApi
 import app.voicecloud.core.network.ReferralsApi
 import app.voicecloud.core.network.TasksAchievementsApi
+import app.voicecloud.core.network.FriendsApi
+import app.voicecloud.core.network.VisitorsApi
+import app.voicecloud.core.network.UserSettingsApi
+import app.voicecloud.core.network.RoomActivityApi
+import app.voicecloud.core.network.ClubsApi
+import app.voicecloud.core.network.ScheduledRoomsApi
 import app.voicecloud.core.network.UsersApi
 import app.voicecloud.core.network.WalletApi
 import app.voicecloud.core.network.SafeApiErrorParser
@@ -101,6 +107,18 @@ object FoundationModule {
     @Provides @Singleton fun referralsApi(services: VoiceCloudApiServices): ReferralsApi = services.referrals
 
     @Provides @Singleton fun tasksAchievementsApi(services: VoiceCloudApiServices): TasksAchievementsApi = services.tasksAchievements
+
+    @Provides @Singleton fun friendsApi(services: VoiceCloudApiServices): FriendsApi = services.friends
+
+    @Provides @Singleton fun visitorsApi(services: VoiceCloudApiServices): VisitorsApi = services.visitors
+
+    @Provides @Singleton fun userSettingsApi(services: VoiceCloudApiServices): UserSettingsApi = services.userSettings
+
+    @Provides @Singleton fun roomActivityApi(services: VoiceCloudApiServices): RoomActivityApi = services.roomActivity
+
+    @Provides @Singleton fun clubsApi(services: VoiceCloudApiServices): ClubsApi = services.clubs
+
+    @Provides @Singleton fun scheduledRoomsApi(services: VoiceCloudApiServices): ScheduledRoomsApi = services.scheduledRooms
 
     @Provides @Singleton
     fun realtimeClient(

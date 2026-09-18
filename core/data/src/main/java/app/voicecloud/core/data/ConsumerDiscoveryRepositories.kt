@@ -17,6 +17,7 @@ import app.voicecloud.core.network.ReferralsApi
 import app.voicecloud.core.network.SafeApiErrorParser
 import app.voicecloud.core.network.TasksAchievementsApi
 import app.voicecloud.core.network.UsersApi
+import app.voicecloud.core.network.VisitorsApi
 import app.voicecloud.core.network.apiCall
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,9 +32,13 @@ data class PublicProfileData(
 @Singleton
 class PublicProfileRepository @Inject constructor(
     private val usersApi: UsersApi,
+    private val visitorsApi: VisitorsApi,
     private val parser: SafeApiErrorParser,
 ) {
-    suspend fun load(userId: String): ApiResult<PublicProfileData> {
+    suspend fun load(userId: String, recordVisit: Boolean = true): ApiResult<PublicProfileData> {
+        if (recordVisit) {
+            apiCall({ visitorsApi.recordVisit(userId) }, parser)
+        }
         val profileResult = apiCall({ usersApi.profile(userId) }, parser)
         if (profileResult is ApiResult.Failure) return profileResult
         val profile = (profileResult as ApiResult.Success).data.data ?: return ApiResult.Failure(

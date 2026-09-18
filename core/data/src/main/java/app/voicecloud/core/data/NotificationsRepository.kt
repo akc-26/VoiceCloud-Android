@@ -15,6 +15,14 @@ data class VoiceCloudNotificationItem(
     val body: String?,
     val isRead: Boolean,
     val createdAt: String?,
+    val type: String?,
+    val targetType: String?,
+    val targetId: String?,
+    val actionUrl: String?,
+    val conversationId: String?,
+    val roomId: String?,
+    val userId: String?,
+    val clubId: String?,
 )
 
 @Singleton
@@ -52,6 +60,14 @@ class NotificationsRepository @Inject constructor(
             body = resolvedBody,
             isRead = resolvedRead,
             createdAt = createdAt,
+            type = type,
+            targetType = targetType,
+            targetId = targetId,
+            actionUrl = actionUrl ?: link,
+            conversationId = conversationId,
+            roomId = roomId,
+            userId = userId,
+            clubId = clubId,
         )
     }
 }

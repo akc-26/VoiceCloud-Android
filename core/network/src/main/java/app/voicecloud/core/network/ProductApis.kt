@@ -21,7 +21,19 @@ import app.voicecloud.core.model.FollowStatsDto
 import app.voicecloud.core.model.ReferralSummaryDto
 import app.voicecloud.core.model.TaskItemDto
 import app.voicecloud.core.model.AchievementItemDto
+import app.voicecloud.core.model.CreateClubRequest
+import app.voicecloud.core.model.CreateConversationRequest
+import app.voicecloud.core.model.ClubDto
+import app.voicecloud.core.model.FriendRequestBody
+import app.voicecloud.core.model.FriendRequestDto
+import app.voicecloud.core.model.ProfileVisitorDto
+import app.voicecloud.core.model.ProfileVisitorStatsDto
+import app.voicecloud.core.model.RoomActivityItemDto
+import app.voicecloud.core.model.ScheduledRoomDto
+import app.voicecloud.core.model.UpdateClubRequest
 import app.voicecloud.core.model.UpdateUserProfileRequest
+import app.voicecloud.core.model.UpdateUserSettingsRequest
+import app.voicecloud.core.model.UserSettingsDto
 import app.voicecloud.core.model.UserProfileDto
 import app.voicecloud.core.model.WalletBalanceDto
 import app.voicecloud.core.model.WalletTransactionDto
@@ -153,6 +165,9 @@ interface ChatApi {
 
     @POST("chat/conversations/{conversationId}/read")
     suspend fun markRead(@Path("conversationId") conversationId: String): Response<Unit>
+
+    @POST("chat/conversations")
+    suspend fun createConversation(@Body body: CreateConversationRequest): Response<DataEnvelope<ChatConversationDto>>
 }
 
 data class SendMessageRequest(val text: String, val content: String? = null)
@@ -227,4 +242,88 @@ interface NotificationsApi {
 
     @POST("notifications/{notificationId}/read")
     suspend fun markRead(@Path("notificationId") notificationId: String): Response<Unit>
+}
+
+interface FriendsApi {
+    @GET("users/friends")
+    suspend fun friends(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("users/friends/requests/pending")
+    suspend fun pendingRequests(): Response<DataEnvelope<List<FriendRequestDto>>>
+
+    @GET("users/friends/suggested")
+    suspend fun suggested(): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @POST("users/friends/request")
+    suspend fun sendRequest(@Body body: FriendRequestBody): Response<Unit>
+
+    @POST("users/friends/request/{requestId}/accept")
+    suspend fun acceptRequest(@Path("requestId") requestId: String): Response<Unit>
+
+    @POST("users/friends/request/{requestId}/reject")
+    suspend fun rejectRequest(@Path("requestId") requestId: String): Response<Unit>
+
+    @DELETE("users/friends/request/{requestId}/cancel")
+    suspend fun cancelRequest(@Path("requestId") requestId: String): Response<Unit>
+
+    @DELETE("users/friends/{userId}")
+    suspend fun removeFriend(@Path("userId") userId: String): Response<Unit>
+}
+
+interface VisitorsApi {
+    @GET("users/visitors")
+    suspend fun visitors(): Response<DataEnvelope<List<ProfileVisitorDto>>>
+
+    @GET("users/visitors/stats")
+    suspend fun stats(): Response<DataEnvelope<ProfileVisitorStatsDto>>
+
+    @POST("users/visitors/{userId}")
+    suspend fun recordVisit(@Path("userId") userId: String): Response<Unit>
+}
+
+interface UserSettingsApi {
+    @GET("users/settings")
+    suspend fun settings(): Response<DataEnvelope<UserSettingsDto>>
+
+    @PATCH("users/settings")
+    suspend fun updateSettings(@Body body: UpdateUserSettingsRequest): Response<DataEnvelope<UserSettingsDto>>
+}
+
+interface RoomActivityApi {
+    @GET("room-activity/me")
+    suspend fun myActivity(): Response<DataEnvelope<List<RoomActivityItemDto>>>
+}
+
+interface ClubsApi {
+    @GET("clubs")
+    suspend fun clubs(): Response<DataEnvelope<List<ClubDto>>>
+
+    @POST("clubs")
+    suspend fun createClub(@Body body: CreateClubRequest): Response<DataEnvelope<ClubDto>>
+
+    @GET("clubs/{clubId}")
+    suspend fun club(@Path("clubId") clubId: String): Response<DataEnvelope<ClubDto>>
+
+    @PATCH("clubs/{clubId}")
+    suspend fun updateClub(@Path("clubId") clubId: String, @Body body: UpdateClubRequest): Response<DataEnvelope<ClubDto>>
+
+    @POST("clubs/{clubId}/join")
+    suspend fun join(@Path("clubId") clubId: String): Response<Unit>
+
+    @POST("clubs/{clubId}/leave")
+    suspend fun leave(@Path("clubId") clubId: String): Response<Unit>
+
+    @GET("clubs/{clubId}/members")
+    suspend fun members(@Path("clubId") clubId: String): Response<DataEnvelope<List<DiscoveryUserDto>>>
+
+    @GET("clubs/{clubId}/scheduled-rooms")
+    suspend fun scheduledRooms(@Path("clubId") clubId: String): Response<DataEnvelope<List<ScheduledRoomDto>>>
+}
+
+interface ScheduledRoomsApi {
+    @GET("scheduled-rooms")
+    suspend fun events(): Response<DataEnvelope<List<ScheduledRoomDto>>>
+
+    @GET("scheduled-rooms/{eventId}")
+    suspend fun event(@Path("eventId") eventId: String): Response<DataEnvelope<ScheduledRoomDto>>
 }

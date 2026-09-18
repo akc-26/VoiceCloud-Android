@@ -1,6 +1,6 @@
 # VoiceCloud Android — R06 Product Coverage Audit R01
 
-Generated: 2026-09-18 (voicecloud-ui-redesign recovery batch)
+Generated: 2026-09-18 PH03/PH04 recovery batch (voicecloud-ui-redesign)
 
 ## Executive summary
 
@@ -10,12 +10,61 @@ Generated: 2026-09-18 (voicecloud-ui-redesign recovery batch)
 | Backend operations in contract | 700 |
 | Realtime inbound subscribe messages | 60 |
 | Realtime outbound emit literals | 102 |
-| Android navigation routes (current) | 35+ |
-| Auth/security detail routes | 4 |
-| Consumer social/discovery routes (PH03) | 10 |
-| Pages with no Android implementation | 60+ |
+| Android consumer routes (approx.) | 50+ |
 
-**Status:** Android is **not** product-complete. PH02 auth gaps largely closed (session/device detail, HTTPS reset App Link parser + mobile config store, session-expiry interceptor). PH03 consumer social/discovery expanded with end-to-end public profile, social lists, saved rooms, rankings, blocks, referrals, tasks hub, and People/Search/Home profile navigation. PH04+ (communities, messaging depth, full realtime room, creator/economy) remain in progress.
+**Status:** Android is **not** product-complete. PH03 consumer social/discovery gaps closed where `/users/friends`, `/users/visitors`, `/room-activity/me`, `/users/settings`, and discovery hosts/events are contracted. PH04 **communities** implemented via authoritative **`/clubs/*`** APIs (see `docs/VC-ANDROID-R06-PH04-COMMUNITY-RECONCILIATION.md`). PH04 **events** via **`/scheduled-rooms`**. Messaging enhanced (conversation id route, typing, create conversation API). Realtime room lifecycle + LiveKit + creator/economy shells → workflows remain in progress.
+
+## PH03 (consumer social/discovery)
+
+| Item | Status |
+| --- | --- |
+| Public profile + follow/unfollow/block | IMPLEMENTED |
+| Followers / following | IMPLEMENTED |
+| People / discovery hosts (trending hosts on Home/Explore) | IMPLEMENTED |
+| Search (rooms + people) | IMPLEMENTED |
+| Friends + requests + suggested | IMPLEMENTED |
+| Profile visitors | IMPLEMENTED |
+| Activity history (`/room-activity/me`) | IMPLEMENTED |
+| Notification preferences (`/users/settings`) | IMPLEMENTED |
+| Notifications + destination routing | IMPLEMENTED |
+| Saved rooms, rankings, blocks, referrals, tasks, achievements | IMPLEMENTED |
+| Edit profile | IMPLEMENTED |
+
+## PH04 (communities, events, messaging)
+
+| Item | Status |
+| --- | --- |
+| Communities (clubs API) list/detail/create/join/leave/members/rooms | IMPLEMENTED |
+| Community manage (admin/moderation UI) | PARTIAL |
+| Events list/detail (`/scheduled-rooms`) | IMPLEMENTED |
+| Event tickets / buy-ticket | BLOCKED — purchase/ticket settlement (BR-adjacent); list/detail only |
+| Messaging list/thread/send/read/typing/create conversation | IMPLEMENTED |
+| Messaging realtime push updates | PARTIAL — REST refresh; socket chat events not fully wired |
+| Notification → conversation/profile/club/event routing | IMPLEMENTED (field-based; room deep link PARTIAL) |
+
+## PH05+ (not complete)
+
+| Item | Status |
+| --- | --- |
+| Full realtime room state machine | MISSING / foundation only |
+| LiveKit media | MISSING (RTC join token API present) |
+| Creator product workflows | PARTIAL (shells) |
+| Economy (non-purchase) | PARTIAL |
+| VIP / paid creator subscription (BR-02/03) | BLOCKED |
+
+## Community reconciliation
+
+Parity pages name **Communities**; authoritative REST paths are **`/clubs/*`**. Do not treat missing `/communities` path as unsupported — see `docs/VC-ANDROID-R06-PH04-COMMUNITY-RECONCILIATION.md`.
+
+## Consumer routes (representative)
+
+`user/friends`, `user/profile/visitors`, `user/activity`, `user/settings/notifications`, `user/communities`, `user/communities/{clubId}`, `user/communities/create`, `user/events`, `user/events/{eventId}`, `user/messages/thread/{conversationId}`, plus existing PH02/PH03 routes documented previously.
+
+## Tests
+
+- `./gradlew test` — unit tests including `PasswordResetDeepLinkParserTest`, `NotificationRoutingTest`
+- `./gradlew :app:compileDebugKotlin` / `:app:assembleDebug`
+
 
 ## A. Discovered screens/features (parity sources)
 
@@ -31,25 +80,42 @@ Total page sources: **96** (Consumer website 74, Creator Studio 22)
 
 ## G. Current Android navigation routes
 
-- `bootstrap`
-- `user`
-- `creator`
-- `user/home`
-- `user/discover`
-- `user/search`
-- `user/room/preview`
-- `user/live`
-- `user/messages`
-- `user/messages/thread`
-- `user/profile`
-- `user/wallet`
-- `user/settings`
-- `creator/dashboard`
-- `creator/audience`
-- `creator/live`
-- `creator/analytics`
-- `creator/workspace`
-- `creator/settings`
+Auth: `auth/*`, `user/security/sessions`, `user/security/sessions/{sessionId}`, `user/security/devices`, `user/security/devices/{deviceId}`, `user/security/login-history`
+
+Consumer: `user/home`, `user/discover`, `user/search`, `user/people`, `user/notifications`, `user/profile`, `user/profile/edit`, `user/profile/user/{userId}`, `user/profile/user/{userId}/social/{listType}`, `user/saved-rooms`, `user/rankings`, `user/blocked`, `user/referrals`, `user/tasks`, `user/room/preview`, `user/live`, `user/messages`, `user/messages/thread`, `user/wallet`, `user/settings`
+
+Creator: `creator/dashboard`, `creator/audience`, `creator/live`, `creator/analytics`, `creator/workspace`, `creator/settings`
+
+## PH02 (auth/account) — latest
+
+| Item | Status |
+| --- | --- |
+| Session list + detail + revoke | IMPLEMENTED |
+| Device list + detail + revoke | IMPLEMENTED |
+| Login history | IMPLEMENTED |
+| Session expiry (401 after refresh) | IMPLEMENTED |
+| HTTPS + custom reset-password deep links | IMPLEMENTED (parser tests; manifest web host placeholders) |
+| Google sign-in | IMPLEMENTED |
+| Restricted / session expired / portal gates | IMPLEMENTED (verify per release) |
+
+## PH03 (consumer social/discovery) — latest
+
+| Item | Status |
+| --- | --- |
+| Public profile + follow/unfollow/block | IMPLEMENTED |
+| Followers / following lists | IMPLEMENTED |
+| People discovery screen | IMPLEMENTED |
+| Search → people → profile | IMPLEMENTED |
+| Notifications list + read | IMPLEMENTED |
+| Edit profile | IMPLEMENTED |
+| Saved rooms | IMPLEMENTED |
+| Rankings | IMPLEMENTED |
+| Blocked users | IMPLEMENTED |
+| Referrals summary | IMPLEMENTED |
+| Tasks & achievements hub | IMPLEMENTED |
+| Profile visitors / friends / activity history | MISSING or PARTIAL (contract-dependent) |
+| Notification preferences | PARTIAL |
+| Creator/live-room discovery parity | PARTIAL (Explore/Home wired; not full parity set) |
 
 ## H. API areas (contract inventory)
 

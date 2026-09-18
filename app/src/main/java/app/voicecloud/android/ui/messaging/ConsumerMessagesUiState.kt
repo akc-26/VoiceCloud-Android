@@ -33,4 +33,5 @@ data class ConsumerConversationUiState(
     val errorMessage: String? = null,
     val messages: List<VCMessageUiModel> = emptyList(),
     val composerText: String = "",
+    val isSending: Boolean = false,
 )

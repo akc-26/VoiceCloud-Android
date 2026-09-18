@@ -45,6 +45,7 @@ fun SettingsScreen(
     onOpenSessions: (() -> Unit)? = null,
     onOpenLoginHistory: (() -> Unit)? = null,
     onOpenDevices: (() -> Unit)? = null,
+    onOpenNotificationPreferences: (() -> Unit)? = null,
     onSignOut: (() -> Unit)? = null,
 ) {
     val spacing = VoiceCloud.spacing
@@ -142,14 +143,10 @@ fun SettingsScreen(
                     }
                     item {
                         VCSettingsRow(
-                            title = "Notifications",
-                            subtitle = when {
-                                state.pushNotificationsConfigured ->
-                                    if (state.pushNotificationsEnabled) "Enabled in VoiceCloud" else "Disabled in VoiceCloud"
-                                else -> "Unavailable until notification preferences are connected"
-                            },
+                            title = "Notification preferences",
+                            subtitle = "Push, messages, and social alerts",
                             icon = VoiceCloudIcons.Notifications,
-                            onClick = null,
+                            onClick = onOpenNotificationPreferences,
                         )
                     }
                     item {

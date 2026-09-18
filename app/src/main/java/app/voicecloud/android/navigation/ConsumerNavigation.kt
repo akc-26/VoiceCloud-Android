@@ -45,6 +45,54 @@ fun NavHostController.navigateToSessionDetail(sessionId: String) {
     }
 }
 
+fun NavHostController.navigateToConversation(conversationId: String, title: String? = null) {
+    navigate(
+        ConsumerDestinations.MessageThread.replace(
+            "{${ConsumerDestinations.ConversationIdArg}}",
+            Uri.encode(conversationId),
+        ),
+    ) {
+        launchSingleTop = true
+    }
+}
+
+fun NavHostController.navigateToCommunity(clubId: String) {
+    navigate(
+        ConsumerDestinations.CommunityDetail.replace(
+            "{${ConsumerDestinations.ClubIdArg}}",
+            Uri.encode(clubId),
+        ),
+    ) {
+        launchSingleTop = true
+    }
+}
+
+fun NavHostController.navigateToEvent(eventId: String) {
+    navigate(
+        ConsumerDestinations.EventDetail.replace(
+            "{${ConsumerDestinations.EventIdArg}}",
+            Uri.encode(eventId),
+        ),
+    ) {
+        launchSingleTop = true
+    }
+}
+
+fun NavHostController.handleNotificationDestination(destination: NotificationDestination) {
+    when (destination) {
+        is NotificationDestination.PublicProfile -> navigateToPublicProfile(destination.userId)
+        is NotificationDestination.Conversation -> navigateToConversation(destination.conversationId)
+        is NotificationDestination.Room -> {
+            // Room preview requires UI state; navigate to live/discover entry
+            navigate(ConsumerDestinations.Discover) { launchSingleTop = true }
+        }
+        is NotificationDestination.Community -> navigateToCommunity(destination.clubId)
+        is NotificationDestination.Event -> navigateToEvent(destination.eventId)
+        NotificationDestination.Notifications -> navigate(ConsumerDestinations.Notifications) { launchSingleTop = true }
+        NotificationDestination.Unknown -> Unit
+    }
+}
+
 fun NavHostController.navigateToDeviceDetail(deviceId: String) {
     navigate(
         SecurityDestinations.DeviceDetail.replace(
@@ -71,6 +119,16 @@ fun String?.hidesConsumerBottomBar(): Boolean {
         this == ConsumerDestinations.BlockedUsers ||
         this == ConsumerDestinations.Referrals ||
         this == ConsumerDestinations.TasksHub ||
+        this == ConsumerDestinations.Friends ||
+        this == ConsumerDestinations.ProfileVisitors ||
+        this == ConsumerDestinations.ActivityHistory ||
+        this == ConsumerDestinations.NotificationPreferences ||
+        this == ConsumerDestinations.Communities ||
+        this == ConsumerDestinations.CreateCommunity ||
+        this == ConsumerDestinations.Events ||
+        startsWith("user/communities/") ||
+        startsWith("user/events/") ||
+        startsWith("user/messages/thread/") ||
         this == SecurityDestinations.Sessions ||
         this == SecurityDestinations.LoginHistory ||
         this == SecurityDestinations.Devices ||

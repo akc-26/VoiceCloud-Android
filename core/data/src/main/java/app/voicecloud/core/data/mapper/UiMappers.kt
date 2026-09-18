@@ -1,11 +1,15 @@
 package app.voicecloud.core.data.mapper
 
+import app.voicecloud.core.designsystem.component.VCCommunityUiModel
+import app.voicecloud.core.designsystem.component.VCEventUiModel
 import app.voicecloud.core.designsystem.component.VCPersonUiModel
 import app.voicecloud.core.designsystem.component.VCRoomUiModel
 import app.voicecloud.core.model.ChatConversationDto
 import app.voicecloud.core.model.ChatMessageDto
+import app.voicecloud.core.model.ClubDto
 import app.voicecloud.core.model.DiscoveryRoomDto
 import app.voicecloud.core.model.DiscoveryUserDto
+import app.voicecloud.core.model.ScheduledRoomDto
 import app.voicecloud.core.model.UserProfileDto
 import app.voicecloud.core.model.WalletBalanceDto
 import app.voicecloud.core.model.WalletTransactionDto
@@ -70,3 +74,19 @@ fun WalletBalanceDto.toBalanceLabel(): String {
 
 fun WalletTransactionDto.toLineLabel(): String =
     listOfNotNull(description, amount?.let { if (it >= 0) "+$it" else "$it" }, createdAt).joinToString(" · ")
+
+fun ClubDto.toCommunityUiModel(): VCCommunityUiModel =
+    VCCommunityUiModel(
+        id = resolvedId,
+        name = resolvedName,
+        metaLabel = memberCount?.let { "$it members" } ?: membersCount?.let { "$it members" },
+        description = description,
+    )
+
+fun ScheduledRoomDto.toEventUiModel(): VCEventUiModel =
+    VCEventUiModel(
+        id = resolvedId,
+        title = resolvedTitle,
+        timeLabel = resolvedTime ?: "Scheduled",
+        placeLabel = location ?: hostName?.let { "Host · $it" },
+    )
