@@ -36,6 +36,7 @@ fun ProfileScreen(
     state: ConsumerProfileUiState,
     onOpenCreatorWorkspace: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenWallet: (() -> Unit)? = null,
     onNotificationsClick: (() -> Unit)? = null,
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit = {},
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit = {},
@@ -65,6 +66,7 @@ fun ProfileScreen(
                     state = state,
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
                     onNotificationsClick = onNotificationsClick,
+                    onOpenWallet = onOpenWallet,
                     onPersonClick = onPersonClick,
                     onCommunityClick = onCommunityClick,
                     onEventClick = onEventClick,
@@ -79,6 +81,7 @@ private fun ProfileContent(
     state: ConsumerProfileUiState,
     onOpenCreatorWorkspace: () -> Unit,
     onNotificationsClick: (() -> Unit)?,
+    onOpenWallet: (() -> Unit)?,
     onPersonClick: (app.voicecloud.core.designsystem.component.VCPersonUiModel) -> Unit,
     onCommunityClick: (app.voicecloud.core.designsystem.component.VCCommunityUiModel) -> Unit,
     onEventClick: (app.voicecloud.core.designsystem.component.VCEventUiModel) -> Unit,
@@ -157,6 +160,17 @@ private fun ProfileContent(
                     subtitle = "Social and room alerts",
                     icon = VoiceCloudIcons.Notifications,
                     onClick = onNotificationsClick,
+                )
+            }
+        }
+        if (onOpenWallet != null) {
+            item { VCSectionHeader(title = "Economy") }
+            item {
+                VCSettingsRow(
+                    title = "Wallet & gifts",
+                    subtitle = "Balance, gifts, and history",
+                    icon = VoiceCloudIcons.Wallet,
+                    onClick = onOpenWallet,
                 )
             }
         }

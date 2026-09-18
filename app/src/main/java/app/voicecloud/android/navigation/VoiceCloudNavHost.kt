@@ -39,6 +39,7 @@ object ConsumerDestinations {
     const val Messages = "user/messages"
     const val MessageThread = "user/messages/thread"
     const val Profile = "user/profile"
+    const val Wallet = "user/wallet"
 }
 
 @Composable

@@ -23,6 +23,8 @@ import app.voicecloud.android.ui.consumer.ConsumerSearchUiState
 import app.voicecloud.android.ui.consumer.ExploreScreen
 import app.voicecloud.android.ui.consumer.HomeScreen
 import app.voicecloud.android.ui.consumer.SearchScreen
+import app.voicecloud.android.ui.economy.ConsumerEconomyUiState
+import app.voicecloud.android.ui.economy.EconomyScreen
 import app.voicecloud.android.ui.messaging.ConsumerConversationUiState
 import app.voicecloud.android.ui.messaging.ConsumerMessagesUiState
 import app.voicecloud.android.ui.messaging.ConversationScreen
@@ -33,6 +35,7 @@ import app.voicecloud.android.ui.profile.ProfileScreen
 import app.voicecloud.android.ui.room.RoomPreviewScreen
 import app.voicecloud.android.ui.room.RoomPreviewUiState
 import app.voicecloud.core.designsystem.component.VCRoomUiModel
+import app.voicecloud.core.designsystem.component.VCGiftUiModel
 import app.voicecloud.core.designsystem.component.VCCommandBar
 import app.voicecloud.core.designsystem.component.VCNavDestination
 import app.voicecloud.core.designsystem.component.VCScaffold
@@ -58,6 +61,8 @@ fun ConsumerShell(
     var messagesState by remember { mutableStateOf(ConsumerMessagesUiState()) }
     var messagesQuery by remember { mutableStateOf("") }
     var conversationState by remember { mutableStateOf<ConsumerConversationUiState?>(null) }
+    var economyState by remember { mutableStateOf(ConsumerEconomyUiState()) }
+    var selectedGift by remember { mutableStateOf<VCGiftUiModel?>(null) }
     val sides = remember {
         listOf(
             VCNavDestination(ConsumerDestinations.Home, "Home", VoiceCloudIcons.Home, VoiceCloudIcons.HomeSelected),
@@ -83,8 +88,12 @@ fun ConsumerShell(
         )
         navController.navigate(ConsumerDestinations.MessageThread) { launchSingleTop = true }
     }
+    val openWallet = {
+        navController.navigate(ConsumerDestinations.Wallet) { launchSingleTop = true }
+    }
     val showBottomBar = route != ConsumerDestinations.RoomPreview &&
-        route != ConsumerDestinations.MessageThread
+        route != ConsumerDestinations.MessageThread &&
+        route != ConsumerDestinations.Wallet
 
     VCScaffold(
         modifier = modifier,
@@ -172,6 +181,16 @@ fun ConsumerShell(
                 ProfileScreen(
                     state = profileState,
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
+                    onOpenWallet = openWallet,
+                )
+            }
+            composable(ConsumerDestinations.Wallet) {
+                EconomyScreen(
+                    state = economyState,
+                    onBack = { navController.popBackStack() },
+                    selectedGift = selectedGift,
+                    onGiftSelect = { gift -> selectedGift = gift },
+                    onGiftSheetDismiss = { selectedGift = null },
                 )
             }
         }
