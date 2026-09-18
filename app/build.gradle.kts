@@ -92,6 +92,7 @@ dependencies {
     implementation(project(":core:logging"))
     implementation(project(":core:realtime"))
     implementation(project(":feature:bootstrap"))
+    implementation(project(":feature:auth"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -99,6 +100,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.animation)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.moshi.kotlin)
     ksp(libs.hilt.compiler)
 

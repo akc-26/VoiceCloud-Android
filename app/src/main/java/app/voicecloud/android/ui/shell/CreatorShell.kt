@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CreatorShell(
     onLeaveWorkspace: () -> Unit,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val darkTheme = rememberVoiceCloudDarkTheme()
@@ -58,6 +59,7 @@ fun CreatorShell(
         VoiceCloudSystemBarAppearance(darkTheme)
         CreatorWorkspace(
             onLeaveWorkspace = onLeaveWorkspace,
+            onSignOut = onSignOut,
             modifier = modifier,
         )
     }
@@ -66,6 +68,7 @@ fun CreatorShell(
 @Composable
 private fun CreatorWorkspace(
     onLeaveWorkspace: () -> Unit,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
@@ -181,6 +184,7 @@ private fun CreatorWorkspace(
                         settingsState = settingsState.copy(themePreference = theme)
                         scope.launch { preferences.setTheme(theme) }
                     },
+                    onSignOut = onSignOut,
                 )
             }
         }

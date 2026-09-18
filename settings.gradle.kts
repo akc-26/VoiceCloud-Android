@@ -22,6 +22,7 @@ include(":core:network")
 include(":core:security")
 include(":core:database")
 include(":feature:bootstrap")
+include(":feature:auth")
 
 include(":core:preferences")
 include(":core:logging")

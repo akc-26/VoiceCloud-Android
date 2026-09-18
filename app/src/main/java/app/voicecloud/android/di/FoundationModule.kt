@@ -8,8 +8,10 @@ import app.voicecloud.core.logging.AndroidVoiceCloudLogger
 import app.voicecloud.core.logging.VoiceCloudLogger
 import app.voicecloud.core.model.AppIdentity
 import app.voicecloud.core.network.ApiClientFactory
+import app.voicecloud.core.network.AuthApi
 import app.voicecloud.core.network.BootstrapApi
 import app.voicecloud.core.network.SafeApiErrorParser
+import app.voicecloud.core.network.VoiceCloudApiServices
 import app.voicecloud.core.preferences.VoiceCloudPreferences
 import app.voicecloud.core.realtime.RealtimeClient
 import app.voicecloud.core.realtime.RealtimeClientFactory
@@ -42,11 +44,15 @@ object FoundationModule {
     fun tokenVault(@ApplicationContext context: Context): TokenVault = AndroidKeyStoreTokenVault(context)
 
     @Provides @Singleton
-    fun bootstrapApi(
+    fun voiceCloudApiServices(
         endpoints: app.voicecloud.android.network.VoiceCloudEndpoints,
         moshi: Moshi,
         tokenVault: TokenVault,
-    ): BootstrapApi = ApiClientFactory.create(endpoints.apiBaseUrl, moshi, tokenVault)
+    ): VoiceCloudApiServices = VoiceCloudApiServices.create(endpoints.apiBaseUrl, moshi, tokenVault)
+
+    @Provides @Singleton fun bootstrapApi(services: VoiceCloudApiServices): BootstrapApi = services.bootstrap
+
+    @Provides @Singleton fun authApi(services: VoiceCloudApiServices): AuthApi = services.auth
 
     @Provides @Singleton
     fun realtimeClient(

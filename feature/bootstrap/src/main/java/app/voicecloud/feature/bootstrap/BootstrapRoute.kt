@@ -33,6 +33,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.voicecloud.core.designsystem.component.VCPrimaryButton
 import app.voicecloud.core.designsystem.component.VCSecondaryButton
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
+import app.voicecloud.core.model.MobileConfig
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 import app.voicecloud.core.designsystem.theme.rememberVoiceCloudMotionEnabled
@@ -57,8 +59,15 @@ fun BootstrapRoute(
     viewModel: BootstrapViewModel = hiltViewModel(),
     onContinueToConsumer: () -> Unit = {},
     onOpenCreatorWorkspace: () -> Unit = {},
+    onConfigReady: (MobileConfig) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(state) {
+        val current = state
+        if (current is BootstrapState.Ready) {
+            onConfigReady(current.config)
+        }
+    }
     AnimatedContent(
         targetState = state,
         label = "bootstrap",
@@ -214,7 +223,7 @@ private fun FoundationReadyScreen(
                     StatusRow("Live audio", if (liveKitAvailable) "Available" else "Backend controlled")
                     HorizontalDivider()
                     Text(
-                        "User and Creator authentication begin in PH02. These workspaces are presentation shells until those experiences are connected.",
+                        "Continue to sign in, restore your session, or open Creator Studio.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

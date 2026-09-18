@@ -56,6 +56,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ConsumerShell(
     onOpenCreatorWorkspace: () -> Unit,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
@@ -217,6 +218,7 @@ fun ConsumerShell(
                         scope.launch { preferences.setTheme(theme) }
                     },
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
+                    onSignOut = onSignOut,
                 )
             }
             composable(ConsumerDestinations.Wallet) {
