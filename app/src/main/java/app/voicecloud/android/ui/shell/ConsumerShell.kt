@@ -52,6 +52,14 @@ import app.voicecloud.core.designsystem.component.VCScaffold
 import app.voicecloud.core.designsystem.icon.VoiceCloudIcons
 import app.voicecloud.core.designsystem.theme.VoiceCloudMotion
 import app.voicecloud.core.designsystem.theme.rememberVoiceCloudMotionEnabled
+import app.voicecloud.android.navigation.SecurityDestinations
+import app.voicecloud.core.model.VoiceCloudAccountRole
+import app.voicecloud.feature.auth.AuthGateViewModel
+import app.voicecloud.feature.auth.AuthSessionState
+import app.voicecloud.feature.auth.LoginHistoryViewModel
+import app.voicecloud.feature.auth.SessionListViewModel
+import app.voicecloud.feature.auth.ui.LoginHistoryScreen
+import app.voicecloud.feature.auth.ui.SessionListScreen
 import app.voicecloud.core.preferences.VoiceCloudPreferences
 import kotlinx.coroutines.launch
 
@@ -59,6 +67,7 @@ import kotlinx.coroutines.launch
 fun ConsumerShell(
     onOpenCreatorWorkspace: () -> Unit,
     onSignOut: () -> Unit,
+    onOpenGuestUpgrade: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
@@ -73,6 +82,8 @@ fun ConsumerShell(
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val economyViewModel: EconomyViewModel = hiltViewModel()
     val hostLiveViewModel: HostLiveViewModel = hiltViewModel()
+    val authGateViewModel: AuthGateViewModel = hiltViewModel()
+    val sessionState by authGateViewModel.sessionState.collectAsStateWithLifecycle()
     val homeState by homeViewModel.state.collectAsStateWithLifecycle()
     val exploreState by exploreViewModel.state.collectAsStateWithLifecycle()
     val searchState by searchViewModel.state.collectAsStateWithLifecycle()
@@ -89,6 +100,14 @@ fun ConsumerShell(
     val scope = rememberCoroutineScope()
     val preferences = remember { VoiceCloudPreferences(context.applicationContext) }
     var settingsState by remember { mutableStateOf(SettingsUiState()) }
+    LaunchedEffect(sessionState, profileState) {
+        val authUser = (sessionState as? AuthSessionState.Authenticated)?.user
+        settingsState = settingsState.copy(
+            accountDisplayName = authUser?.displayName ?: profileState.displayName,
+            accountHandle = authUser?.username?.let { "@$it" } ?: profileState.handle,
+            isGuestAccount = authUser?.accountRole == VoiceCloudAccountRole.GUEST,
+        )
+    }
     LaunchedEffect(preferences) {
         preferences.theme.collect { theme ->
             settingsState = settingsState.copy(themePreference = theme)
@@ -133,7 +152,9 @@ fun ConsumerShell(
     val showBottomBar = route != ConsumerDestinations.RoomPreview &&
         route != ConsumerDestinations.MessageThread &&
         route != ConsumerDestinations.Wallet &&
-        route != ConsumerDestinations.Settings
+        route != ConsumerDestinations.Settings &&
+        route != SecurityDestinations.Sessions &&
+        route != SecurityDestinations.LoginHistory
 
     VCScaffold(
         modifier = modifier,
@@ -227,7 +248,28 @@ fun ConsumerShell(
                         scope.launch { preferences.setTheme(theme) }
                     },
                     onOpenCreatorWorkspace = onOpenCreatorWorkspace,
+                    onOpenGuestUpgrade = if (settingsState.isGuestAccount) onOpenGuestUpgrade else null,
+                    onOpenSessions = {
+                        navController.navigate(SecurityDestinations.Sessions) { launchSingleTop = true }
+                    },
+                    onOpenLoginHistory = {
+                        navController.navigate(SecurityDestinations.LoginHistory) { launchSingleTop = true }
+                    },
                     onSignOut = onSignOut,
+                )
+            }
+            composable(SecurityDestinations.Sessions) {
+                SessionListScreen(
+                    title = "Active sessions",
+                    viewModel = hiltViewModel<SessionListViewModel>(),
+                    onBack = { navController.popBackStack() },
+                    revokeEnabled = true,
+                )
+            }
+            composable(SecurityDestinations.LoginHistory) {
+                LoginHistoryScreen(
+                    viewModel = hiltViewModel<LoginHistoryViewModel>(),
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable(ConsumerDestinations.Wallet) {

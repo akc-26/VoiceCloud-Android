@@ -41,6 +41,9 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     onThemeSelected: (ThemePreference) -> Unit = {},
     onOpenCreatorWorkspace: (() -> Unit)? = null,
+    onOpenGuestUpgrade: (() -> Unit)? = null,
+    onOpenSessions: (() -> Unit)? = null,
+    onOpenLoginHistory: (() -> Unit)? = null,
     onSignOut: (() -> Unit)? = null,
 ) {
     val spacing = VoiceCloud.spacing
@@ -76,8 +79,18 @@ fun SettingsScreen(
                                     Text(it, style = VoiceCloud.typography.bodySecondary, color = VoiceCloud.colors.textSecondary)
                                 }
                             } else {
-                                SettingsMuted("Account details will appear here when authentication is connected.")
+                                SettingsMuted("Sign in to view account details.")
                             }
+                        }
+                    }
+                    if (onOpenGuestUpgrade != null) {
+                        item {
+                            VCSettingsRow(
+                                title = "Upgrade guest account",
+                                subtitle = "Add email and password to keep your profile",
+                                icon = VoiceCloudIcons.Profile,
+                                onClick = onOpenGuestUpgrade,
+                            )
                         }
                     }
                     if (onOpenCreatorWorkspace != null) {
@@ -156,6 +169,22 @@ fun SettingsScreen(
                             Modifier.padding(horizontal = spacing.pageGutter),
                         )
                     }
+                    item { VCSectionHeader(title = "Security") }
+                    item {
+                        VCSettingsRow(
+                            title = "Active sessions",
+                            subtitle = "Devices signed in to VoiceCloud",
+                            icon = VoiceCloudIcons.Settings,
+                            onClick = onOpenSessions,
+                        )
+                    }
+                    item {
+                        VCSettingsRow(
+                            title = "Login activity",
+                            subtitle = "Recent sign-ins on your account",
+                            onClick = onOpenLoginHistory,
+                        )
+                    }
                     item { VCSectionHeader(title = "Safety") }
                     item {
                         VCSettingsRow(
@@ -212,8 +241,8 @@ fun SettingsScreen(
                     if (state.accountDisplayName == null && !state.pushNotificationsConfigured && !state.helpAvailable) {
                         item {
                             VCEmptyState(
-                                title = "Settings are ready",
-                                message = "Account, safety, and support options will use VoiceCloud when those experiences are connected.",
+                                title = "More settings coming soon",
+                                message = "Additional privacy, notification, and support controls will appear as VoiceCloud enables them for your account.",
                             )
                         }
                     }

@@ -103,6 +103,20 @@ class AuthRepository(
     suspend fun googleLogin(idToken: String): AuthResult<AuthTokenBundle> =
         tokenCall { api.googleLogin(app.voicecloud.core.model.GoogleLoginRequest(idToken)) }
 
+    suspend fun upgradeGuest(
+        email: String,
+        username: String,
+        password: String,
+    ): AuthResult<AuthTokenBundle> = tokenCall {
+        api.guestUpgrade(
+            app.voicecloud.core.model.GuestUpgradeRequest(
+                email = email,
+                username = username,
+                password = password,
+            ),
+        )
+    }
+
     private suspend inline fun <reified T> tokenCall(crossinline call: suspend () -> retrofit2.Response<T>): AuthResult<T> {
         return try {
             val response = call()

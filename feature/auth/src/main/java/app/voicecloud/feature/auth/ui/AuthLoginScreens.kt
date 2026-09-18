@@ -27,6 +27,9 @@ fun UserLoginScreen(
     viewModel: UserLoginViewModel,
     onBack: () -> Unit,
     onAuthenticated: () -> Unit,
+    onRegister: () -> Unit = {},
+    onForgotPassword: () -> Unit = {},
+    onPhoneSignIn: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -40,6 +43,11 @@ fun UserLoginScreen(
         onPasswordChange = viewModel::onPasswordChange,
         onToggleIdentifierMode = viewModel::toggleUseEmail,
         onSubmit = { viewModel.submit { onAuthenticated() } },
+        footer = {
+            VCTextButton(text = "Create account", onClick = onRegister)
+            VCTextButton(text = "Forgot password", onClick = onForgotPassword)
+            VCTextButton(text = "Phone sign-in", onClick = onPhoneSignIn)
+        },
         modifier = modifier,
     )
 }
@@ -77,6 +85,7 @@ private fun LoginForm(
     onPasswordChange: (String) -> Unit,
     onToggleIdentifierMode: () -> Unit,
     onSubmit: () -> Unit,
+    footer: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val spacing = VoiceCloud.spacing
@@ -110,6 +119,7 @@ private fun LoginForm(
             text = if (state.useEmail) "Use username instead" else "Use email instead",
             onClick = onToggleIdentifierMode,
         )
+        footer?.invoke()
         state.errorMessage?.let { message ->
             VCErrorState(title = "Sign in failed", message = message)
         }

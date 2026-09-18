@@ -14,4 +14,5 @@ data class SettingsUiState(
     val pushNotificationsEnabled: Boolean = false,
     val helpAvailable: Boolean = false,
     val legalLinksAvailable: Boolean = false,
+    val isGuestAccount: Boolean = false,
 )

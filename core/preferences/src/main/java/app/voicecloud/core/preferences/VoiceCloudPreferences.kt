@@ -1,6 +1,7 @@
 package app.voicecloud.core.preferences
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -16,6 +17,7 @@ class VoiceCloudPreferences(private val context: Context) {
     private object Keys {
         val theme = stringPreferencesKey("appearance_theme")
         val lastPortal = stringPreferencesKey("last_portal")
+        val onboardingComplete = booleanPreferencesKey("onboarding_complete")
     }
 
     /** Fresh/public VoiceCloud launches are Light-first until an authenticated preference is applied. */
@@ -29,8 +31,18 @@ class VoiceCloudPreferences(private val context: Context) {
 
     suspend fun setTheme(value: ThemePreference) = context.voiceCloudDataStore.edit { it[Keys.theme] = value.name }
     suspend fun setLastPortal(value: LastPortal) = context.voiceCloudDataStore.edit { it[Keys.lastPortal] = value.name }
+
+    val onboardingComplete: Flow<Boolean> = context.voiceCloudDataStore.data.map { prefs ->
+        prefs[Keys.onboardingComplete] == true
+    }
+
+    suspend fun setOnboardingComplete(value: Boolean = true) = context.voiceCloudDataStore.edit {
+        it[Keys.onboardingComplete] = value
+    }
+
     suspend fun clearAccountPreferences() = context.voiceCloudDataStore.edit {
         it.remove(Keys.theme)
         it.remove(Keys.lastPortal)
+        it.remove(Keys.onboardingComplete)
     }
 }

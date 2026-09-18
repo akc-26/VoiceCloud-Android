@@ -40,6 +40,14 @@ class AuthSessionController @Inject constructor(
         _state.value = AuthSessionState.LoggedOut
     }
 
+    suspend fun clearLoggedOut() {
+        _state.value = AuthSessionState.LoggedOut
+    }
+
+    fun markSessionExpired() {
+        _state.value = AuthSessionState.LoggedOut
+    }
+
     suspend fun persistPortal(portal: LastPortal) {
         preferences.setLastPortal(portal)
     }

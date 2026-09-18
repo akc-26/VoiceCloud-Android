@@ -9,10 +9,13 @@ import app.voicecloud.core.designsystem.theme.PortalTheme
 import app.voicecloud.core.designsystem.theme.VoiceCloudTheme
 
 @Composable
-fun VoiceCloudRoot() {
+fun VoiceCloudRoot(initialPasswordResetToken: String? = null) {
     val darkTheme = rememberVoiceCloudDarkTheme()
     VoiceCloudTheme(portal = PortalTheme.User, darkTheme = darkTheme) {
         VoiceCloudSystemBarAppearance(darkTheme)
-        VoiceCloudNavHost(navController = rememberNavController())
+        VoiceCloudNavHost(
+            navController = rememberNavController(),
+            initialPasswordResetToken = initialPasswordResetToken,
+        )
     }
 }
