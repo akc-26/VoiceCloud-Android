@@ -811,6 +811,7 @@ fun VoiceCloudNavHost(
                 state = state,
                 isGuest = viewer?.isGuest == true,
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadHome() },
+                greetingName = viewer?.displayName.orEmpty().ifBlank { viewer?.username.orEmpty() },
                 onRooms = { open(VoiceCloudRoutes.Rooms) },
                 onRoom = { open(VoiceCloudRoutes.roomExperience(it)) },
                 onPeople = { open(VoiceCloudRoutes.People) },
@@ -1523,6 +1524,8 @@ fun VoiceCloudNavHost(
         }
         composable(VoiceCloudRoutes.Economy) {
             EconomyHubScreen(
+                state = economyState,
+                onLoadWallet = { economyViewModel.load(EconomySection.WALLET) },
                 onOpen = { open(VoiceCloudRoutes.economySection(it)) },
                 onBack = { navController.popBackStack() },
             )

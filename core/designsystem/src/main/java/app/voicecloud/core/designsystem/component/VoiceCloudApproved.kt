@@ -54,13 +54,13 @@ import app.voicecloud.core.designsystem.theme.CreatorColors
  * while this file owns the visual geometry shared by the supplied reference boards.
  */
 object VoiceCloudApprovedMetrics {
-    val pagePadding: Dp = 16.dp
-    val cardRadius: Dp = 14.dp
-    val fieldRadius: Dp = 11.dp
-    val buttonRadius: Dp = 12.dp
-    val primaryButtonHeight: Dp = 48.dp
-    val compactCardPadding: Dp = 12.dp
-    val sectionGap: Dp = 14.dp
+    val pagePadding: Dp = 20.dp
+    val cardRadius: Dp = 16.dp
+    val fieldRadius: Dp = 12.dp
+    val buttonRadius: Dp = 28.dp
+    val primaryButtonHeight: Dp = 50.dp
+    val compactCardPadding: Dp = 14.dp
+    val sectionGap: Dp = 16.dp
     val rowGap: Dp = 10.dp
 }
 
@@ -150,7 +150,7 @@ fun VoiceCloudApprovedSecondaryButton(
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.fillMaxWidth().height(46.dp),
+        modifier = modifier.fillMaxWidth().height(48.dp),
         shape = RoundedCornerShape(VoiceCloudApprovedMetrics.buttonRadius),
         border = BorderStroke(1.dp, ConsumerColors.Sapphire.copy(alpha = .42f)),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = ConsumerColors.SapphireDeep),
@@ -285,7 +285,7 @@ fun VoiceCloudApprovedFeaturedRoom(
 ) {
     val shape = RoundedCornerShape(15.dp)
     Box(
-        modifier.fillMaxWidth().height(136.dp).clip(shape).clickable(onClick = onClick)
+        modifier.fillMaxWidth().height(168.dp).clip(shape).clickable(onClick = onClick)
             .background(ConsumerColors.DeepNavy)
     ) {
         VoiceCloudRemoteMedia(imageUrl, title, Modifier.fillMaxSize(), VoiceCloudVisualKind.LIVE, dark = true, contentScale = ContentScale.Crop, fallbackDrawable = R.drawable.vc_ref_home_mic)
