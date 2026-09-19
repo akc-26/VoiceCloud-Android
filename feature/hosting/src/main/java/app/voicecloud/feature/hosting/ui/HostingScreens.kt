@@ -62,10 +62,10 @@ private fun HostPage(
     VoiceCloudTheme(portal = PortalTheme.Creator, darkTheme = dark) {
         val metrics = VoiceCloudPageMetrics.current()
         Scaffold(
-            containerColor = if (dark) ConsumerColors.DeepNavy else ConsumerColors.Surface,
+            containerColor = if (dark) ConsumerColors.DeepNavy else ConsumerColors.Cloud,
             topBar = {
                 if (!dark) {
-                    Surface(color = ConsumerColors.Surface, shadowElevation = 1.dp) { Row(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding)) { VoiceCloudApprovedTopBar(title, onBack = onBack) } }
+                    Surface(color = ConsumerColors.Cloud, shadowElevation = 1.dp) { Row(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding)) { VoiceCloudApprovedTopBar(title, onBack = onBack) } }
                 } else {
                     Surface(color = ConsumerColors.DeepNavy, shadowElevation = 1.dp) {
                         Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {

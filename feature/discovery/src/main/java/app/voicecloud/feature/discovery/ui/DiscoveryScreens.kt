@@ -2,6 +2,7 @@ package app.voicecloud.feature.discovery.ui
 
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +34,12 @@ import androidx.compose.ui.unit.sp
 import app.voicecloud.core.designsystem.R
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedCard
+import app.voicecloud.core.designsystem.component.VcGreetingCard
+import app.voicecloud.core.designsystem.component.VcLiveBadge
+import app.voicecloud.core.designsystem.component.VcPersonSuggestCard
+import app.voicecloud.core.designsystem.component.VcRoomCard
+import app.voicecloud.core.designsystem.component.VcSearchField
+import app.voicecloud.core.designsystem.component.VcSectionHeader
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedChip
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedFeaturedRoom
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedMetricRow
@@ -76,16 +84,16 @@ private fun ConsumerScaffold(
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         bottomBar = {
             Surface(
-                color = Color.White,
-                tonalElevation = 2.dp,
-                shadowElevation = 5.dp,
+                color = ConsumerColors.Surface,
+                tonalElevation = 0.dp,
+                shadowElevation = 12.dp,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
-                    Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 7.dp),
+                    Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
@@ -103,15 +111,17 @@ private fun ConsumerScaffold(
                         selected = selected == "explore",
                         onClick = onExplore,
                     )
-                    Surface(
-                        onClick = onLive,
-                        shape = CircleShape,
-                        color = ConsumerColors.Sapphire,
-                        shadowElevation = 5.dp,
-                        modifier = Modifier.size(44.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(painterResource(R.drawable.vc_nav_live), contentDescription = "Live", tint = Color.White, modifier = Modifier.size(24.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(bottom = 8.dp)) {
+                        Surface(
+                            onClick = onLive,
+                            shape = CircleShape,
+                            color = ConsumerColors.Sapphire,
+                            shadowElevation = 8.dp,
+                            modifier = Modifier.size(56.dp),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(painterResource(R.drawable.vc_nav_live), contentDescription = "Live", tint = Color.White, modifier = Modifier.size(26.dp))
+                            }
                         }
                     }
                     ConsumerBoardNavItem(
@@ -194,7 +204,7 @@ private fun SecondaryPageLayout(
 ) {
     val metrics = VoiceCloudPageMetrics.current()
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         topBar = { Row(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding)) { VoiceCloudApprovedTopBar(title = title, onBack = onBack) } },
     ) { innerPadding ->
         content(Modifier.fillMaxSize().padding(innerPadding))
@@ -305,6 +315,16 @@ private fun RoomCard(room: VoiceCloudRoom, onOpen: () -> Unit) {
 @Composable
 private fun EmptyBlock(title: String, body: String) {
     VoiceCloudEmptyVisual(title, body, Modifier.fillMaxWidth(), voiceCloudVisualFor(title))
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.RowScope.HomeShortcut(label: String, icon: Int, onClick: () -> Unit) {
+    VoiceCloudApprovedCard(Modifier.weight(1f).height(64.dp), onClick = onClick, contentPadding = 12.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Icon(painterResource(icon), contentDescription = null, tint = ConsumerColors.Sapphire, modifier = Modifier.size(22.dp))
+            Text(label, style = MaterialTheme.typography.labelLarge, color = ConsumerColors.Text, maxLines = 1)
+        }
+    }
 }
 
 @Composable
@@ -432,6 +452,7 @@ private fun HomeRankedHost(user: VoiceCloudUser, rank: Int, onProfile: (String) 
 fun HomeScreen(
     state: DiscoveryUiState,
     isGuest: Boolean,
+    greetingName: String,
     onLoad: () -> Unit,
     onRooms: () -> Unit,
     onRoom: (String) -> Unit,
@@ -446,104 +467,140 @@ fun HomeScreen(
     onFriends: () -> Unit,
     onMe: () -> Unit,
     onCommunities: () -> Unit,
+    onEvents: () -> Unit,
     onMessages: () -> Unit,
     onNotifications: () -> Unit,
     onHostStudio: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onLoad() }
     val rooms = state.home.rooms.distinctBy { it.id }
-    val featuredRoom = rooms.firstOrNull()
+    val liveRooms = rooms.filter { it.isLive }
+    val popularRooms = rooms.filterNot { it.isLive }.ifEmpty { rooms.drop(1) }
+    val featuredLive = liveRooms.firstOrNull() ?: rooms.firstOrNull()
 
     ConsumerScaffold("home", onHome, onExplore, onLive, onFriends, onMe) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface),
+            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Cloud),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             item {
-                Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-                    VoiceCloudBrandMark(30.dp)
+                Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
+                    VoiceCloudBrandMark(28.dp)
                     Spacer(Modifier.width(8.dp))
-                    Text("For You", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink, modifier = Modifier.weight(1f))
-                    IconButton(onClick = onSearch, modifier = Modifier.size(36.dp)) { Icon(painterResource(R.drawable.vc_icon_search), "Search", tint = ConsumerColors.Ink, modifier = Modifier.size(20.dp)) }
-                    IconButton(onClick = onNotifications, modifier = Modifier.size(36.dp)) { Icon(painterResource(R.drawable.vc_icon_bell), "Notifications", tint = ConsumerColors.Ink, modifier = Modifier.size(20.dp)) }
-                }
-            }
-            item {
-                Surface(
-                    onClick = onSearch,
-                    shape = RoundedCornerShape(16.dp),
-                    color = ConsumerColors.SurfaceSoft,
-                    modifier = Modifier.fillMaxWidth().height(44.dp),
-                ) {
-                    Row(Modifier.padding(horizontal = 13.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(painterResource(R.drawable.vc_icon_search), null, tint = ConsumerColors.TextMuted, modifier = Modifier.size(17.dp))
-                        Text("Search rooms, hosts, topics...", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                    Text("VoiceCloud", style = MaterialTheme.typography.titleLarge, color = ConsumerColors.Text, modifier = Modifier.weight(1f))
+                    IconButton(onClick = onNotifications, modifier = Modifier.size(36.dp)) {
+                        Icon(painterResource(R.drawable.vc_icon_bell), "Notifications", tint = ConsumerColors.Ink, modifier = Modifier.size(20.dp))
+                    }
+                    IconButton(onClick = onMe, modifier = Modifier.size(36.dp)) {
+                        Icon(painterResource(R.drawable.vc_nav_profile), "Profile", tint = ConsumerColors.Ink, modifier = Modifier.size(20.dp))
                     }
                 }
             }
+            item { VcSearchField("Search rooms, people, communities...", onSearch) }
+            item { Spacer(Modifier.height(8.dp)) }
             item {
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    VoiceCloudApprovedChip("For You", true) { }
-                    VoiceCloudApprovedChip("Trending", false, onClick = onExplore)
-                    VoiceCloudApprovedChip("New", false, onClick = onRooms)
-                    VoiceCloudApprovedChip("Music", false, onClick = onRooms)
-                    VoiceCloudApprovedChip("Communities", false, onClick = onCommunities)
-                }
-            }
-            item { StatusBlock(state, onLoad) }
-            item {
-                VoiceCloudApprovedFeaturedRoom(
-                    title = featuredRoom?.title?.ifBlank { null } ?: "Late Night Talks 🌙",
-                    subtitle = featuredRoom?.description?.takeIf { it.isNotBlank() } ?: "Deep conversations. Real people.",
-                    imageUrl = featuredRoom?.coverUrl,
-                    listeners = if (featuredRoom != null) "${featuredRoom.listenerCount} listening" else "Discover live rooms",
-                    onClick = { if (featuredRoom != null) onRoom(featuredRoom.id) else onRooms() },
+                VcGreetingCard(
+                    name = greetingName.ifBlank { "there" },
+                    subtitle = "Great conversations are waiting for you!",
+                    onJoinLive = featuredLive?.let { { onRoom(it.id) } } ?: onLive,
                 )
             }
-            item { SectionTitle("Popular Rooms", "See All", onRooms) }
-            if (rooms.isEmpty() && !state.loading) {
-                item { VoiceCloudApprovedCard(Modifier.fillMaxWidth()) { Text("No live rooms right now.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted) } }
+            item { StatusBlock(state, onLoad) }
+            item { VcSectionHeader("Live now", "See all", onRooms) }
+            if (liveRooms.isEmpty() && !state.loading) {
+                item {
+                    VoiceCloudApprovedCard(Modifier.fillMaxWidth()) {
+                        Text("No live rooms right now.", style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.TextMuted)
+                    }
+                }
             } else {
-                items(rooms.drop(1).take(4), key = { "home-room:${it.id}" }) { room ->
-                    VoiceCloudApprovedRoomRow(
+                items(liveRooms.take(4), key = { "home-live:${it.id}" }) { room ->
+                    VcRoomCard(
                         title = room.title.ifBlank { "VoiceCloud Room" },
-                        subtitle = room.category.ifBlank { "Live audio" },
-                        imageUrl = room.coverUrl,
-                        meta = "${room.listenerCount}",
-                        live = room.isLive,
+                        host = room.category.ifBlank { "Host" },
+                        topic = room.language.ifBlank { "Live audio" },
+                        listeners = "${room.listenerCount}",
+                        live = true,
+                        coverUrl = room.coverUrl,
                         onClick = { onRoom(room.id) },
+                        onJoin = { onRoom(room.id) },
                     )
+                    Spacer(Modifier.height(12.dp))
                 }
             }
-            val recommendedPeople = (state.home.creators + state.home.people).distinctBy { it.id }.take(6)
-            item { SectionTitle("Creators to discover", "See All", onCreators) }
-            if (recommendedPeople.isEmpty() && !state.loading) {
-                item { VoiceCloudApprovedCard(Modifier.fillMaxWidth()) { Text("Creator recommendations will appear as your VoiceCloud network grows.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted) } }
-            } else {
-                item { CompactPeopleRow(recommendedPeople, onProfile) }
+            item { VcSectionHeader("Popular rooms", "See all", onRooms) }
+            items(popularRooms.take(3), key = { "home-popular:${it.id}" }) { room ->
+                VcRoomCard(
+                    title = room.title.ifBlank { "VoiceCloud Room" },
+                    host = room.category.ifBlank { "Host" },
+                    topic = room.language.ifBlank { "Live audio" },
+                    listeners = "${room.listenerCount}",
+                    live = room.isLive,
+                    coverUrl = room.coverUrl,
+                    onClick = { onRoom(room.id) },
+                    onJoin = if (room.isLive) ({ onRoom(room.id) }) else null,
+                )
+                Spacer(Modifier.height(12.dp))
             }
-            item { SectionTitle("Quick access") }
+            val recommendedPeople = (state.home.creators + state.home.people).distinctBy { it.id }.take(8)
+            item { VcSectionHeader("People you may like", "See all", onPeople) }
+            if (recommendedPeople.isEmpty() && !state.loading) {
+                item {
+                    VoiceCloudApprovedCard(Modifier.fillMaxWidth()) {
+                        Text("People recommendations will appear as your VoiceCloud network grows.", style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.TextMuted)
+                    }
+                }
+            } else {
+                item {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(recommendedPeople, key = { it.id }) { user ->
+                            VcPersonSuggestCard(
+                                name = user.displayName.ifBlank { user.username },
+                                subtitle = "${user.followersCount} followers",
+                                photo = user.avatarUrl,
+                                onClick = { onProfile(user.username) },
+                            )
+                        }
+                    }
+                }
+            }
+            item { VcSectionHeader("Upcoming events", "See all", onEvents) }
+            item {
+                VoiceCloudApprovedCard(Modifier.fillMaxWidth(), onClick = onEvents) {
+                    Text("Events", style = MaterialTheme.typography.titleSmall, color = ConsumerColors.Text)
+                    Text("See live and upcoming VoiceCloud events.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                }
+            }
+            item { VcSectionHeader("Communities", "See all", onCommunities) }
+            item {
+                VoiceCloudApprovedCard(Modifier.fillMaxWidth(), onClick = onCommunities) {
+                    Text("Communities", style = MaterialTheme.typography.titleSmall, color = ConsumerColors.Text)
+                    Text("Find groups and rooms that match your interests.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                }
+            }
+            item { VcSectionHeader("Shortcuts") }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     HomeShortcut("Discover", R.drawable.vc_nav_explore, onExplore)
-                    HomeShortcut("Communities", R.drawable.vc_icon_community, onCommunities)
+                    HomeShortcut("Host Studio", R.drawable.vc_icon_host, onHostStudio)
                 }
             }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HomeShortcut("Messages", R.drawable.vc_icon_message, onMessages)
                     HomeShortcut("Creators", R.drawable.vc_icon_host, onCreators)
+                    HomeShortcut("Messages", R.drawable.vc_icon_message, onMessages)
                 }
             }
             if (isGuest) item {
-                Surface(shape = RoundedCornerShape(12.dp), color = ConsumerColors.SapphireSoft, modifier = Modifier.fillMaxWidth()) {
-                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("Create an account to save rooms and follow creators.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.SapphireDeep, modifier = Modifier.weight(1f))
-                        TextButton(onClick = onUpgrade) { Text("Upgrade", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                Surface(shape = RoundedCornerShape(16.dp), color = ConsumerColors.SapphireSoft, modifier = Modifier.fillMaxWidth()) {
+                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text("Create an account to save rooms and follow creators.", style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.SapphireDeep, modifier = Modifier.weight(1f))
+                        TextButton(onClick = onUpgrade) { Text("Upgrade", style = MaterialTheme.typography.labelLarge) }
                     }
                 }
             }
+            item { Spacer(Modifier.height(8.dp)) }
         }
     }
 }
@@ -571,109 +628,119 @@ fun ExploreScreen(
     val trendingRooms = state.explore.trendingRooms.distinctBy { it.id }
     val creators = (state.explore.creators + state.explore.people).distinctBy { it.id }
     val categories = (trendingRooms + liveRooms)
-        .map { it.category.trim() }.filter(String::isNotBlank).distinct().take(8)
-        .ifEmpty { listOf("Music", "Talk", "Entertainment", "Gaming", "Wellness", "Technology") }
+        .map { it.category.trim() }.filter(String::isNotBlank).distinct().take(9)
+    var tab by rememberSaveable { mutableStateOf("All") }
+    var selectedCategory by rememberSaveable { mutableStateOf("") }
+    val featured = liveRooms.firstOrNull() ?: trendingRooms.firstOrNull()
+    val visibleRooms = when (tab) {
+        "Live" -> liveRooms
+        else -> (trendingRooms + liveRooms).distinctBy { it.id }
+    }.let { list ->
+        if (selectedCategory.isBlank()) list else list.filter { it.category.equals(selectedCategory, ignoreCase = true) }
+    }
 
     ConsumerScaffold("explore", onHome, onExplore, onLive, onFriends, onMe) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface),
+            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Cloud),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            item { VoiceCloudApprovedTopBar(title = "Discover", onSearch = onSearch) }
             item {
-                Surface(
-                    onClick = onSearch,
-                    shape = RoundedCornerShape(16.dp),
-                    color = ConsumerColors.SurfaceSoft,
-                    modifier = Modifier.fillMaxWidth().height(46.dp),
-                ) {
-                    Row(Modifier.padding(horizontal = 13.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(painterResource(R.drawable.vc_icon_search), null, tint = ConsumerColors.TextMuted, modifier = Modifier.size(18.dp))
-                        Text("Search rooms, people and communities", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Explore", style = MaterialTheme.typography.headlineMedium, color = ConsumerColors.Text, modifier = Modifier.weight(1f))
+                    IconButton(onClick = onSearch) {
+                        Icon(painterResource(R.drawable.vc_icon_search), "Search", tint = ConsumerColors.Ink)
                     }
                 }
             }
             item {
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    VoiceCloudApprovedChip("All", true) { }
-                    VoiceCloudApprovedChip("Rooms", false, onClick = onRooms)
-                    VoiceCloudApprovedChip("Creators", false, onClick = onCreators)
-                    VoiceCloudApprovedChip("Communities", false, onClick = onCommunities)
-                    VoiceCloudApprovedChip("Events", false, onClick = onEvents)
-                }
-            }
-            item { StatusBlock(state, onLoad) }
-
-            item { SectionTitle("Trending rooms", "See All", onRooms) }
-            if (trendingRooms.isEmpty() && liveRooms.isEmpty() && !state.loading) {
-                item { VoiceCloudApprovedCard(Modifier.fillMaxWidth()) { Text("Live and trending rooms will appear here.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted) } }
-            } else {
-                items((trendingRooms + liveRooms).distinctBy { it.id }.take(5), key = { "discover-room:${it.id}" }) { room ->
-                    VoiceCloudApprovedRoomRow(
-                        title = room.title.ifBlank { "VoiceCloud Room" },
-                        subtitle = room.category.ifBlank { "Live audio" },
-                        imageUrl = room.coverUrl,
-                        meta = "${room.listenerCount}",
-                        live = room.isLive,
-                        onClick = { onRoom(room.id) },
-                    )
-                }
-            }
-
-            item { SectionTitle("Popular creators", "See All", onCreators) }
-            if (creators.isEmpty() && !state.loading) {
-                item { VoiceCloudApprovedCard(Modifier.fillMaxWidth()) { Text("Creator recommendations will appear as the community grows.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted) } }
-            } else {
-                items(creators.take(4), key = { "discover-creator:${it.id}" }) { creator ->
-                    VoiceCloudApprovedPersonRow(
-                        name = creator.displayName.ifBlank { creator.username },
-                        subtitle = "${creator.followersCount} followers",
-                        avatarUrl = creator.avatarUrl,
-                        actionLabel = "View",
-                        online = creator.isOnline,
-                        verified = creator.isVerified,
-                        onClick = { onProfile(creator.username) },
-                        onAction = { onProfile(creator.username) },
-                    )
-                }
-            }
-
-            item { SectionTitle("Browse categories") }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    categories.chunked(3).forEach { row ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            row.forEach { category ->
-                                Surface(
-                                    onClick = onRooms,
-                                    modifier = Modifier.weight(1f).height(84.dp),
-                                    shape = RoundedCornerShape(14.dp),
-                                    color = ConsumerColors.SurfaceSoft,
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, ConsumerColors.Border.copy(alpha = .72f)),
-                                ) {
-                                    Column(
-                                        Modifier.padding(10.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                                    ) {
-                                        VoiceCloudPictogram(voiceCloudVisualFor(category), size = 34.dp)
-                                        Text(voiceCloudTitleCase(category), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    }
-                                }
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("All", "Live", "Events", "Communities").forEach { label ->
+                        VoiceCloudApprovedChip(label, tab == label) {
+                            when (label) {
+                                "Events" -> onEvents()
+                                "Communities" -> onCommunities()
+                                else -> tab = label
                             }
-                            repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                         }
                     }
                 }
             }
-
-            item {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HomeShortcut("Communities", R.drawable.vc_icon_community, onCommunities)
-                    HomeShortcut("Events", R.drawable.vc_icon_calendar, onEvents)
+            item { StatusBlock(state, onLoad) }
+            if (featured != null) {
+                item {
+                    Box(
+                        Modifier.fillMaxWidth().height(168.dp).clip(RoundedCornerShape(20.dp)).clickable { onRoom(featured.id) },
+                    ) {
+                        VoiceCloudRemoteMedia(featured.coverUrl, featured.title, Modifier.fillMaxSize(), VoiceCloudVisualKind.LIVE, dark = true, contentScale = ContentScale.Crop)
+                        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f)))))
+                        Column(Modifier.align(Alignment.BottomStart).padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            VcLiveBadge(small = true)
+                            Text("Featured Live Rooms", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
+                            Text(featured.title.ifBlank { "Live room" }, style = MaterialTheme.typography.titleLarge, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Surface(onClick = { onRoom(featured.id) }, shape = RoundedCornerShape(20.dp), color = ConsumerColors.Sapphire) {
+                                Text("Join", Modifier.padding(horizontal = 16.dp, vertical = 7.dp), color = Color.White, style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                    }
                 }
             }
+            if (categories.isNotEmpty()) {
+                item { VcSectionHeader("Categories") }
+                item {
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        categories.forEach { category ->
+                            val active = selectedCategory.equals(category, ignoreCase = true)
+                            Surface(
+                                onClick = { selectedCategory = if (active) "" else category },
+                            shape = RoundedCornerShape(14.dp),
+                            color = if (active) ConsumerColors.SapphireSoft else ConsumerColors.SurfaceSoft,
+                            border = BorderStroke(1.dp, if (active) ConsumerColors.Sapphire else ConsumerColors.Border),
+                        ) {
+                            Column(Modifier.padding(horizontal = 12.dp, vertical = 14.dp).width(72.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(category.take(1), style = MaterialTheme.typography.titleMedium)
+                                Text(category, style = MaterialTheme.typography.labelSmall, color = ConsumerColors.Text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                        }
+                        }
+                    }
+                }
+            }
+            item { VcSectionHeader("Trending", "See all", onRooms) }
+            if (visibleRooms.isEmpty() && !state.loading) {
+                item { VoiceCloudApprovedCard(Modifier.fillMaxWidth()) { Text("Live and trending rooms will appear here.", style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.TextMuted) } }
+            } else {
+                items(visibleRooms.take(6), key = { "discover-room:${it.id}" }) { room ->
+                    VcRoomCard(
+                        title = room.title.ifBlank { "VoiceCloud Room" },
+                        host = room.category.ifBlank { "Host" },
+                        topic = room.language.ifBlank { "Live audio" },
+                        listeners = "${room.listenerCount}",
+                        live = room.isLive,
+                        coverUrl = room.coverUrl,
+                        onClick = { onRoom(room.id) },
+                        onJoin = if (room.isLive) ({ onRoom(room.id) }) else null,
+                    )
+                }
+            }
+            item { VcSectionHeader("Rising creators", "See all", onCreators) }
+            if (creators.isEmpty() && !state.loading) {
+                item { VoiceCloudApprovedCard(Modifier.fillMaxWidth()) { Text("Creator recommendations will appear as the community grows.", style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.TextMuted) } }
+            } else {
+                item {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(creators.take(8), key = { "discover-creator:${it.id}" }) { creator ->
+                            VcPersonSuggestCard(
+                                name = creator.displayName.ifBlank { creator.username },
+                                subtitle = "${creator.followersCount} followers",
+                                photo = creator.avatarUrl,
+                                onClick = { onProfile(creator.username) },
+                            )
+                        }
+                    }
+                }
+            }
+            item { Spacer(Modifier.height(8.dp)) }
         }
     }
 }
@@ -761,7 +828,7 @@ fun SearchScreen(
 
     ConsumerScaffold("explore", onHome, onExplore, onLive, onFriends, onMe) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface),
+            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Cloud),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -837,7 +904,7 @@ fun PublicProfileScreen(
     val profile = state.profile
     SecondaryPageLayout(title = "Profile", onBack = onBack) { pageModifier ->
         LazyColumn(
-            pageModifier.background(ConsumerColors.Surface),
+            pageModifier.background(ConsumerColors.Cloud),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -939,7 +1006,7 @@ fun MyProfileScreen(
     val profile = state.myProfile
     ConsumerScaffold("profile", onHome, onExplore, onLive, onFriends, onMe) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface),
+            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Cloud),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(11.dp),
         ) {
@@ -1097,7 +1164,7 @@ fun FriendsScreen(
     var selected by rememberSaveable { mutableStateOf("Friends") }
     val tabs = listOf("Friends", "Requests", "Suggestions")
     ConsumerScaffold("friends", onHome, onExplore, onLive, onFriends, onMe) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Cloud), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item { VoiceCloudApprovedTopBar(title = "Friends & Connections") }
             item { StatusBlock(state, onLoad) }
             item {

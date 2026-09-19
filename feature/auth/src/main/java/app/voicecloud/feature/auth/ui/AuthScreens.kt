@@ -72,7 +72,7 @@ private fun AuthPage(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     VoiceCloudTheme(portal = if (creator) PortalTheme.Creator else PortalTheme.User, darkTheme = false) {
-        Box(Modifier.fillMaxSize().background(ConsumerColors.Surface).imePadding()) {
+        Box(Modifier.fillMaxSize().background(ConsumerColors.Cloud).imePadding()) {
             Column(
                 Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                     .padding(horizontal = VoiceCloudApprovedMetrics.pagePadding, vertical = 18.dp),

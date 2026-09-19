@@ -52,7 +52,7 @@ private fun EconomySection.visualKind(): VoiceCloudVisualKind = when (this) {
 @Composable
 fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         topBar = {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                 VoiceCloudApprovedTopBar("Wallet", onBack = onBack)
@@ -68,7 +68,7 @@ fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(15.dp),
-                    colors = CardDefaults.cardColors(containerColor = ConsumerColors.LiveSurface),
+                    colors = CardDefaults.cardColors(containerColor = ConsumerColors.Sapphire),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                 ) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -149,7 +149,7 @@ fun EconomySectionScreen(
     LaunchedEffect(section) { onLoad() }
     VoiceCloudToastEffect(state.error, state.notice)
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         topBar = { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) { VoiceCloudApprovedTopBar(section.label, onBack = onBack) } },
     ) { padding ->
         LazyColumn(
@@ -204,7 +204,7 @@ private fun EconomyBoardHeader(section: EconomySection, payload: Any?) {
     val sections = payloadSections(payload)
     val first = sections.asSequence().flatMap { it.second.asSequence() }.firstOrNull()
     val value = first?.firstDisplayValue("balance", "availableBalance", "coinBalance", "coins", "amount", "total", "points", "xp", "rank", "streak")
-    val dark = section in setOf(EconomySection.WALLET, EconomySection.VIP, EconomySection.GIFTS)
+    val dark = section == EconomySection.VIP
     VoiceCloudApprovedCard(Modifier.fillMaxWidth(), contentPadding = 0.dp, dark = dark) {
         Box(Modifier.fillMaxWidth().height(if (dark) 132.dp else 108.dp)) {
             VoiceCloudRemoteMedia(

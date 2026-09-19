@@ -71,7 +71,7 @@ private fun SecondaryPageLayout(
     content: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         topBar = {
             VoiceCloudPageTopBar(
                 title = title,

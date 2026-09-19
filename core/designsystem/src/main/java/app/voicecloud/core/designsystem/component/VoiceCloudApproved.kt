@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.voicecloud.core.designsystem.R
+import app.voicecloud.core.designsystem.theme.CommonColors
 import app.voicecloud.core.designsystem.theme.ConsumerColors
 import app.voicecloud.core.designsystem.theme.CreatorColors
 
@@ -55,13 +56,13 @@ import app.voicecloud.core.designsystem.theme.CreatorColors
  */
 object VoiceCloudApprovedMetrics {
     val pagePadding: Dp = 16.dp
-    val cardRadius: Dp = 14.dp
-    val fieldRadius: Dp = 11.dp
-    val buttonRadius: Dp = 12.dp
+    val cardRadius: Dp = 16.dp
+    val fieldRadius: Dp = 16.dp
+    val buttonRadius: Dp = 16.dp
     val primaryButtonHeight: Dp = 48.dp
-    val compactCardPadding: Dp = 12.dp
-    val sectionGap: Dp = 14.dp
-    val rowGap: Dp = 10.dp
+    val compactCardPadding: Dp = 14.dp
+    val sectionGap: Dp = 16.dp
+    val rowGap: Dp = 12.dp
 }
 
 @Composable
@@ -294,7 +295,7 @@ fun VoiceCloudApprovedFeaturedRoom(
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextOnDarkSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Surface(shape = RoundedCornerShape(50), color = Color(0xFFE84C4C)) { Text("LIVE", Modifier.padding(horizontal = 7.dp, vertical = 3.dp), style = MaterialTheme.typography.labelSmall, color = Color.White, fontWeight = FontWeight.Bold) }
+                Surface(shape = RoundedCornerShape(50), color = CommonColors.Error) { Text("LIVE", Modifier.padding(horizontal = 7.dp, vertical = 3.dp), style = MaterialTheme.typography.labelSmall, color = Color.White, fontWeight = FontWeight.Bold) }
                 Text(listeners, style = MaterialTheme.typography.labelSmall, color = Color.White)
             }
         }
@@ -320,7 +321,7 @@ fun VoiceCloudApprovedRoomRow(
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = ConsumerColors.Ink, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                if (live) Surface(shape = RoundedCornerShape(50), color = Color(0xFFE84C4C)) { Text("LIVE", Modifier.padding(horizontal = 6.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, color = Color.White) }
+                if (live) Surface(shape = RoundedCornerShape(50), color = CommonColors.Error) { Text("LIVE", Modifier.padding(horizontal = 6.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, color = Color.White) }
             }
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }

@@ -44,7 +44,7 @@ import app.voicecloud.feature.settings.model.*
 @Composable
 private fun PageScaffold(title: String, subtitle: String? = null, onBack: () -> Unit, content: @Composable (PaddingValues) -> Unit) {
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         topBar = { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) { VoiceCloudApprovedTopBar(title = title, onBack = onBack) } },
         content = content,
     )
@@ -162,13 +162,7 @@ fun PrivacySettingsScreen(
             item { ToggleRow("Allow Direct Messages", "Allow Other Members To Message You", value.allowDirectMessages) { value = value.copy(allowDirectMessages = it) } }
             item { ToggleRow("Show Gifts", "Show Gift Activity On Your Profile", value.showGifts) { value = value.copy(showGifts = it) } }
             item { VoiceCloudApprovedSecondaryButton("Blocked Users", onClick = onBlocked) }
-            item {
-                Button(
-                    onClick = { onSave(value) },
-                    enabled = !state.saving,
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(voiceCloudTitleCase(if (state.saving) "Saving…" else "Save Privacy Settings")) }
-            }
+            item { VoiceCloudApprovedPrimaryButton(if (state.saving) "Saving…" else "Save Privacy Settings", enabled = !state.saving) { onSave(value) } }
         }
     }
 }

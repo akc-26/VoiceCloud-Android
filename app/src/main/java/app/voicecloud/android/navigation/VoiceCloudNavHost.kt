@@ -810,6 +810,7 @@ fun VoiceCloudNavHost(
             HomeScreen(
                 state = state,
                 isGuest = viewer?.isGuest == true,
+                greetingName = viewer?.displayName?.ifBlank { viewer.username }.orEmpty(),
                 onLoad = { vm.setViewer(viewer?.id, viewer?.username); vm.loadHome() },
                 onRooms = { open(VoiceCloudRoutes.Rooms) },
                 onRoom = { open(VoiceCloudRoutes.roomExperience(it)) },
@@ -824,6 +825,7 @@ fun VoiceCloudNavHost(
                 onFriends = { open(VoiceCloudRoutes.Messages) },
                 onMe = { open(VoiceCloudRoutes.MyProfile) },
                 onCommunities = { open(VoiceCloudRoutes.Communities) },
+                onEvents = { open(VoiceCloudRoutes.Events) },
                 onMessages = { open(VoiceCloudRoutes.Messages) },
                 onNotifications = { open(VoiceCloudRoutes.Notifications) },
                 onHostStudio = { if (viewer?.isGuest == true) open(VoiceCloudRoutes.GuestUpgrade) else open(VoiceCloudRoutes.HostStudio) },

@@ -32,6 +32,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.voicecloud.core.designsystem.component.VcConnectionBanner
+import app.voicecloud.core.designsystem.component.VcLiveBadge
 import app.voicecloud.core.designsystem.component.VoiceCloudPageTopBar
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedCard
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedMetricRow
@@ -70,49 +72,57 @@ fun RoomPreviewScreen(
     LaunchedEffect(roomId) { onLoad() }
     VoiceCloudToastEffect(state.error, state.notice)
     Scaffold(
-        containerColor = ConsumerColors.Surface,
-        topBar = { VoiceCloudPageTopBar(title = "Room Details", onBack = onBack) },
+        containerColor = ConsumerColors.DarkBackground,
+        topBar = {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onBack) {
+                    Text("‹", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                }
+                Text("Room preview", style = MaterialTheme.typography.titleMedium, color = Color.White, modifier = Modifier.weight(1f))
+                TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) {
+                    Text(if (state.saved) "Saved" else "Save", color = Color.White)
+                }
+            }
+        },
     ) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface),
+            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.DarkBackground),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            if (state.loading) item { LoadingBlock() }
+            if (state.loading) item { LinearProgressIndicator(Modifier.fillMaxWidth(), color = ConsumerColors.Sapphire) }
             state.room?.let { room ->
                 item {
-                    Box(Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(16.dp)).background(ConsumerColors.DeepNavy)) {
+                    Box(Modifier.fillMaxWidth().height(320.dp).clip(RoundedCornerShape(28.dp)).background(ConsumerColors.LiveSurface)) {
                         VoiceCloudRemoteMedia(room.coverUrl, room.title.ifBlank { "Room artwork" }, Modifier.fillMaxSize(), VoiceCloudVisualKind.LIVE, dark = true, fallbackDrawable = app.voicecloud.core.designsystem.R.drawable.vc_ref_live_forest)
-                        Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, ConsumerColors.DeepNavy.copy(alpha = .94f)))))
-                        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            if (room.isLive) VoiceCloudLiveBadge() else Surface(shape = RoundedCornerShape(50), color = Color.Black.copy(alpha = .34f)) { Text(voiceCloudTitleCase(room.status.ifBlank { "Room" }), Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = Color.White) }
-                            Spacer(Modifier.weight(1f))
-                            TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) { Text(if (state.saved) "Saved" else "Save", color = Color.White, style = MaterialTheme.typography.labelSmall) }
-                        }
-                        Column(Modifier.align(Alignment.BottomStart).padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                            Text(room.title.ifBlank { "VoiceCloud Room" }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            Text(listOf(room.category, room.language).filter(String::isNotBlank).joinToString(" · ").ifBlank { "Live audio" }, style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextOnDarkSecondary)
-                            Text("Hosted on VoiceCloud", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDarkSecondary)
+                        Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, ConsumerColors.DarkBackground.copy(alpha = .92f)))))
+                        Column(Modifier.align(Alignment.BottomStart).padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (room.isLive) VcLiveBadge(count = "${room.listenerCount}")
+                            Text(room.title.ifBlank { "VoiceCloud Room" }, style = MaterialTheme.typography.headlineMedium, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(listOf(room.category, room.language).filter(String::isNotBlank).joinToString(" · ").ifBlank { "Live audio" }, style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.TextOnDarkSecondary)
                         }
                     }
                 }
-                item { VoiceCloudApprovedMetricRow(listOf(room.speakerCount.toString() to "Speakers", room.listenerCount.toString() to "Listeners", (if (room.isPremium) "VIP" else "Open") to "Access")) }
+                item { VoiceCloudApprovedMetricRow(listOf(room.speakerCount.toString() to "Speakers", room.listenerCount.toString() to "Listeners", (if (room.isPremium) "VIP" else "Open") to "Access"), dark = true) }
                 if (!room.description.isNullOrBlank()) item {
-                    VoiceCloudApprovedCard(Modifier.fillMaxWidth()) {
+                    VoiceCloudApprovedCard(Modifier.fillMaxWidth(), dark = true) {
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("About this room", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
-                            Text(room.description, style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.TextMuted)
+                            Text("About this room", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                            Text(room.description, style = MaterialTheme.typography.bodyLarge, color = ConsumerColors.TextOnDarkSecondary)
                         }
                     }
                 }
                 val restrictions = room.restrictionLabels()
                 if (restrictions.isNotEmpty()) item {
                     Row(Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        restrictions.forEach { label -> Surface(shape = RoundedCornerShape(50), color = ConsumerColors.SurfaceSoft) { Text(label, Modifier.padding(horizontal = 10.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted) } }
+                        restrictions.forEach { label -> Surface(shape = RoundedCornerShape(50), color = ConsumerColors.LiveSurfaceElevated) { Text(label, Modifier.padding(horizontal = 10.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDarkSecondary) } }
                     }
                 }
-                item { VoiceCloudApprovedPrimaryButton(if (state.joining) "Joining..." else if (room.isJoinablePresentation()) "Join Room" else "Unavailable", enabled = room.isJoinablePresentation() && !state.joining, onClick = onJoin) }
-                item { VoiceCloudApprovedSecondaryButton(if (state.saved) "Room Saved" else "Save Room", enabled = !state.mutationBusy, onClick = onToggleSave) }
+                item { VoiceCloudApprovedPrimaryButton(if (state.joining) "Joining..." else if (room.isJoinablePresentation()) "Join" else "Unavailable", enabled = room.isJoinablePresentation() && !state.joining, onClick = onJoin) }
+                item { VoiceCloudApprovedSecondaryButton(if (state.saved) "Saved" else "Save", enabled = !state.mutationBusy, onClick = onToggleSave) }
             }
         }
     }
@@ -328,6 +338,15 @@ private fun LiveStageHeader(state: LiveRoomUiState, viewerId: String?, onRetryAu
                 Text(primary?.username?.takeIf(String::isNotBlank) ?: if (primary?.userId == viewerId) "You" else "Host", color = Color.White, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                 Text(if (primary?.isSpeaking == true) "Speaking" else primary?.role?.replace('_', ' ') ?: "Host", color = if (primary?.isSpeaking == true) ConsumerColors.Ice else ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelSmall)
             }
+        }
+        if (state.joining && !state.inRoom) {
+            VcConnectionBanner("Getting your room ready...", ConsumerColors.Ice, ConsumerColors.Ice.copy(alpha = 0.14f))
+        } else when (state.rtcState) {
+            RtcAudioState.Connecting -> VcConnectionBanner("Joining the conversation...", ConsumerColors.Sapphire, ConsumerColors.Sapphire.copy(alpha = 0.18f))
+            RtcAudioState.Reconnecting -> VcConnectionBanner("Connection interrupted. Reconnecting...", CommonColors.Warning, CommonColors.Warning.copy(alpha = 0.15f), action = "Retry", onAction = onRetryAudio)
+            is RtcAudioState.Failed -> VcConnectionBanner("Audio interrupted. Check your connection.", CommonColors.Warning, CommonColors.Warning.copy(alpha = 0.15f), action = "Retry", onAction = onRetryAudio)
+            RtcAudioState.Disconnected -> if (state.inRoom) VcConnectionBanner("You've been disconnected.", CommonColors.Error, CommonColors.Error.copy(alpha = 0.14f), action = "Retry", onAction = onRetryAudio)
+            else -> Unit
         }
         if (state.rtcState is RtcAudioState.Failed || (state.rtcState is RtcAudioState.Disconnected && state.inRoom)) {
             TextButton(onClick = onRetryAudio) { Text("Retry audio", color = ConsumerColors.Ice, style = MaterialTheme.typography.labelSmall) }

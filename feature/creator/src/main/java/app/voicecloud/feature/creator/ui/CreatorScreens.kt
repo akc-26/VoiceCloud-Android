@@ -955,7 +955,7 @@ fun CreatorWalletScreen(state: CreatorUiState, onLoad: () -> Unit, onBack: () ->
                 Card(
                     Modifier.fillMaxWidth().border(1.dp, ConsumerColors.VipGold.copy(alpha = .45f), RoundedCornerShape(22.dp)),
                     shape = RoundedCornerShape(22.dp),
-                    colors = CardDefaults.cardColors(containerColor = ConsumerColors.LiveSurface),
+                    colors = CardDefaults.cardColors(containerColor = CreatorColors.Primary),
                 ) {
                     Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {

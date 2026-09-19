@@ -396,7 +396,7 @@ private fun ProfilePage(
 ) {
     val metrics = VoiceCloudPageMetrics.current()
     Scaffold(
-        containerColor = ConsumerColors.Surface,
+        containerColor = ConsumerColors.Cloud,
         topBar = { Row(Modifier.fillMaxWidth().padding(horizontal = metrics.horizontalPadding)) { VoiceCloudApprovedTopBar(title, onBack = onBack) } },
     ) { padding ->
         LazyColumn(
