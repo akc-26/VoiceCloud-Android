@@ -40,6 +40,7 @@ import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSecondaryBut
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSectionTitle
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedStatCard
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudCreatorBottomBar
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.theme.VoiceCloudTheme
 import app.voicecloud.core.designsystem.theme.ConsumerColors
@@ -89,40 +90,22 @@ private fun CreatorPortalFrame(
                 }
             },
             bottomBar = {
-                Surface(color = CreatorColors.LightSurface, shadowElevation = 5.dp) {
-                    Row(
-                        Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 7.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround,
-                    ) {
-                        CreatorBoardNavItem("Home", VoiceCloudVisualKind.DISCOVER, selected == CreatorPortalSection.DASHBOARD, onDashboard)
-                        CreatorBoardNavItem("Studio", VoiceCloudVisualKind.LIVE, selected == CreatorPortalSection.LIVE, onLive)
-                        Surface(onClick = onLive, shape = CircleShape, color = CreatorColors.Primary, shadowElevation = 5.dp, modifier = Modifier.size(44.dp)) {
-                            Box(contentAlignment = Alignment.Center) { Icon(painterResource(R.drawable.vc_nav_live), contentDescription = "Live", tint = Color.White, modifier = Modifier.size(24.dp)) }
-                        }
-                        CreatorBoardNavItem("Analytics", VoiceCloudVisualKind.ANALYTICS, false, onAnalytics)
-                        CreatorBoardNavItem("Profile", VoiceCloudVisualKind.PROFILE, selected == CreatorPortalSection.PROFILE, onProfile)
-                    }
-                }
+                VoiceCloudCreatorBottomBar(
+                    selectedId = when (selected) {
+                        CreatorPortalSection.DASHBOARD -> "home"
+                        CreatorPortalSection.LIVE -> "studio"
+                        CreatorPortalSection.PROFILE -> "profile"
+                        else -> ""
+                    },
+                    onHome = onDashboard,
+                    onStudio = onLive,
+                    onLive = onLive,
+                    onAnalytics = onAnalytics,
+                    onProfile = onProfile,
+                )
             },
             content = content,
         )
-    }
-}
-
-@Composable
-private fun RowScope.CreatorBoardNavItem(
-    label: String,
-    kind: VoiceCloudVisualKind,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    Surface(onClick = onClick, color = Color.Transparent, modifier = Modifier.weight(1f).fillMaxHeight()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            VoiceCloudPictogram(kind, size = 24.dp, dark = false, accent = if (selected) CreatorColors.Primary else CreatorColors.TextMuted)
-            Spacer(Modifier.height(2.dp))
-            Text(label, style = MaterialTheme.typography.labelSmall, color = if (selected) CreatorColors.PrimaryDark else CreatorColors.TextMuted, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium, maxLines = 1)
-        }
     }
 }
 
@@ -164,8 +147,8 @@ fun CreatorDashboardScreen(
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     VoiceCloudAvatar(state.profile?.avatarUrl, state.profile?.displayName?.ifBlank { creatorName } ?: creatorName, size = 46.dp, verified = true)
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                        Text("Welcome back, ${creatorName.ifBlank { "Creator" }}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = CreatorColors.Text)
-                        Text("Manage your audience, rooms and creator performance from one place.", style = MaterialTheme.typography.bodySmall, color = CreatorColors.TextMuted)
+                        Text("Good ${creatorGreetingPeriod()}, ${creatorName.ifBlank { "Creator" }}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = CreatorColors.Text)
+                        Text("Here's what's happening with your community.", style = MaterialTheme.typography.bodySmall, color = CreatorColors.TextMuted)
                     }
                 }
             }
@@ -1116,5 +1099,14 @@ fun CreatorPayoutDetailScreen(state: CreatorUiState, payoutId: String, onLoad: (
             payout.createdAt?.let { Text(voiceCloudTitleCase("Requested: $it")) }
             payout.updatedAt?.let { Text(voiceCloudTitleCase("Updated: $it")) }
         }
+    }
+}
+
+private fun creatorGreetingPeriod(): String {
+    val hour = java.time.LocalTime.now().hour
+    return when (hour) {
+        in 5..11 -> "morning"
+        in 12..16 -> "afternoon"
+        else -> "evening"
     }
 }

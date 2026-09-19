@@ -41,6 +41,7 @@ import app.voicecloud.core.designsystem.component.VoiceCloudApprovedRoomRow
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSearchBar
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedSectionTitle
 import app.voicecloud.core.designsystem.component.VoiceCloudApprovedTopBar
+import app.voicecloud.core.designsystem.component.VoiceCloudConsumerBottomBar
 import app.voicecloud.core.designsystem.component.VoiceCloudToastEffect
 import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
 import app.voicecloud.core.designsystem.component.VoiceCloudBrandMark
@@ -78,96 +79,20 @@ private fun ConsumerScaffold(
     Scaffold(
         containerColor = ConsumerColors.Surface,
         bottomBar = {
-            Surface(
-                color = Color.White,
-                tonalElevation = 2.dp,
-                shadowElevation = 5.dp,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                ) {
-                    ConsumerBoardNavItem(
-                        label = "Home",
-                        icon = R.drawable.vc_nav_home,
-                        selectedIcon = R.drawable.vc_nav_home_selected,
-                        selected = selected == "home",
-                        onClick = onHome,
-                    )
-                    ConsumerBoardNavItem(
-                        label = "Discover",
-                        icon = R.drawable.vc_nav_explore,
-                        selectedIcon = R.drawable.vc_nav_explore_selected,
-                        selected = selected == "explore",
-                        onClick = onExplore,
-                    )
-                    Surface(
-                        onClick = onLive,
-                        shape = CircleShape,
-                        color = ConsumerColors.Sapphire,
-                        shadowElevation = 5.dp,
-                        modifier = Modifier.size(44.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(painterResource(R.drawable.vc_nav_live), contentDescription = "Live", tint = Color.White, modifier = Modifier.size(24.dp))
-                        }
-                    }
-                    ConsumerBoardNavItem(
-                        label = "Messages",
-                        icon = R.drawable.vc_icon_message,
-                        selectedIcon = R.drawable.vc_icon_message,
-                        selected = selected == "friends",
-                        onClick = onFriends,
-                    )
-                    ConsumerBoardNavItem(
-                        label = "Profile",
-                        icon = R.drawable.vc_nav_profile,
-                        selectedIcon = R.drawable.vc_nav_profile_selected,
-                        selected = selected == "profile",
-                        onClick = onProfile,
-                    )
-                }
-            }
+            VoiceCloudConsumerBottomBar(
+                selectedId = when (selected) {
+                    "friends" -> "messages"
+                    else -> selected
+                },
+                onHome = onHome,
+                onDiscover = onExplore,
+                onLive = onLive,
+                onMessages = onFriends,
+                onProfile = onProfile,
+            )
         },
         content = content,
     )
-}
-
-@Composable
-private fun RowScope.ConsumerBoardNavItem(
-    label: String,
-    icon: Int,
-    selectedIcon: Int,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        color = Color.Transparent,
-        modifier = Modifier.weight(1f).fillMaxHeight(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Icon(
-                painter = painterResource(if (selected) selectedIcon else icon),
-                contentDescription = label,
-                tint = if (selected) ConsumerColors.Sapphire else ConsumerColors.TextMuted,
-                modifier = Modifier.size(19.dp),
-            )
-            Spacer(Modifier.height(3.dp))
-            Text(
-                label,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (selected) ConsumerColors.Sapphire else ConsumerColors.TextMuted,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                maxLines = 1,
-            )
-        }
-    }
 }
 
 @Composable
@@ -432,6 +357,7 @@ private fun HomeRankedHost(user: VoiceCloudUser, rank: Int, onProfile: (String) 
 fun HomeScreen(
     state: DiscoveryUiState,
     isGuest: Boolean,
+    greetingName: String,
     onLoad: () -> Unit,
     onRooms: () -> Unit,
     onRoom: (String) -> Unit,
@@ -461,10 +387,20 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-                    VoiceCloudBrandMark(30.dp)
+                Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
+                    VoiceCloudBrandMark(32.dp)
                     Spacer(Modifier.width(8.dp))
-                    Text("For You", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink, modifier = Modifier.weight(1f))
+                    Column(Modifier.weight(1f)) {
+                        Text("VoiceCloud", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
+                        val firstName = greetingName.trim().substringBefore(' ').ifBlank { "" }
+                        Text(
+                            if (firstName.isBlank()) "Discover live conversations" else "Good ${homeGreetingPeriod()}, $firstName",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = ConsumerColors.TextMuted,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                     IconButton(onClick = onSearch, modifier = Modifier.size(36.dp)) { Icon(painterResource(R.drawable.vc_icon_search), "Search", tint = ConsumerColors.Ink, modifier = Modifier.size(20.dp)) }
                     IconButton(onClick = onNotifications, modifier = Modifier.size(36.dp)) { Icon(painterResource(R.drawable.vc_icon_bell), "Notifications", tint = ConsumerColors.Ink, modifier = Modifier.size(20.dp)) }
                 }
@@ -492,14 +428,23 @@ fun HomeScreen(
                 }
             }
             item { StatusBlock(state, onLoad) }
-            item {
-                VoiceCloudApprovedFeaturedRoom(
-                    title = featuredRoom?.title?.ifBlank { null } ?: "Late Night Talks 🌙",
-                    subtitle = featuredRoom?.description?.takeIf { it.isNotBlank() } ?: "Deep conversations. Real people.",
-                    imageUrl = featuredRoom?.coverUrl,
-                    listeners = if (featuredRoom != null) "${featuredRoom.listenerCount} listening" else "Discover live rooms",
-                    onClick = { if (featuredRoom != null) onRoom(featuredRoom.id) else onRooms() },
-                )
+            if (featuredRoom != null) {
+                item {
+                    VoiceCloudApprovedFeaturedRoom(
+                        title = featuredRoom.title.ifBlank { "VoiceCloud Room" },
+                        subtitle = featuredRoom.description?.takeIf { it.isNotBlank() }
+                            ?: listOf(featuredRoom.category, featuredRoom.language).filter(String::isNotBlank).joinToString(" · ").ifBlank { "Live audio" },
+                        imageUrl = featuredRoom.coverUrl,
+                        listeners = "${featuredRoom.listenerCount} listening",
+                        onClick = { onRoom(featuredRoom.id) },
+                    )
+                }
+            } else if (!state.loading) {
+                item {
+                    VoiceCloudApprovedCard(Modifier.fillMaxWidth()) {
+                        Text("No live rooms right now. Explore VoiceCloud to find the next conversation.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
+                    }
+                }
             }
             item { SectionTitle("Popular Rooms", "See All", onRooms) }
             if (rooms.isEmpty() && !state.loading) {
@@ -1135,6 +1080,15 @@ fun FriendsScreen(
                 }
             }
         }
+    }
+}
+
+private fun homeGreetingPeriod(): String {
+    val hour = java.time.LocalTime.now().hour
+    return when (hour) {
+        in 5..11 -> "morning"
+        in 12..16 -> "afternoon"
+        else -> "evening"
     }
 }
 

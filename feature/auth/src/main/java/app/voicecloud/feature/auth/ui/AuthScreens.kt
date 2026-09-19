@@ -212,14 +212,14 @@ fun PortalSelectorScreen(
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Welcome to VoiceCloud",
+                        "Speak. Connect. Belong.",
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = ConsumerColors.Ink,
                         textAlign = TextAlign.Center,
                     )
                     Text(
-                        "Join live conversations, discover creators and connect through voice.",
+                        "Join live conversations, share ideas and build communities around what matters.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = ConsumerColors.TextMuted,
                         textAlign = TextAlign.Center,
@@ -254,6 +254,7 @@ fun PortalSelectorScreen(
                     Text("Choose how you want to experience VoiceCloud.", style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextMuted)
                     Spacer(Modifier.height(4.dp))
                     PortalChoice("Listener", "Join rooms, listen and connect with amazing people.", R.drawable.vc_portal_user, ConsumerColors.Sapphire, onUser)
+                    PortalChoice("Speaker", "Host rooms and share your voice with the world.", R.drawable.vc_icon_host, ConsumerColors.Indigo, onUser)
                     PortalChoice("Creator", "Build your audience, manage creator tools and grow your community.", R.drawable.vc_portal_creator, ConsumerColors.SapphireDeep, onCreator)
                     Spacer(Modifier.weight(1f))
                     VoiceCloudApprovedPrimaryButton("Continue as Listener", onClick = onUser)

@@ -1,6 +1,6 @@
 package app.voicecloud.feature.live.ui
 
-import app.voicecloud.core.designsystem.component.voiceCloudTitleCase
+import androidx.annotation.DrawableRes
 import app.voicecloud.core.designsystem.theme.VoiceCloudBrand
 
 import androidx.compose.foundation.Canvas
@@ -70,49 +70,67 @@ fun RoomPreviewScreen(
     LaunchedEffect(roomId) { onLoad() }
     VoiceCloudToastEffect(state.error, state.notice)
     Scaffold(
-        containerColor = ConsumerColors.Surface,
-        topBar = { VoiceCloudPageTopBar(title = "Room Details", onBack = onBack) },
+        containerColor = ConsumerColors.DeepNavy,
     ) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.Surface),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxSize().padding(padding).background(ConsumerColors.DeepNavy),
+            contentPadding = PaddingValues(bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            item {
+                Box(Modifier.fillMaxWidth().height(320.dp).background(ConsumerColors.DeepNavy)) {
+                    VoiceCloudRemoteMedia(
+                        state.room?.coverUrl,
+                        state.room?.title?.ifBlank { "Room artwork" } ?: "Room artwork",
+                        Modifier.fillMaxSize(),
+                        VoiceCloudVisualKind.LIVE,
+                        dark = true,
+                        fallbackDrawable = app.voicecloud.core.designsystem.R.drawable.vc_ref_live_forest,
+                    )
+                    Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, ConsumerColors.DeepNavy.copy(alpha = .55f), ConsumerColors.DeepNavy))))
+                    IconButton(onClick = onBack, modifier = Modifier.padding(8.dp)) {
+                        Text("‹", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                    }
+                    Row(Modifier.align(Alignment.TopEnd).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) {
+                            Text(if (state.saved) "Saved" else "Save", color = Color.White, style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                    Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 16.dp, vertical = 18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        val room = state.room
+                        if (room?.isLive == true) VoiceCloudLiveBadge()
+                        Text(room?.title?.ifBlank { "VoiceCloud Room" } ?: "VoiceCloud Room", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(listOf(room?.category, room?.language).mapNotNull { it?.takeIf(String::isNotBlank) }.joinToString(" · ").ifBlank { "Live audio" }, style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextOnDarkSecondary)
+                    }
+                }
+            }
             if (state.loading) item { LoadingBlock() }
             state.room?.let { room ->
                 item {
-                    Box(Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(16.dp)).background(ConsumerColors.DeepNavy)) {
-                        VoiceCloudRemoteMedia(room.coverUrl, room.title.ifBlank { "Room artwork" }, Modifier.fillMaxSize(), VoiceCloudVisualKind.LIVE, dark = true, fallbackDrawable = app.voicecloud.core.designsystem.R.drawable.vc_ref_live_forest)
-                        Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, ConsumerColors.DeepNavy.copy(alpha = .94f)))))
-                        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            if (room.isLive) VoiceCloudLiveBadge() else Surface(shape = RoundedCornerShape(50), color = Color.Black.copy(alpha = .34f)) { Text(voiceCloudTitleCase(room.status.ifBlank { "Room" }), Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = Color.White) }
-                            Spacer(Modifier.weight(1f))
-                            TextButton(onClick = onToggleSave, enabled = !state.mutationBusy) { Text(if (state.saved) "Saved" else "Save", color = Color.White, style = MaterialTheme.typography.labelSmall) }
-                        }
-                        Column(Modifier.align(Alignment.BottomStart).padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                            Text(room.title.ifBlank { "VoiceCloud Room" }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            Text(listOf(room.category, room.language).filter(String::isNotBlank).joinToString(" · ").ifBlank { "Live audio" }, style = MaterialTheme.typography.bodySmall, color = ConsumerColors.TextOnDarkSecondary)
-                            Text("Hosted on VoiceCloud", style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDarkSecondary)
-                        }
-                    }
+                    VoiceCloudApprovedMetricRow(
+                        listOf(room.speakerCount.toString() to "Speakers", room.listenerCount.toString() to "Listeners", (if (room.isPremium) "VIP" else "Open") to "Access"),
+                        Modifier.padding(horizontal = 16.dp),
+                        dark = true,
+                    )
                 }
-                item { VoiceCloudApprovedMetricRow(listOf(room.speakerCount.toString() to "Speakers", room.listenerCount.toString() to "Listeners", (if (room.isPremium) "VIP" else "Open") to "Access")) }
                 if (!room.description.isNullOrBlank()) item {
-                    VoiceCloudApprovedCard(Modifier.fillMaxWidth()) {
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("About this room", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ConsumerColors.Ink)
-                            Text(room.description, style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.TextMuted)
-                        }
+                    Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("About this room", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(room.description, style = MaterialTheme.typography.bodyMedium, color = ConsumerColors.TextOnDarkSecondary)
                     }
                 }
                 val restrictions = room.restrictionLabels()
                 if (restrictions.isNotEmpty()) item {
-                    Row(Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        restrictions.forEach { label -> Surface(shape = RoundedCornerShape(50), color = ConsumerColors.SurfaceSoft) { Text(label, Modifier.padding(horizontal = 10.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextMuted) } }
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).horizontalScroll(androidx.compose.foundation.rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        restrictions.forEach { label -> Surface(shape = RoundedCornerShape(50), color = ConsumerColors.LiveSurfaceElevated) { Text(label, Modifier.padding(horizontal = 10.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDarkSecondary) } }
                     }
                 }
-                item { VoiceCloudApprovedPrimaryButton(if (state.joining) "Joining..." else if (room.isJoinablePresentation()) "Join Room" else "Unavailable", enabled = room.isJoinablePresentation() && !state.joining, onClick = onJoin) }
-                item { VoiceCloudApprovedSecondaryButton(if (state.saved) "Room Saved" else "Save Room", enabled = !state.mutationBusy, onClick = onToggleSave) }
+                item {
+                    Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        VoiceCloudApprovedPrimaryButton(if (state.joining) "Joining..." else if (room.isJoinablePresentation()) "Join Room" else "Unavailable", enabled = room.isJoinablePresentation() && !state.joining, onClick = onJoin)
+                        VoiceCloudApprovedSecondaryButton(if (state.saved) "Room Saved" else "Save Room", enabled = !state.mutationBusy, onClick = onToggleSave)
+                    }
+                }
             }
         }
     }
@@ -236,13 +254,15 @@ fun LiveRoomScreen(
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        LiveBottomControl("💬", "Chat") { showChat = true }
-                        LiveBottomControl("🎙", "Mic Request") { onToggleHand() }
-                        Surface(onClick = onToggleHand, shape = CircleShape, color = ConsumerColors.Sapphire, modifier = Modifier.size(52.dp), enabled = !state.mutationBusy && !state.paused) {
-                            Box(contentAlignment = Alignment.Center) { Text(if (state.handRaised) "✓" else "✋", style = MaterialTheme.typography.headlineSmall, color = Color.White) }
+                        LiveBottomControl(R.drawable.vc_icon_message, "Chat") { showChat = true }
+                        LiveBottomControl(R.drawable.vc_icon_host, "Mic Request") { onToggleHand() }
+                        Surface(onClick = onToggleHand, shape = CircleShape, color = ConsumerColors.Sapphire, modifier = Modifier.size(56.dp), enabled = !state.mutationBusy && !state.paused, shadowElevation = 6.dp) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(painterResource(R.drawable.vc_nav_live), contentDescription = if (state.handRaised) "Hand raised" else "Raise hand", tint = Color.White, modifier = Modifier.size(26.dp))
+                            }
                         }
-                        LiveBottomControl("☺", "Reactions") { showReactions = true }
-                        LiveBottomControl("🎁", "Gifts") { showGifts = true }
+                        LiveBottomControl(R.drawable.vc_icon_emoji, "Reactions") { showReactions = true }
+                        LiveBottomControl(R.drawable.vc_icon_gift, "Gifts") { showGifts = true }
                     }
                 }
             }
@@ -294,9 +314,9 @@ fun LiveRoomScreen(
 }
 
 @Composable
-private fun LiveBottomControl(symbol: String, label: String, onClick: () -> Unit) {
+private fun LiveBottomControl(@DrawableRes icon: Int, label: String, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp), modifier = Modifier.clickable(onClick = onClick).padding(horizontal = 4.dp)) {
-        Text(symbol, style = MaterialTheme.typography.titleMedium, color = Color.White)
+        Icon(painterResource(icon), contentDescription = label, tint = Color.White, modifier = Modifier.size(22.dp))
         Text(label, style = MaterialTheme.typography.labelSmall, color = ConsumerColors.TextOnDarkSecondary, maxLines = 1)
     }
 }

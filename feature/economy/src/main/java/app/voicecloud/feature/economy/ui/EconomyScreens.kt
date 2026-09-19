@@ -50,7 +50,20 @@ private fun EconomySection.visualKind(): VoiceCloudVisualKind = when (this) {
 
 /** Compact visual economy hub for wallet, membership, rewards and progression. */
 @Composable
-fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
+fun EconomyHubScreen(
+    state: EconomyUiState,
+    onLoadWallet: () -> Unit,
+    onOpen: (EconomySection) -> Unit,
+    onBack: () -> Unit,
+) {
+    LaunchedEffect(Unit) { onLoadWallet() }
+    val walletValue = if (state.title == EconomySection.WALLET.label) {
+        payloadSections(state.payload)
+            .asSequence()
+            .flatMap { it.second.asSequence() }
+            .firstOrNull()
+            ?.firstDisplayValue("balance", "availableBalance", "coinBalance", "coins", "amount", "total")
+    } else null
     Scaffold(
         containerColor = ConsumerColors.Surface,
         topBar = {
@@ -74,8 +87,8 @@ fun EconomyHubScreen(onOpen: (EconomySection) -> Unit, onBack: () -> Unit) {
                     Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                             Text("VoiceCloud Coins", color = ConsumerColors.TextOnDarkSecondary, style = MaterialTheme.typography.labelSmall)
-                            Text("Wallet & Rewards", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                            Text("Secure · Transparent · Rewarding", color = ConsumerColors.VipGold, style = MaterialTheme.typography.labelSmall)
+                            Text(walletValue ?: "Wallet", color = ConsumerColors.TextOnDark, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            Text(if (walletValue != null) "Secure · Verified balance" else "Wallet & Rewards", color = ConsumerColors.VipGold, style = MaterialTheme.typography.labelSmall)
                         }
                         VoiceCloudRemoteMedia(
                             url = null,
