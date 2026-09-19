@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -11,7 +12,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,55 +20,108 @@ import androidx.compose.ui.unit.sp
 sealed interface PortalTheme { data object User : PortalTheme; data object Creator : PortalTheme }
 
 @Immutable
-data class VoiceCloudRadii(val small: androidx.compose.ui.unit.Dp = 12.dp, val medium: androidx.compose.ui.unit.Dp = 18.dp, val large: androidx.compose.ui.unit.Dp = 24.dp, val extraLarge: androidx.compose.ui.unit.Dp = 30.dp)
-object VoiceCloudMotion { const val FastMs = 160; const val StandardMs = 220; const val SlowMs = 420 }
+data class VoiceCloudRadii(
+    val small: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_SMALL.dp,
+    val medium: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_MEDIUM.dp,
+    val large: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_LARGE.dp,
+    val extraLarge: androidx.compose.ui.unit.Dp = app.voicecloud.core.designsystem.BuildConfig.RADIUS_EXTRA_LARGE.dp,
+)
+object VoiceCloudMotion {
+    val FastMs: Int get() = app.voicecloud.core.designsystem.BuildConfig.MOTION_FAST_MS
+    val StandardMs: Int get() = app.voicecloud.core.designsystem.BuildConfig.MOTION_STANDARD_MS
+    val SlowMs: Int get() = app.voicecloud.core.designsystem.BuildConfig.MOTION_SLOW_MS
+}
 val LocalVoiceCloudRadii = staticCompositionLocalOf { VoiceCloudRadii() }
 
 private val consumerLight = lightColorScheme(
     primary = ConsumerColors.Sapphire, onPrimary = Color.White,
     primaryContainer = ConsumerColors.SapphireSoft, onPrimaryContainer = ConsumerColors.Ink,
+    inversePrimary = ConsumerColors.Ice,
     secondary = ConsumerColors.Indigo, onSecondary = Color.White,
+    secondaryContainer = ConsumerColors.SapphireSoft, onSecondaryContainer = ConsumerColors.Ink,
     tertiary = ConsumerColors.Violet, onTertiary = Color.White,
+    tertiaryContainer = ConsumerColors.Lavender, onTertiaryContainer = ConsumerColors.Ink,
     background = ConsumerColors.Cloud, onBackground = ConsumerColors.Text,
     surface = ConsumerColors.Surface, onSurface = ConsumerColors.Text,
     surfaceVariant = ConsumerColors.SurfaceSoft, onSurfaceVariant = ConsumerColors.TextMuted,
-    outline = ConsumerColors.Border, error = CommonColors.Error,
+    surfaceTint = ConsumerColors.Sapphire,
+    inverseSurface = ConsumerColors.DeepNavy, inverseOnSurface = ConsumerColors.TextOnDark,
+    outline = ConsumerColors.Border, outlineVariant = ConsumerColors.Sky,
+    surfaceBright = ConsumerColors.Surface,
+    surfaceDim = ConsumerColors.SurfaceSoft,
+    surfaceContainerLowest = ConsumerColors.Surface,
+    surfaceContainerLow = ConsumerColors.Surface,
+    surfaceContainer = ConsumerColors.Cloud,
+    surfaceContainerHigh = ConsumerColors.SurfaceSoft,
+    surfaceContainerHighest = ConsumerColors.SapphireSoft,
+    scrim = ConsumerColors.DeepNavy,
+    error = CommonColors.Error,
 )
 private val consumerDark = darkColorScheme(
     primary = ConsumerColors.DarkSapphire, onPrimary = ConsumerColors.DarkBackground,
-    primaryContainer = Color(0xFF0A2A34), onPrimaryContainer = ConsumerColors.DarkText,
-    secondary = Color(0xFF6171FF), onSecondary = Color.White,
+    primaryContainer = ConsumerColors.DarkSurfaceSoft, onPrimaryContainer = ConsumerColors.DarkText,
+    inversePrimary = ConsumerColors.SapphireDeep,
+    secondary = ConsumerColors.DarkSapphireDeep, onSecondary = ConsumerColors.DarkBackground,
+    secondaryContainer = ConsumerColors.LiveSurface, onSecondaryContainer = ConsumerColors.DarkText,
+    tertiary = ConsumerColors.Ice, onTertiary = ConsumerColors.DarkBackground,
+    tertiaryContainer = ConsumerColors.LiveSurfaceElevated, onTertiaryContainer = ConsumerColors.DarkText,
     background = ConsumerColors.DarkBackground, onBackground = ConsumerColors.DarkText,
     surface = ConsumerColors.DarkSurface, onSurface = ConsumerColors.DarkText,
     surfaceVariant = ConsumerColors.DarkSurfaceSoft, onSurfaceVariant = ConsumerColors.DarkMuted,
-    outline = ConsumerColors.DarkBorder, error = CommonColors.Error,
+    surfaceTint = ConsumerColors.DarkSapphire,
+    inverseSurface = ConsumerColors.Surface, inverseOnSurface = ConsumerColors.Ink,
+    outline = ConsumerColors.DarkBorder, outlineVariant = ConsumerColors.Navy,
+    surfaceBright = ConsumerColors.DarkSurfaceSoft,
+    surfaceDim = ConsumerColors.DarkBackground,
+    surfaceContainerLowest = ConsumerColors.DarkBackground,
+    surfaceContainerLow = ConsumerColors.DarkSurface,
+    surfaceContainer = ConsumerColors.DarkSurfaceSoft,
+    surfaceContainerHigh = ConsumerColors.Navy,
+    surfaceContainerHighest = ConsumerColors.LiveSurfaceElevated,
+    scrim = Color.Black,
+    error = CommonColors.Error,
 )
 private val creatorLight = lightColorScheme(
-    primary = CreatorColors.Primary, onPrimary = Color(0xFF07130D),
+    primary = CreatorColors.Primary, onPrimary = Color.White,
     secondary = CreatorColors.Secondary, onSecondary = Color.White,
-    tertiary = CreatorColors.Accent, onTertiary = Color(0xFF062A25),
+    tertiary = CreatorColors.Accent, onTertiary = CreatorColors.Navigation,
     background = CreatorColors.LightBackground, onBackground = CreatorColors.Text,
     surface = CreatorColors.LightSurface, onSurface = CreatorColors.Text,
     surfaceVariant = CreatorColors.Elevated, onSurfaceVariant = CreatorColors.TextMuted,
-    outline = CreatorColors.Border, error = Color(0xFFDC2626),
+    outline = CreatorColors.Border, error = CommonColors.Error,
 )
 private val creatorDark = darkColorScheme(
-    primary = CreatorColors.PrimaryLight, onPrimary = Color(0xFF07130D),
-    secondary = CreatorColors.SecondaryLight, onSecondary = Color(0xFF062A25),
+    primary = CreatorColors.PrimaryLight, onPrimary = CreatorColors.DarkBackground,
+    secondary = CreatorColors.SecondaryLight, onSecondary = CreatorColors.Navigation,
     background = CreatorColors.DarkBackground, onBackground = CreatorColors.DarkText,
     surface = CreatorColors.DarkSurface, onSurface = CreatorColors.DarkText,
     surfaceVariant = CreatorColors.DarkElevated, onSurfaceVariant = CreatorColors.DarkMuted,
-    outline = CreatorColors.DarkBorder, error = Color(0xFFEF4444),
+    outline = CreatorColors.DarkBorder, error = CommonColors.Error,
+)
+
+
+private val voiceCloudShapes = Shapes(
+    extraSmall = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_SMALL.dp),
+    small = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_SMALL.dp),
+    medium = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_MEDIUM.dp),
+    large = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_LARGE.dp),
+    extraLarge = RoundedCornerShape(app.voicecloud.core.designsystem.BuildConfig.RADIUS_EXTRA_LARGE.dp),
 )
 
 private val voiceCloudTypography = Typography(
-    displaySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp),
-    headlineMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp),
-    titleLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 26.sp),
-    titleMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 22.sp),
-    bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp),
-    bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 21.sp),
-    labelLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, lineHeight = 20.sp),
+    displaySmall = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.ExtraBold, fontSize = 32.sp, lineHeight = 37.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, lineHeight = 32.sp, letterSpacing = (-0.35).sp),
+    headlineMedium = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, lineHeight = 26.sp, letterSpacing = (-0.2).sp),
+    headlineSmall = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.Bold, fontSize = 19.sp, lineHeight = 24.sp),
+    titleLarge = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 23.sp),
+    titleMedium = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 20.sp),
+    titleSmall = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 18.sp),
+    bodyLarge = TextStyle(fontFamily = VoiceCloudBodyFont, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 22.sp),
+    bodyMedium = TextStyle(fontFamily = VoiceCloudBodyFont, fontWeight = FontWeight.Normal, fontSize = 13.sp, lineHeight = 20.sp),
+    bodySmall = TextStyle(fontFamily = VoiceCloudBodyFont, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp),
+    labelLarge = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 18.sp),
+    labelMedium = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, lineHeight = 16.sp),
+    labelSmall = TextStyle(fontFamily = VoiceCloudDisplayFont, fontWeight = FontWeight.SemiBold, fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.5.sp),
 )
 
 @Composable
@@ -77,6 +131,6 @@ fun VoiceCloudTheme(portal: PortalTheme, darkTheme: Boolean = isSystemInDarkThem
         PortalTheme.Creator -> if (darkTheme) creatorDark else creatorLight
     }
     androidx.compose.runtime.CompositionLocalProvider(LocalVoiceCloudRadii provides VoiceCloudRadii()) {
-        MaterialTheme(colorScheme = colors, typography = voiceCloudTypography, content = content)
+        MaterialTheme(colorScheme = colors, typography = voiceCloudTypography, shapes = voiceCloudShapes, content = content)
     }
 }

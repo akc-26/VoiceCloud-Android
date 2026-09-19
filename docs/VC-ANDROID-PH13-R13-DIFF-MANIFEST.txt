@@ -1,0 +1,21 @@
+Changed from R12 tracked authority:
+CHANGED: CHANGELOG.md
+CHANGED: README.md
+CHANGED: app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+
+New R13 delivery files:
+NEW: VC-ANDROID-PH13-R13-REVISION.txt
+NEW: contracts/VC-ANDROID-PH13-R12-SOURCE-MANIFEST.sha256
+NEW: contracts/VC-ANDROID-PH13-R13-PH13-R12-PARENT-CANONICAL.sha256
+NEW: contracts/VC-ANDROID-PH13-R13-R09-RUNTIME-CANONICAL.sha256
+NEW: docs/VC-ANDROID-PH13-R13-AUTOMATED-EVIDENCE.md
+NEW: docs/VC-ANDROID-PH13-R13-CORRECTION-REPORT.md
+NEW: scripts/VC-ANDROID-PH13-R13-ACCEPTANCE.cmd
+NEW: scripts/VC-ANDROID-PH13-R13-DEVICE-CLOSURE.ps1
+NEW: scripts/VC-ANDROID-PH13-R13-SOURCE-DIAGNOSTIC.ps1
+NEW: scripts/ph13_r13_acceptance_wiring_regression.py
+NEW: scripts/ph13_r13_delivery_integrity.py
+NEW: scripts/ph13_r13_device_closure_regression.py
+NEW: scripts/ph13_r13_instrumentation_palette_regression.py
+NEW: scripts/ph13_r13_product_preservation_regression.py
+NEW: scripts/ph13_r13_workstation_artifact_regression.py

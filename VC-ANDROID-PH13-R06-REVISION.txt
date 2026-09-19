@@ -1,0 +1,9 @@
+VoiceCloud Android VC-ANDROID-PH13-R06
+Parent package: VC-ANDROID-PH13-R05
+Scope: acceptance-harness corrective revision only; R05 Android product/UI/API/runtime implementation is preserved byte-for-byte.
+Corrections:
+- Keeps Gradle Wrapper runtime pinned to the checksum-verified local Gradle 9.5.0 ZIP used during bootstrap instead of rewriting back to services.gradle.org.
+- Prevents compile/test/lint/assembly gates from failing solely because services.gradle.org is unreachable after a successful local bootstrap.
+- Treats Android Studio/Gradle workstation artifacts (.gradle, local.properties, generated wrapper files, build outputs) as non-product artifacts during source/product integrity checks, while keeping tracked source hash verification and unknown unmanifested product files fail-closed.
+- Uses the cached Gradle executable for daemon cleanup to avoid a second wrapper network lookup.
+Workstation acceptance: scripts\VC-ANDROID-PH13-R06-ACCEPTANCE.cmd

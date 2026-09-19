@@ -1,0 +1,5 @@
+VC-ANDROID-PH13-R14
+Parent: VC-ANDROID-PH13-R13
+Scope: full physical-device-driven UI/UX correction over the preserved PH13 functional/runtime authority.
+Acceptance: scripts\VC-ANDROID-PH13-R14-ACCEPTANCE.cmd
+Status at packaging: source/static/package verified; Windows Gradle + physical-device acceptance must pass before Git freeze.

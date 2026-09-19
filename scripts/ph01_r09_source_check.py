@@ -14,7 +14,9 @@ ok('AGP9 built-in Kotlin retained', 'org.jetbrains.kotlin.android' not in catalo
 ok('debug staging release variants retained', all(x in app for x in ['debug {','create("staging")','release {']))
 ok('compileSdk 37 locked', 'compileSdk = 37' in app); ok('targetSdk 36 locked', 'targetSdk = 36' in app); ok('minSdk 26 locked', 'minSdk = 26' in app)
 colors=text('core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudColors.kt')
-for token in ['0xFF0B7C86','0xFF075762','0xFF22C7CF','0xFF22C55E','0xFF123A32']: ok(f'R06 design token {token} retained', token in colors)
+branding=text('branding/voicecloud-brand.properties')
+for token, prop in [('#0B7C86','consumer.sapphire'),('#075762','consumer.sapphireDeep'),('#22C7CF','consumer.ice'),('#22C55E','creator.primary'),('#123A32','creator.navigation')]:
+    ok(f'R06 design token {token} retained through white-label authority', f'{prop}={token}' in branding and 'VoiceCloudBrand.color(BuildConfig.' in colors)
 ok('fresh User launch is Light-first', 'darkTheme = false' in text('app/src/main/java/app/voicecloud/android/ui/VoiceCloudRoot.kt'))
 nav=text('app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt'); ok('dual portal bootstrap navigation retained', all(x in nav for x in ['NavHost','UserPortal','CreatorPortal']))
 vault=text('core/security/src/main/java/app/voicecloud/core/security/AndroidKeyStoreTokenVault.kt'); ok('Keystore AES-GCM token vault retained', all(x in vault for x in ['AndroidKeyStore','AES/GCM/NoPadding','GCMParameterSpec']))

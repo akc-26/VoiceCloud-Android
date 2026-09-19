@@ -1,0 +1,4 @@
+VC-ANDROID-PH13-R19
+Parent: VC-ANDROID-PH13-R18
+Functional/build authority: build-proven R15 core carried through R18.
+Scope: consolidated physical-device-video-driven product architecture and approved-design fidelity correction for End User + Creator/Host, including correct Live/Discover navigation and backend-authoritative Host gating.

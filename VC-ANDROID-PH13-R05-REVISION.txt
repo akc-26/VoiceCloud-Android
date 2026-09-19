@@ -1,0 +1,8 @@
+VoiceCloud Android VC-ANDROID-PH13-R05
+Parent package: VC-ANDROID-PH13-R04
+Scope: approved premium Android UI/UX implementation only; no feature/API/business-rule changes.
+Visual authority: warm ivory/off-white surfaces + deep emerald/teal primary + restrained gold accents; premium cards, rounded controls, polished spacing/typography, immersive deep-emerald live audio rooms, and purposeful micro-interactions.
+Portals covered: End User / Listener and Creator Portal / Host.
+Functional preservation: PH13-R04 API/repository/ViewModel/model/security/realtime files remain byte-identical; all public screen callback contracts and callback invocation counts are preserved by R05 regression checks.
+Build status in assistant sandbox: SOURCE/CONTRACT VERIFIED; full Gradle compilation NOT EXECUTED because the distribution bootstrap could not reach services.gradle.org and the package intentionally contains no generated Gradle wrapper JAR/scripts.
+Workstation acceptance: run scripts\VC-ANDROID-PH13-R05-ACCEPTANCE.cmd to execute compileDebugKotlin, compileStagingKotlin, compileReleaseKotlin, unit tests, lint, assemblies, device gate, and delivery integrity.

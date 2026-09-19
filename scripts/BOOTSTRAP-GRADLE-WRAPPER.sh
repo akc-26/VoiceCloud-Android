@@ -17,15 +17,17 @@ if [[ ! -x "$HOME_DIR/bin/gradle" ]]; then
 fi
 LOCAL_URI="$(python3 -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve().as_uri())' "$ZIP")"
 "$HOME_DIR/bin/gradle" wrapper --gradle-version "$VERSION" --distribution-type bin --gradle-distribution-url "$LOCAL_URI"
+ESCAPED_LOCAL_URI="${LOCAL_URI/:/\\:}"
 cat > gradle/wrapper/gradle-wrapper.properties <<EOF
 distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
 distributionSha256Sum=$SHA256
-distributionUrl=https\://services.gradle.org/distributions/gradle-$VERSION-bin.zip
+distributionUrl=$ESCAPED_LOCAL_URI
 networkTimeout=60000
 validateDistributionUrl=true
 zipStoreBase=GRADLE_USER_HOME
 zipStorePath=wrapper/dists
 EOF
 [[ -f gradle/wrapper/gradle-wrapper.jar && -f gradlew && -f gradlew.bat ]] || { echo '[FAIL] Standard wrapper files were not generated.'; exit 1; }
-echo '[PASS] Standard Gradle Wrapper generated from local cache and pinned to official distribution.'
+grep -Fq 'distributionUrl=file\:///' gradle/wrapper/gradle-wrapper.properties || { echo '[FAIL] Wrapper runtime is not pinned to the verified local Gradle ZIP.'; exit 1; }
+echo '[PASS] Standard Gradle Wrapper generated and pinned to verified local Gradle ZIP.'

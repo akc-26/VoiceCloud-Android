@@ -1,0 +1,38 @@
+from pathlib import Path
+import re
+ROOT = Path(__file__).resolve().parents[1]
+def t(p): return (ROOT/p).read_text(encoding='utf-8')
+def ok(n,c):
+    if not c: raise SystemExit(f'[FAIL] PH08-R02 corrective point {n}')
+    print(f'[PASS] PH08-R02 corrective point {n}')
+
+dui=t(Path('feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt'))
+drepo=t(Path('feature/discovery/src/main/java/app/voicecloud/feature/discovery/data/DiscoveryRepository.kt'))
+dapi=t(Path('feature/discovery/src/main/java/app/voicecloud/feature/discovery/data/DiscoveryApi.kt'))
+dvm=t(Path('feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryViewModel.kt'))
+dmodels=t(Path('feature/discovery/src/main/java/app/voicecloud/feature/discovery/model/DiscoveryModels.kt'))
+enui=t(Path('feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt'))
+enrepo=t(Path('feature/economy/src/main/java/app/voicecloud/feature/economy/data/EconomyRepository.kt'))
+enmodels=t(Path('feature/economy/src/main/java/app/voicecloud/feature/economy/model/EconomyModels.kt'))
+papi=t(Path('feature/profile/src/main/java/app/voicecloud/feature/profile/data/ProfileApi.kt'))
+prepo=t(Path('feature/profile/src/main/java/app/voicecloud/feature/profile/data/ProfileRepository.kt'))
+pui=t(Path('feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt'))
+auth=t(Path('feature/auth/src/main/java/app/voicecloud/feature/auth/data/AuthRepository.kt'))
+live=t(Path('feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt'))
+nav=t(Path('app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt'))
+
+ok(1, '.take(10)' in drepo and '.take(4)' in drepo and 'SectionTitle("Live now"' in dui)
+ok(2, 'onEconomySection' in dui and 'Economy & progression' in dui and 'VoiceCloudPageTopBar(section.label' in enui)
+ok(3, 'SectionTitle("Sent")' in dui and 'cancelFriendRequest' in dapi and 'Suggestions' in dui)
+ok(4, 'SearchLandingSnapshot' in dmodels and 'loadSearchLanding' in dvm and all(x in dui for x in ['SectionTitle("People"','SectionTitle("Creators"','SectionTitle("Rooms"','SectionTitle("Communities"','No results found for']))
+ok(5, 'SectionTitle("Trending rooms"' in dui and 'HomeShortcut("Events"' in dui and 'HomeShortcut("Communities"' in dui)
+ok(6, 'VoiceCloudBrandMark(size = 44.dp)' in dui)
+ok(7, 'payload.toString()' not in enui and 'payloadSections(' in enui and enrepo.count('safe {') >= 10 and enmodels.find('REFERRALS') > enmodels.find('TICKETS'))
+ok(8, '@GET("cms/pages")' in papi and 'HelpPagesScreen' in pui and 'Help, terms & information' in dui)
+ok(9, 'serverProfileAlreadyConfigured' in auth and 'hasCompletedOnboarding' in auth)
+ok(10, '@POST("users/avatar")' in papi and '@PUT("users/avatar")' in papi and '@POST("users/cover")' in papi and '@PUT("users/cover")' in papi and '800 × 800 px' in pui and '1600 × 600 px' in pui)
+ok(11, nav.count('tween(220)') >= 2 and 'slideInHorizontally' in nav and 'slideOutHorizontally' in nav)
+ok(12, 'LiveRoomTopBar' in live and re.search(r'title\s*=\s*state\.room.*', live) is not None and 'maxLines = 2' in live)
+ok(13, 'bottomBar = {' in live and 'ChatComposer(' in live and 'Text("Leave", color = CommonColors.Error' in live and 'vc_icon_emoji' in live and 'vc_icon_gift' in live)
+ok(14, 'roomPreview(it)' not in nav and nav.count('roomExperience(it)') >= 4)
+print('[PASS] VC-ANDROID-PH08-R02 product-quality regression: 14/14 PASS')

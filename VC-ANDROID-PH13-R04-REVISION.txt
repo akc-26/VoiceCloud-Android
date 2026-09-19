@@ -1,0 +1,6 @@
+VoiceCloud Android VC-ANDROID-PH13-R04
+Parent package: VC-ANDROID-PH13-R03
+Scope: acceptance-harness complete-diagnostic and Windows isolated-workspace cleanup closure only
+Product source: unchanged from PH13-R01/R02/R03
+Mandatory order: source/regression diagnostics -> Java/SDK preconditions -> compileDebugKotlin -> compileStagingKotlin -> compileReleaseKotlin -> tests -> lint -> assemblies -> device instrumentation -> original delivery-tree integrity
+Discovery behavior: independent gates continue after failures; consolidated failure summary emitted at end; genuine mandatory failures remain fail-closed.

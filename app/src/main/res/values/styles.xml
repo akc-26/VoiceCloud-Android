@@ -2,8 +2,14 @@
     <style name="Theme.VoiceCloud" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">@color/voicecloud_surface</item>
-        <item name="android:navigationBarColor">@color/voicecloud_surface</item>
+        <item name="android:statusBarColor">@color/vc_brand_system_surface</item>
+        <item name="android:navigationBarColor">@color/vc_brand_system_surface</item>
         <item name="android:windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="Theme.VoiceCloud.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/vc_brand_system_surface</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/vc_brand_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.VoiceCloud</item>
     </style>
 </resources>

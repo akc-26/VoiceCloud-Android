@@ -1,0 +1,35 @@
+VC-ANDROID-PH11-R02 -> VC-ANDROID-PH12-R01 Diff Manifest
+Authoritative parent Git commit: fad14e236a780cbe14a74a4676a3ad94237d9bbe
+
+  M	CHANGELOG.md
+  M	README.md
+  M	app/build.gradle.kts
+  M	app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+  M	feature/creator/build.gradle.kts
+  M	feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+  M	feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+  M	feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+  M	feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+  M	feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+  M	feature/creator/src/test/java/app/voicecloud/feature/creator/model/CreatorModelsTest.kt
+  M	feature/discovery/src/main/java/app/voicecloud/feature/discovery/data/DiscoveryRepository.kt
+  M	feature/engagement/src/main/java/app/voicecloud/feature/engagement/data/EngagementRepository.kt
+  M	feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+  M	feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementViewModel.kt
+  M	feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+  A	VC-ANDROID-PH12-R01-REVISION.txt
+  A	contracts/VC-ANDROID-PH12-R01-PH11-R02-BASELINE-CANONICAL.sha256
+  A	docs/VC-ANDROID-PH12-R01-AUTOMATED-EVIDENCE.md
+  A	docs/VC-ANDROID-PH12-R01-DIFF-MANIFEST.txt
+  A	docs/VC-ANDROID-PH12-R01-IMPLEMENTATION-REPORT.md
+  A	docs/VC-ANDROID-PH12-R01-MANUAL-QA.md
+  A	docs/VC-ANDROID-PH12-R01-SOURCE-GATE-RESULTS.txt
+  A	scripts/VC-ANDROID-PH12-R01-ACCEPTANCE.cmd
+  A	scripts/ph12_r01_acceptance_wiring_regression.py
+  A	scripts/ph12_r01_backend_contract_regression.py
+  A	scripts/ph12_r01_compile_surface_regression.py
+  A	scripts/ph12_r01_package_hygiene.py
+  A	scripts/ph12_r01_preservation_regression.py
+  A	scripts/ph12_r01_source_check.py
+  A	scripts/ph12_r01_unit_contract_regression.py
+  A	contracts/VC-ANDROID-PH12-R01-SOURCE-MANIFEST.sha256

@@ -1,0 +1,5 @@
+VC-ANDROID-PH13-R13
+Parent: VC-ANDROID-PH13-R12
+Scope: androidTest palette-authority correction only; production Android app/UI/API/runtime source remains unchanged from build-proven PH13-R09/R12.
+Correction: foundation instrumentation now asserts the approved premium palette (#18312D text, #006C63 primary) instead of stale pre-redesign values (#10262E, #0B7C86).
+Retest: reuses a verified prior R12/R11 build workspace and rebuilds only the androidTest APK when available.

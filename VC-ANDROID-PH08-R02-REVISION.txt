@@ -1,0 +1,5 @@
+VC-ANDROID-PH08-R02
+Parent Git baseline: VoiceCloud-Android-VC-ANDROID-PH07-R03 @ fe2e7857802861e2ace2733a313c00c5d27d331d
+Scope: PH08 completion/corrective integration, 14 reported UX/runtime corrections, hosted Stripe/Razorpay/PayPal rail, Google Play Billing rail.
+Current testing payment mode: HOSTED_GATEWAY (backend/Admin-selected provider; Stripe currently configured by deployment).
+Launch switch: VOICECLOUD_ANDROID_PAYMENT_MODE=HOSTED_GATEWAY or GOOGLE_PLAY.

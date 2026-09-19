@@ -1,0 +1,9 @@
+VC-ANDROID-PH13-R07
+Parent: VC-ANDROID-PH13-R06
+Purpose: real Kotlin compile correction after PH13-R06 workstation acceptance reached Compose compilation.
+Scope: UI implementation compile correction only; no API, repository, ViewModel, model, navigation contract, permission, RTC, economy, or business-rule changes.
+Corrections:
+- VoiceCloudBrandMark Canvas drawArc calls use named style= arguments compatible with current Compose API.
+- VoiceCloudPremium speaking-ring Canvas uses fillMaxSize instead of unavailable matchParentSize import.
+- Canvas drawing calls in touched primitives use named parameters to prevent overload/parameter-order ambiguity.
+- R07 source regressions lock these exact compiler findings and preserve PH13-R06 product behavior.

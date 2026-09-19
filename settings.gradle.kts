@@ -11,6 +11,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
@@ -26,3 +27,21 @@ include(":feature:bootstrap")
 include(":core:preferences")
 include(":core:logging")
 include(":core:realtime")
+
+include(":feature:auth")
+
+include(":feature:discovery")
+
+include(":feature:engagement")
+
+include(":feature:live")
+
+include(":feature:hosting")
+
+include(":feature:economy")
+
+include(":feature:profile")
+
+include(":feature:settings")
+
+include(":feature:creator")

@@ -1,0 +1,63 @@
+VC-ANDROID-PH13-R16 DIFF MANIFEST
+Parent: VC-ANDROID-PH13-R15
+
+Modified parent files: 17
+MODIFIED  CHANGELOG.md
+MODIFIED  README.md
+MODIFIED  app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudPageMetrics.kt
+MODIFIED  core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+MODIFIED  feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+MODIFIED  feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+MODIFIED  feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+MODIFIED  feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+MODIFIED  feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+MODIFIED  feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+MODIFIED  feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+MODIFIED  feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+MODIFIED  feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+MODIFIED  feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+
+New files: 38
+ADDED     VC-ANDROID-PH13-R16-REVISION.txt
+ADDED     contracts/VC-ANDROID-PH13-R16-ALLOWED-PRESENTATION-CHANGES.txt
+ADDED     contracts/VC-ANDROID-PH13-R16-PH13-R15-PRODUCT-CANONICAL.sha256
+ADDED     contracts/VC-ANDROID-PH13-R16-SOURCE-MANIFEST.sha256
+ADDED     core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_onboarding_conversation.png
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_ref_creator_mic.png
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_ref_creator_wallet.png
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_ref_home_mic.png
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_ref_live_forest.png
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_ref_vip_crown.png
+ADDED     core/designsystem/src/main/res/drawable-nodpi/vc_ref_wallet_spark.png
+ADDED     docs/VC-ANDROID-PH13-R16-AUTOMATED-EVIDENCE.md
+ADDED     docs/VC-ANDROID-PH13-R16-DESIGN-FIDELITY-MATRIX.md
+ADDED     docs/VC-ANDROID-PH13-R16-DIFF-MANIFEST.txt
+ADDED     docs/VC-ANDROID-PH13-R16-IMPLEMENTATION-REPORT.md
+ADDED     docs/VC-ANDROID-PH13-R16-MANUAL-DEVICE-QA.md
+ADDED     docs/VC-ANDROID-PH13-R16-SOURCE-GATE-RESULTS.txt
+ADDED     docs/reference/approved-r16/01-overall-design-system.png
+ADDED     docs/reference/approved-r16/02-auth-onboarding.png
+ADDED     docs/reference/approved-r16/03-discover-search-community.png
+ADDED     docs/reference/approved-r16/04-listener-live-room.png
+ADDED     docs/reference/approved-r16/05-economy-profile-settings.png
+ADDED     docs/reference/approved-r16/06-creator-dashboard-growth.png
+ADDED     docs/reference/approved-r16/07-creator-room-creation-scheduling.png
+ADDED     docs/reference/approved-r16/08-host-controls-moderation.png
+ADDED     docs/reference/approved-r16/09-creator-showcase.png
+ADDED     scripts/VC-ANDROID-PH13-R16-ACCEPTANCE.cmd
+ADDED     scripts/VC-ANDROID-PH13-R16-ISOLATED-BUILD.ps1
+ADDED     scripts/VC-ANDROID-PH13-R16-SOURCE-DIAGNOSTIC.ps1
+ADDED     scripts/ph13_r16_acceptance_wiring_regression.py
+ADDED     scripts/ph13_r16_compile_surface_regression.py
+ADDED     scripts/ph13_r16_delivery_integrity.py
+ADDED     scripts/ph13_r16_design_fidelity_regression.py
+ADDED     scripts/ph13_r16_product_preservation_regression.py
+ADDED     scripts/ph13_r16_source_hygiene.py
+ADDED     scripts/ph13_r16_windows_harness_structure_regression.py
+ADDED     scripts/ph13_r16_workstation_artifact_regression.py
+
+Missing parent files: 0

@@ -1,0 +1,8 @@
+VoiceCloud Android revision: VC-ANDROID-PH13-R02
+Corrective parent package: VoiceCloud-Android-VC-ANDROID-PH13-R01
+Functional parent package: VoiceCloud-Android-VC-ANDROID-PH12-R01
+Git ancestry carried by parent: PH11-R02 @ fad14e236a780cbe14a74a4676a3ad94237d9bbe
+Scope: Acceptance Gate 8/package-hygiene correction only. PH13 product/Kotlin functionality is unchanged from R01.
+Reported failure: Gate 8 falsely reported gradle/wrapper/gradle-wrapper.properties drift after the standard Windows Gradle-wrapper bootstrap rewrote canonical LF text as CRLF; the old hygiene rule would also reject build directories produced by Gates 1-6.
+Correction: restore canonical tracked wrapper source after bootstrap, remove generated wrapper launch/JAR files, verify all tracked source hashes exactly, permit only known workstation-generated artifacts post-build, and keep strict ZIP hygiene as a separate delivery gate.
+Build acceptance: PH13-R01 Gates 1-6 passed on the user workstation; rerun PH13-R02 full acceptance and require its final PASS before Git freeze.

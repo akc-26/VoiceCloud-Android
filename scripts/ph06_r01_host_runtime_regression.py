@@ -1,0 +1,21 @@
+from pathlib import Path
+R=Path(__file__).resolve().parents[1]; c=[]
+def t(x): return (R/x).read_text()
+def ck(n,v):
+ if not v: raise SystemExit('[FAIL] '+n)
+ c.append(n); print('[PASS] '+n)
+rtc=t('feature/live/src/main/java/app/voicecloud/feature/live/rtc/RtcAudioEngine.kt'); vm=t('feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt'); ui=t('feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt'); inst=t('app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt')
+ck('host RTC stays receive-only on connect','audio = false' in rtc and 'video = false' in rtc)
+ck('mic is explicit suspend operation','override suspend fun setMicrophoneEnabled' in rtc)
+ck('mic source uses LiveKit local participant','localParticipant.setMicrophoneEnabled(enabled)' in rtc)
+ck('mic state resets before connection','mutableMicrophoneEnabled.value = false' in rtc)
+ck('mic state resets on disconnect',rtc.count('mutableMicrophoneEnabled.value = false') >= 2)
+ck('runtime permission launcher exists','ActivityResultContracts.RequestPermission()' in ui)
+ck('mic enable only after permission','checkSelfPermission' in ui and 'permissionLauncher.launch' in ui)
+ck('denied permission has user-safe copy','You can still host and listen without it.' in ui)
+ck('console disposes session','DisposableEffect(roomId) { onDispose { onLeave() } }' in ui)
+ck('leave invalidates generation before cleanup','sessionGeneration.incrementAndGet()' in vm and 'rtcJoinJob?.cancel()' in vm)
+ck('end disables mic before RTC leave','rtcEngine.setMicrophoneEnabled(false)' in vm)
+ck('viewmodel teardown disconnects singleton','override fun onCleared()' in vm and 'rtcEngine.disconnect()' in vm)
+ck('instrumentation checks microphone manifest permission','ph06DeclaresMicrophonePermissionForExplicitHostPublishing' in inst and 'Manifest.permission.RECORD_AUDIO in permissions' in inst)
+print(f'VC-ANDROID-PH06-R01 host runtime regression: {len(c)}/{len(c)} PASS')

@@ -1,0 +1,845 @@
+===== ph13_r19_acceptance_wiring_regression.py :: PASS =====
+[PASS] R19 source diagnostics wired
+[PASS] R19 full isolated build wired
+[PASS] R19 delivery integrity wired
+[PASS] R19 video/product architecture regression wired
+[PASS] R19 product preservation wired
+[PASS] R19 compile surface wired
+[PASS] R18 component-signature closure retained
+[PASS] R16 approved-design fidelity retained
+[PASS] Python UTF-8 mode forced by CMD
+[PASS] Debug compile mandatory
+[PASS] Staging compile mandatory
+[PASS] Release compile mandatory
+[PASS] Unit tests mandatory
+[PASS] Lint mandatory
+[PASS] Assemblies mandatory
+[PASS] Physical-device instrumentation mandatory
+[PASS] Device pending distinct
+[PASS] Full acceptance only after device success
+[PASS] VC-ANDROID-PH13-R19 acceptance wiring: 18/18 PASS
+
+===== ph13_r19_product_preservation_regression.py :: PASS =====
+[PASS] R19 preserves 190 R18 product/runtime/build inputs byte-for-byte
+[PASS] R19 product changes are restricted to 5 video-driven navigation/presentation/Host-authority files
+[PASS] API/repository/model/RTC/security/payment/business authority remains protected; Hosting ViewModel change only consumes existing hostAccess authority
+
+===== ph13_r19_video_product_regression.py :: PASS =====
+[PASS] consumer bottom navigation owns a dedicated Live action
+[PASS] consumer second bottom tab is Discover
+[PASS] consumer center action is a Live/microphone action rather than Search
+[PASS] Search belongs to Discover context instead of becoming a bottom tab
+[PASS] Home has a distinct For You identity
+[PASS] Discover has its own dedicated page identity and search affordance
+[PASS] Home remains useful in data-light states with creator and quick-access sections
+[PASS] End User profile binds backend cover media
+[PASS] wallet is a compact profile action rather than the dominant profile hero
+[PASS] Speaker is not exposed as a fake account portal
+[PASS] portal selector exposes Listener and Creator experiences
+[PASS] Creator portal copy does not falsely imply automatic Host authority
+[PASS] Creator navigation exposes Studio explicitly
+[PASS] Creator center navigation no longer uses an unexplained plus action
+[PASS] Creator center action visibly represents live audio
+[PASS] Creator dashboard uses role-neutral welcome copy instead of hard-coded time-of-day greeting
+[PASS] Creator dashboard has a designed honest no-metrics state
+[PASS] Creator Live Studio derives actual Host approval state
+[PASS] unapproved Creator receives Host-access guidance instead of room-creation controls
+[PASS] Go Live and scheduling controls are inside approved-Host branch
+[PASS] Creator Studio loads authoritative Host profile and eligibility
+[PASS] Creator Studio does not load Host rooms before approval
+[PASS] Creator Profile opens as an overview with explicit edit mode
+[PASS] Creator Profile exposes a deliberate Edit Profile action
+[PASS] consumer center Live action routes to the live-room directory across primary surfaces
+[PASS] Creator Studio Host-access CTA routes to verification
+[PASS] complete Listener + Creator/Host screen inventory retained (91 Screen composables)
+[PASS] VC-ANDROID-PH13-R19 video/product architecture regression: 27/27 PASS
+
+===== ph13_r19_compile_surface_regression.py :: PASS =====
+[PASS] R19 Kotlin exists: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced braces: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced parentheses: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced brackets: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] R19 Kotlin exists: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] no merge markers: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] balanced braces: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] balanced parentheses: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] balanced brackets: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] R19 Kotlin exists: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] no merge markers: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] balanced braces: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] balanced parentheses: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] balanced brackets: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] R19 Kotlin exists: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced braces: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced parentheses: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced brackets: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] R19 Kotlin exists: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] no merge markers: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced braces: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced parentheses: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced brackets: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] HomeScreen exposes center Live callback
+[PASS] ExploreScreen exposes center Live callback
+[PASS] SearchScreen exposes center Live callback
+[PASS] MyProfileScreen exposes center Live callback
+[PASS] FriendsScreen exposes center Live callback
+[PASS] NavHost supplies Live callback to primary consumer screens
+[PASS] CreatorLiveStudioScreen exposes Host verification callback
+[PASS] NavHost Creator Live call matches new verification callback
+[PASS] HostingViewModel resolves existing Host authority API
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves import for .clip(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves import for .background(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves import for .clickable(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves import for .clip(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves import for .background(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves import for .clickable(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves import for .horizontalScroll(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves import for .clip(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves import for .background(
+[PASS] VC-ANDROID-PH13-R19 compile surface: 43/43 PASS
+
+===== ph13_r18_component_signature_regression.py :: PASS =====
+[PASS] VoiceCloudRemoteMedia project signature discovered
+[PASS] VoiceCloudRemoteMedia current parameter authority uses contentDescription + kind
+[PASS] VoiceCloudRemoteMedia legacy label/fallbackKind parameters are absent
+[PASS] all project-declared VoiceCloud* named-argument callsites match current function signatures
+[PASS] VoiceCloudRemoteMedia callsite audit covered project usage (21 calls)
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt has no stale VoiceCloudRemoteMedia label/fallbackKind callsites
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt has no stale VoiceCloudRemoteMedia label/fallbackKind callsites
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt has no stale VoiceCloudRemoteMedia label/fallbackKind callsites
+[PASS] Economy stale unused import removed: androidx.compose.foundation.clickable
+[PASS] Economy stale unused import removed: androidx.compose.foundation.border
+[PASS] Economy stale unused import removed: VoiceCloudPageTopBar
+[PASS] Economy stale unused import removed: VoiceCloudBrandMark
+[PASS] Economy stale unused import removed: VoiceCloudHeroCard
+[PASS] Economy stale unused import removed: VoiceCloudPageHero
+[PASS] Economy stale unused import removed: VoiceCloudGlossCard
+[PASS] Economy stale unused import removed: VoiceCloudPosterArtwork
+[PASS] Economy stale unused import removed: VoiceCloudPremiumCard
+[PASS] Economy stale unused import removed: VoiceCloudApprovedMetricRow
+[PASS] Economy unused glyph helper removed
+[PASS] VC-ANDROID-PH13-R18 component-signature closure: 19/19 PASS
+
+===== ph13_r17_compiler_locale_closure_regression.py :: PASS =====
+[PASS] VoiceCloudSpeakingAvatar public size parameter remains API-compatible
+[PASS] SpeakingAvatar Canvas captures DrawScope size explicitly
+[PASS] SpeakingAvatar center uses DrawScope canvas width/height
+[PASS] SpeakingAvatar head geometry uses DrawScope minDimension
+[PASS] SpeakingAvatar body arc uses DrawScope dimensions
+[PASS] SpeakingAvatar stroke uses DrawScope minDimension
+[PASS] SpeakingAvatar Canvas contains no unqualified size.width/height/minDimension shadowing
+[PASS] R17 CMD forces Python UTF-8 mode before diagnostics and integrity
+[PASS] R17 CMD forces UTF-8 Python stdio
+[PASS] R17 PowerShell source diagnostic forces Python UTF-8 mode for every child regression
+[PASS] R17 PowerShell source diagnostic forces UTF-8 stdio
+[PASS] R16 compile-surface checker uses explicit UTF-8 reads after closure
+[PASS] R16 compile-surface checker has no implicit Path.read_text() locale dependency
+[PASS] VC-ANDROID-PH13-R17 compiler/locale closure regression: 13/13 PASS
+
+===== ph13_r18_compile_surface_regression.py :: PASS =====
+[PASS] R18 audited Kotlin exists: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced braces: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced parentheses: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced brackets: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] R18 audited Kotlin exists: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+[PASS] balanced braces: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+[PASS] balanced parentheses: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+[PASS] balanced brackets: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .fillMaxSize(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .width(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .height(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .size(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .padding(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .clip(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .shadow(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .clickable(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .background(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudApproved.kt resolves Compose extension import for .border(
+[PASS] R18 audited Kotlin exists: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+[PASS] balanced braces: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+[PASS] balanced parentheses: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+[PASS] balanced brackets: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt resolves Compose extension import for .fillMaxSize(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt resolves Compose extension import for .size(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt resolves Compose extension import for .clip(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt resolves Compose extension import for .background(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt resolves Compose extension import for .border(
+[PASS] R18 audited Kotlin exists: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+[PASS] balanced braces: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+[PASS] balanced parentheses: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+[PASS] balanced brackets: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .fillMaxSize(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .height(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .size(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .padding(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .clip(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .background(
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt resolves Compose extension import for .border(
+[PASS] R18 audited Kotlin exists: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudPageMetrics.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudPageMetrics.kt
+[PASS] balanced braces: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudPageMetrics.kt
+[PASS] balanced parentheses: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudPageMetrics.kt
+[PASS] balanced brackets: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudPageMetrics.kt
+[PASS] R18 audited Kotlin exists: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+[PASS] balanced braces: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+[PASS] balanced parentheses: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+[PASS] balanced brackets: core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+[PASS] R18 audited Kotlin exists: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] no merge markers: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] balanced braces: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] balanced parentheses: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] balanced brackets: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .width(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .height(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .size(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .imePadding(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .clickable(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .background(
+[PASS] feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt resolves Compose extension import for .verticalScroll(
+[PASS] R18 audited Kotlin exists: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] no merge markers: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] balanced braces: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] balanced parentheses: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] balanced brackets: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .width(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .height(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .size(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .padding(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .scale(
+[PASS] feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt resolves Compose extension import for .background(
+[PASS] R18 audited Kotlin exists: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced braces: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced parentheses: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced brackets: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .fillMaxHeight(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .height(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .size(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .offset(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .background(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .border(
+[PASS] feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt resolves Compose extension import for .verticalScroll(
+[PASS] R18 audited Kotlin exists: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] no merge markers: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] balanced braces: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] balanced parentheses: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] balanced brackets: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .fillMaxHeight(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .width(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .height(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .size(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .offset(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .clickable(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .background(
+[PASS] feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt resolves Compose extension import for .horizontalScroll(
+[PASS] R18 audited Kotlin exists: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] no merge markers: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] balanced braces: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] balanced parentheses: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] balanced brackets: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .height(
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .size(
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt resolves Compose extension import for .background(
+[PASS] R18 audited Kotlin exists: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] no merge markers: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] balanced braces: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] balanced parentheses: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] balanced brackets: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .width(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .height(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .size(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .clickable(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .background(
+[PASS] feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt resolves Compose extension import for .border(
+[PASS] R18 audited Kotlin exists: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] no merge markers: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced braces: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced parentheses: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced brackets: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .width(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .height(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .size(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .background(
+[PASS] feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt resolves Compose extension import for .verticalScroll(
+[PASS] R18 audited Kotlin exists: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] no merge markers: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] balanced braces: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] balanced parentheses: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] balanced brackets: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .width(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .height(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .size(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .clickable(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .background(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .border(
+[PASS] feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt resolves Compose extension import for .horizontalScroll(
+[PASS] R18 audited Kotlin exists: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] no merge markers: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] balanced braces: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] balanced parentheses: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] balanced brackets: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .width(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .height(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .size(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .clip(
+[PASS] feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt resolves Compose extension import for .background(
+[PASS] R18 audited Kotlin exists: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] no merge markers: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] balanced braces: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] balanced parentheses: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] balanced brackets: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt resolves Compose extension import for .fillMaxSize(
+[PASS] feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt resolves Compose extension import for .fillMaxWidth(
+[PASS] feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt resolves Compose extension import for .size(
+[PASS] feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt resolves Compose extension import for .padding(
+[PASS] feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt resolves Compose extension import for .horizontalScroll(
+[PASS] feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt resolves Compose extension import for .verticalScroll(
+[PASS] R18 audited Kotlin exists: app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+[PASS] no merge markers: app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+[PASS] balanced braces: app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+[PASS] balanced parentheses: app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+[PASS] balanced brackets: app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudVisuals.kt::VoiceCloudPictogram has no DrawScope size shadowing
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudBrandMark.kt::VoiceCloudBrandMark has no DrawScope size shadowing
+[PASS] core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt::VoiceCloudSpeakingAvatar has no DrawScope size shadowing
+[PASS] drawable resource resolves: vc_icon_bell
+[PASS] drawable resource resolves: vc_icon_calendar
+[PASS] drawable resource resolves: vc_icon_check_all
+[PASS] drawable resource resolves: vc_icon_community
+[PASS] drawable resource resolves: vc_icon_delete
+[PASS] drawable resource resolves: vc_icon_host
+[PASS] drawable resource resolves: vc_icon_message
+[PASS] drawable resource resolves: vc_icon_search
+[PASS] drawable resource resolves: vc_icon_visibility
+[PASS] drawable resource resolves: vc_icon_visibility_off
+[PASS] drawable resource resolves: vc_nav_explore
+[PASS] drawable resource resolves: vc_nav_explore_selected
+[PASS] drawable resource resolves: vc_nav_home
+[PASS] drawable resource resolves: vc_nav_home_selected
+[PASS] drawable resource resolves: vc_nav_profile
+[PASS] drawable resource resolves: vc_nav_profile_selected
+[PASS] drawable resource resolves: vc_onboarding_conversation
+[PASS] drawable resource resolves: vc_portal_creator
+[PASS] drawable resource resolves: vc_portal_user
+[PASS] drawable resource resolves: vc_ref_creator_mic
+[PASS] drawable resource resolves: vc_ref_home_mic
+[PASS] drawable resource resolves: vc_ref_live_forest
+[PASS] drawable resource resolves: vc_ref_vip_crown
+[PASS] drawable resource resolves: vc_ref_wallet_spark
+[PASS] Discovery non-null descriptor avoids redundant Elvis compiler warning
+[PASS] Hosting nullable stage has no unsafe direct dereference
+[PASS] Hosting clip compiler closure retained
+[PASS] Title Case formatter preserves whitespace
+[PASS] SpeakingAvatar compiler closure captures DrawScope size explicitly
+[PASS] stale SpeakingAvatar shadowed size.width expression removed
+[PASS] stale SpeakingAvatar shadowed size.minDimension expression removed
+[PASS] PortalSelector guest callback signature matches navigation
+[PASS] Creator portal analytics callback signature matches navigation
+[PASS] VC-ANDROID-PH13-R18 compile-surface regression: 238/238 PASS
+
+===== ph13_r16_design_fidelity_regression.py :: PASS =====
+[PASS] approved board bundled: 01-overall-design-system.png
+[PASS] approved board retained at high resolution: 01-overall-design-system.png
+[PASS] approved board bundled: 02-auth-onboarding.png
+[PASS] approved board retained at high resolution: 02-auth-onboarding.png
+[PASS] approved board bundled: 03-discover-search-community.png
+[PASS] approved board retained at high resolution: 03-discover-search-community.png
+[PASS] approved board bundled: 04-listener-live-room.png
+[PASS] approved board retained at high resolution: 04-listener-live-room.png
+[PASS] approved board bundled: 05-economy-profile-settings.png
+[PASS] approved board retained at high resolution: 05-economy-profile-settings.png
+[PASS] approved board bundled: 06-creator-dashboard-growth.png
+[PASS] approved board retained at high resolution: 06-creator-dashboard-growth.png
+[PASS] approved board bundled: 07-creator-room-creation-scheduling.png
+[PASS] approved board retained at high resolution: 07-creator-room-creation-scheduling.png
+[PASS] approved board bundled: 08-host-controls-moderation.png
+[PASS] approved board retained at high resolution: 08-host-controls-moderation.png
+[PASS] approved board bundled: 09-creator-showcase.png
+[PASS] approved board retained at high resolution: 09-creator-showcase.png
+[PASS] board-derived component exists: VoiceCloudApprovedTopBar
+[PASS] board-derived component exists: VoiceCloudApprovedPrimaryButton
+[PASS] board-derived component exists: VoiceCloudApprovedTextField
+[PASS] board-derived component exists: VoiceCloudApprovedSearchBar
+[PASS] board-derived component exists: VoiceCloudApprovedChip
+[PASS] board-derived component exists: VoiceCloudApprovedCard
+[PASS] board-derived component exists: VoiceCloudApprovedFeaturedRoom
+[PASS] board-derived component exists: VoiceCloudApprovedRoomRow
+[PASS] board-derived component exists: VoiceCloudApprovedPersonRow
+[PASS] board-derived component exists: VoiceCloudApprovedMetricRow
+[PASS] board-derived component exists: VoiceCloudApprovedStatCard
+[PASS] central title formatter preserves whitespace tokens
+[PASS] rejected generic PageHero composition is not used by feature screens
+[PASS] auth approved composition retains VoiceCloudApprovedTextField
+[PASS] auth approved composition retains VoiceCloudOtpDigitsField
+[PASS] auth approved composition retains vc_onboarding_conversation
+[PASS] auth approved composition retains acceptedTerms
+[PASS] discovery approved composition retains VoiceCloudApprovedSearchBar
+[PASS] discovery approved composition retains VoiceCloudApprovedFeaturedRoom
+[PASS] discovery approved composition retains VoiceCloudApprovedRoomRow
+[PASS] discovery approved composition retains avatarUrl
+[PASS] discovery approved composition retains coverUrl
+[PASS] engagement approved composition retains VoiceCloudApprovedCard
+[PASS] engagement approved composition retains Community
+[PASS] engagement approved composition retains Messages
+[PASS] live approved composition retains VoiceCloudLiveBadge
+[PASS] live approved composition retains VoiceCloudSpeakingAvatar
+[PASS] live approved composition retains StageRoster
+[PASS] economy approved composition retains VoiceCloudApprovedCard
+[PASS] economy approved composition retains WALLET
+[PASS] economy approved composition retains VIP
+[PASS] profile approved composition retains RemoteMedia
+[PASS] profile approved composition retains coverUrl
+[PASS] profile approved composition retains avatarUrl
+[PASS] settings approved composition retains VoiceCloudApprovedCard
+[PASS] settings approved composition retains Notifications
+[PASS] settings approved composition retains Privacy
+[PASS] creator approved composition retains VoiceCloudApprovedStatCard
+[PASS] creator approved composition retains CreatorAnalyticsScreen
+[PASS] creator approved composition retains CreatorEarningsScreen
+[PASS] creator approved composition retains CreatorPayoutsScreen
+[PASS] hosting approved composition retains HostLiveConsoleScreen
+[PASS] hosting approved composition retains PollsQuizScreen
+[PASS] hosting approved composition retains ScheduleEditorScreen
+[PASS] hosting approved composition retains RoomEditorScreen
+[PASS] creator analytics/earnings do not fabricate hard-coded time-series data
+[PASS] creator charts fail honest when backend time-series is unavailable
+[PASS] remote backend media remains primary with board-derived fallback support
+[PASS] board-derived visual asset packaged: vc_onboarding_conversation
+[PASS] board-derived visual asset packaged: vc_ref_home_mic
+[PASS] board-derived visual asset packaged: vc_ref_live_forest
+[PASS] board-derived visual asset packaged: vc_ref_wallet_spark
+[PASS] board-derived visual asset packaged: vc_ref_vip_crown
+[PASS] board-derived visual asset packaged: vc_ref_creator_mic
+[PASS] board-derived visual asset packaged: vc_ref_creator_wallet
+[PASS] complete screen implementation inventory remains present (91 Screen composables detected)
+[PASS] VC-ANDROID-PH13-R16 approved-design fidelity regression: 74/74 PASS
+
+===== ph13_r19_windows_harness_structure_regression.py :: PASS =====
+[PASS] VC-ANDROID-PH13-R19-ISOLATED-BUILD.ps1 parentheses balanced
+[PASS] VC-ANDROID-PH13-R19-ISOLATED-BUILD.ps1 braces balanced
+[PASS] VC-ANDROID-PH13-R19-ISOLATED-BUILD.ps1 brackets balanced
+[PASS] VC-ANDROID-PH13-R19-ISOLATED-BUILD.ps1 no unterminated quote
+[PASS] VC-ANDROID-PH13-R19-SOURCE-DIAGNOSTIC.ps1 parentheses balanced
+[PASS] VC-ANDROID-PH13-R19-SOURCE-DIAGNOSTIC.ps1 braces balanced
+[PASS] VC-ANDROID-PH13-R19-SOURCE-DIAGNOSTIC.ps1 brackets balanced
+[PASS] VC-ANDROID-PH13-R19-SOURCE-DIAGNOSTIC.ps1 no unterminated quote
+[PASS] R19 CMD delayed ERRORLEVEL capture
+[PASS] R19 CMD locale-independent Python mode
+[PASS] VC-ANDROID-PH13-R19 Windows harness structure: 10/10 PASS
+
+===== ph13_r19_source_hygiene.py :: PASS =====
+[PASS] R19 source hygiene checked 671 authored text files
+[PASS] R19 authored source has final newlines and no trailing whitespace
+
+===== ph13_r19_workstation_artifact_regression.py :: PASS =====
+[PASS] R19 workstation/generated-artifact simulation accepted: 23 artifacts including exact Room schema JSON
+[PASS] R19 preservation and delivery integrity remain fail-closed for unknown product/source drift
+
+===== ph13_r13_instrumentation_palette_regression.py :: PASS =====
+[PASS] approved premium consumer text authority is #18312D
+[PASS] approved premium consumer primary authority is #006C63
+[PASS] instrumentation text ARGB assertion matches current centralized branding authority
+[PASS] instrumentation primary ARGB assertion matches current centralized branding authority
+[PASS] legacy pre-redesign text ARGB assertion is absent
+[PASS] legacy pre-redesign sapphire ARGB assertion is absent
+[PASS] runtime palette conversion guard remains intact
+[PASS] runtime palette size guard remains intact
+[PASS] package identity instrumentation remains intact
+[PASS] microphone permission instrumentation remains intact
+[PASS] exactly three foundation instrumentation tests remain
+[PASS] VC-ANDROID-PH13-R13 instrumentation palette correction regression: 11/11 PASS
+
+===== ph13_r07_compile_correction_regression.py :: PASS =====
+[PASS] Brand mark retains three cloud drawArc primitives
+[PASS] All brand drawArc calls use named color arguments
+[PASS] All brand drawArc calls use named startAngle arguments
+[PASS] All brand drawArc calls use named sweepAngle arguments
+[PASS] All brand drawArc calls use named useCenter arguments
+[PASS] All brand drawArc calls use named topLeft arguments
+[PASS] All brand drawArc calls use named size arguments
+[PASS] All brand drawArc calls pass Stroke through style=
+[PASS] Legacy positional drawArc overload misuse is absent
+[PASS] matchParentSize import is absent
+[PASS] matchParentSize invocation is absent
+[PASS] fillMaxSize import is present for speaking-ring canvas
+[PASS] speaking-ring canvas uses fillMaxSize
+[PASS] new premium Canvas lines use named strokeWidth/cap arguments
+[PASS] no positional Stroke object can bind to drawArc alpha slot
+[PASS] VC-ANDROID-PH13-R07 compile correction regression: 15/15 PASS
+
+===== ph13_r06_harness_correction_regression.py :: PASS =====
+[PASS] Windows bootstrap still checksum-verifies cached Gradle ZIP
+[PASS] Windows wrapper generation uses verified local distribution URI
+[PASS] Windows bootstrap keeps generated wrapper pinned to local file URI
+[PASS] Windows bootstrap explicitly verifies local wrapper runtime
+[PASS] Unix bootstrap keeps generated wrapper pinned to local file URI
+[PASS] R06 build verifies local wrapper before compile gates
+[PASS] R06 compile gates are blocked if local wrapper bootstrap is invalid
+[PASS] R06 cleanup uses cached Gradle executable and cannot force remote wrapper fetch
+[PASS] R06 source copy excludes workstation machine artifacts
+[PASS] R06 delivery integrity distinguishes generated workstation artifacts from product drift
+[PASS] R06 delivery integrity remains hash fail-closed for tracked files
+[PASS] VC-ANDROID-PH13-R06 harness correction regression: 11/11 PASS
+
+===== ph13_r01_unit_contract_regression.py :: PASS =====
+[PASS] PH12 Audience enum remains preserved
+[PASS] Financial navigation does not mutate core bottom-nav enum
+[PASS] PH12 plan non-paid default retained
+[PASS] PH13 financial empty/unknown defaults tested
+[PASS] PH13 payout default status unknown
+[PASS] VC-ANDROID-PH13-R01 unit contract regression: 5/5 PASS
+
+===== ph13_r01_source_check.py :: PASS =====
+[PASS] PH13 app version declared
+[PASS] PH13 route CreatorAnalytics
+[PASS] PH13 route CreatorWallet
+[PASS] PH13 route CreatorEarnings
+[PASS] PH13 route CreatorGifts
+[PASS] PH13 route CreatorPayouts
+[PASS] PH13 route CreatorPayoutDetail
+[PASS] PH13 route CreatorNotifications
+[PASS] PH13 route CreatorVerification
+[PASS] PH13 route HostVerification
+[PASS] PH13 screen CreatorAnalyticsScreen
+[PASS] PH13 screen CreatorWalletScreen
+[PASS] PH13 screen CreatorEarningsScreen
+[PASS] PH13 screen CreatorGiftsScreen
+[PASS] PH13 screen CreatorPayoutsScreen
+[PASS] PH13 screen CreatorPayoutDetailScreen
+[PASS] Creator notifications reuse Engagement authority
+[PASS] Host verification screen implemented
+[PASS] Creator PH13 endpoint @GET("analytics")
+[PASS] Creator PH13 endpoint @GET("wallet/balance")
+[PASS] Creator PH13 endpoint @GET("wallet/summary")
+[PASS] Creator PH13 endpoint @GET("wallet/transactions")
+[PASS] Creator PH13 endpoint @GET("gifts/history")
+[PASS] Creator PH13 endpoint @GET("creator/earnings")
+[PASS] Creator PH13 endpoint @POST("creator/payout-request")
+[PASS] Creator PH13 endpoint @GET("creator/payout-requests")
+[PASS] Creator PH13 endpoint @GET("creator/payout-requests/{id}")
+[PASS] Host PH13 endpoint @POST("hosts/apply")
+[PASS] Host PH13 endpoint @GET("hosts/progression")
+[PASS] Host PH13 endpoint @GET("hosts/verification/assets")
+[PASS] Host PH13 endpoint @POST("hosts/verification/government-id")
+[PASS] Host PH13 endpoint @POST("hosts/verification/profile-photo")
+[PASS] Host PH13 endpoint @POST("hosts/verification/documents")
+[PASS] Host PH13 endpoint @PUT("hosts/verification/assets/{assetId}/replacement")
+[PASS] Payout minimum enforced
+[PASS] Payout idempotency wired
+[PASS] Verification replacement uses backend asset id
+[PASS] Verification is transient in-memory selection
+[PASS] Android stream credentials are prohibited
+[PASS] No public verification upload path introduced
+[PASS] VC-ANDROID-PH13-R01 source authority: 40/40 PASS
+
+===== ph13_r01_backend_contract_regression.py :: PASS =====
+[PASS] GET analytics wired
+[PASS] GET wallet/balance wired
+[PASS] GET wallet/summary wired
+[PASS] GET wallet/transactions wired
+[PASS] GET gifts/history wired
+[PASS] GET creator/earnings wired
+[PASS] POST creator/payout-request wired
+[PASS] GET creator/payout-requests wired
+[PASS] GET creator/payout-requests/{id} wired
+[PASS] CreatePayoutRequest diamondAmount exact
+[PASS] CreatePayoutRequest payoutMethod exact
+[PASS] CreatePayoutRequest operationKey exact
+[PASS] No invented payout accountDetails payload
+[PASS] Payout minimum 100
+[PASS] Payout method allowlist authoritative
+[PASS] POST hosts/apply wired
+[PASS] GET hosts/progression wired
+[PASS] GET hosts/verification/assets wired
+[PASS] POST hosts/verification/government-id wired
+[PASS] POST hosts/verification/profile-photo wired
+[PASS] POST hosts/verification/documents wired
+[PASS] PUT hosts/verification/assets/{assetId}/replacement wired
+[PASS] ApplyHost DTO realName exact
+[PASS] ApplyHost DTO private government asset exact
+[PASS] ApplyHost DTO private selfie asset exact
+[PASS] ApplyHost DTO supporting assets exact
+[PASS] ApplyHost does not use deprecated public URL DTO fields
+[PASS] Verification uploads use multipart
+[PASS] Replacement sends only replacementAssetId
+[PASS] Private asset list retained after mutations
+[PASS] Stream credential GET prohibited
+[PASS] Stream credential regenerate prohibited
+[PASS] VC-ANDROID-PH13-R01 backend contract: 32/32 PASS
+
+===== ph13_r01_compile_surface_regression.py :: PASS =====
+[PASS] no merge markers app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced braces app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] balanced parentheses app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorApi.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/data/CreatorRepository.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/model/CreatorModels.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] balanced braces feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] balanced parentheses feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorViewModel.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingApi.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/data/HostingRepository.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/model/HostingModels.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] no merge markers feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced braces feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] balanced parentheses feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingViewModel.kt
+[PASS] Creator vertical-scroll import resolves
+[PASS] Creator phase13 callbacks match navigation
+[PASS] Creator payout route helper URI encodes
+[PASS] Hosting Retrofit multipart imports resolve
+[PASS] Hosting OkHttp multipart imports resolve
+[PASS] Hosting activity picker imports resolve
+[PASS] Hosting ViewModel callback signatures resolve
+[PASS] Host Studio verification callback matches navigation
+[PASS] No unresolved PH13 formatValue helper
+[PASS] Hosting module has Activity Compose + Retrofit
+[PASS] VC-ANDROID-PH13-R01 compile surface: 43/43 PASS
+
+===== ph12_r01_backend_contract_regression.py :: PASS =====
+[PASS] GET creator/plans wired
+[PASS] POST creator/plans wired
+[PASS] PATCH creator/plans/{id} wired
+[PASS] DELETE creator/plans/{id} wired
+[PASS] GET creator/subscribers wired
+[PASS] CreateCreatorPlan DTO field "title"
+[PASS] CreateCreatorPlan DTO field "description"
+[PASS] CreateCreatorPlan DTO field "monthlyPrice"
+[PASS] CreateCreatorPlan DTO field "yearlyPrice"
+[PASS] CreateCreatorPlan DTO field "benefits"
+[PASS] CreateCreatorPlan DTO field "visibility"
+[PASS] Update plan sends documented status
+[PASS] Plan status allowlist exact
+[PASS] Visibility allowlist exact
+[PASS] Archive uses DELETE authority
+[PASS] Subscribers status allowlist exact
+[PASS] Unknown subscriber total remains nullable
+[PASS] Direct conversations call backend type direct
+[PASS] Follow mutations use canonical users follow endpoints
+[PASS] No fabricated payment completion model
+[PASS] VC-ANDROID-PH12-R01 backend contract: 20/20 PASS
+
+===== ph12_r01_unit_contract_regression.py :: PASS =====
+[PASS] Creator unit test expects PH12 AUDIENCE section
+[PASS] Creator unit test still forbids PH13 finance
+[PASS] Plan defaults are non-paid DRAFT
+[PASS] Subscriber total unknown state covered
+[PASS] VC-ANDROID-PH12-R01 unit contract regression: 4/4 PASS
+
+===== ph11_r02_backend_contract_regression.py :: PASS =====
+[PASS] Privacy model and PATCH contain backend field showOnlineStatus
+[PASS] Privacy model and PATCH contain backend field showLastSeen
+[PASS] Privacy model and PATCH contain backend field allowDirectMessages
+[PASS] Privacy model and PATCH contain backend field showGifts
+[PASS] Privacy no longer submits obsolete field messagingPermission
+[PASS] Privacy no longer submits obsolete field followPermission
+[PASS] Privacy no longer submits obsolete field invitationPermission
+[PASS] Privacy no longer submits obsolete field visitorPermission
+[PASS] Privacy no longer submits obsolete field allowVisitorTracking
+[PASS] Privacy no longer submits obsolete field anonymousVisiting
+[PASS] Privacy uses canonical GET/PATCH users/privacy
+[PASS] Device detail API path is canonical deviceId
+[PASS] Device revoke API path is canonical deviceId
+[PASS] Safe device canonicalizes backend deviceId before row id
+[PASS] Device list navigation passes canonical deviceId
+[PASS] Contact request uses phoneNumber field
+[PASS] Contact request uses message field
+[PASS] Contact request does not send legacy phone field
+[PASS] Contact request does not send legacy description field
+[PASS] Contact validates backend minimum message length
+[PASS] Contact posts to canonical /contact
+[PASS] Consumer CMS uses public END_USER endpoint
+[PASS] Consumer CMS applies defensive End User audience filter
+[PASS] Creator CMS uses creator audience endpoints
+[PASS] Consumer settings repository never calls creator CMS endpoint
+[PASS] VC-ANDROID-PH11-R02 backend-contract regression: 25/25 PASS
+
+===== ph11_r02_compile_surface_regression.py :: PASS =====
+[PASS] no merge markers: core/network/src/main/java/app/voicecloud/core/network/UserFacingErrors.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPageTopBar.kt
+[PASS] no merge markers: core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudFeedback.kt
+[PASS] no merge markers: app/src/main/java/app/voicecloud/android/navigation/VoiceCloudNavHost.kt
+[PASS] no merge markers: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] Title Case import resolved: feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+[PASS] no merge markers: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] Title Case import resolved: feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+[PASS] no merge markers: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] Title Case import resolved: feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+[PASS] no merge markers: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] Title Case import resolved: feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+[PASS] no merge markers: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] Title Case import resolved: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+[PASS] no merge markers: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileImageCropper.kt
+[PASS] Title Case import resolved: feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileImageCropper.kt
+[PASS] no merge markers: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] Title Case import resolved: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+[PASS] no merge markers: feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthViewModel.kt
+[PASS] no merge markers: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] Title Case import resolved: feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+[PASS] no merge markers: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] Title Case import resolved: feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+[PASS] no merge markers: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] Title Case import resolved: feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+[PASS] no merge markers: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] Title Case import resolved: feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+[PASS] cropper compile surface resolves import android.graphics.ImageDecoder
+[PASS] cropper compile surface resolves import androidx.compose.ui.graphics.asImageBitmap
+[PASS] cropper compile surface resolves import androidx.compose.ui.layout.ContentScale
+[PASS] cropper compile surface resolves import androidx.compose.ui.unit.IntOffset
+[PASS] cropper compile surface resolves import androidx.compose.ui.unit.IntSize
+[PASS] cropper compile surface resolves import androidx.compose.ui.unit.LayoutDirection
+[PASS] cropper compile surface resolves ByteArrayOutputStream
+[PASS] Creator dynamic PH11 room/schedule routes URI encode
+[PASS] Creator Live screen callback signatures wired
+[PASS] Device route uses deviceId argument consistently
+[PASS] Settings Retrofit has Body/Path imports
+[PASS] Auth safe error extension import resolves
+[PASS] safe network mapper imports Retrofit HttpException
+[PASS] VC-ANDROID-PH11-R02 compile-surface regression: 40/40 PASS
+
+===== ph11_r02_economy_payment_regression.py :: PASS =====
+[PASS] hosted payment endpoint retained: wallet/purchase/web/initiate
+[PASS] hosted payment endpoint retained: wallet/purchase/web/complete
+[PASS] hosted payment endpoint retained: wallet/purchase/web/cancel
+[PASS] hosted payment endpoint retained: vip/checkout/web/initiate
+[PASS] hosted payment endpoint retained: vip/checkout/web/complete
+[PASS] hosted payment endpoint retained: vip/checkout/web/cancel
+[PASS] Wallet visual card still launches real credit purchase callback
+[PASS] VIP visual card still launches real VIP purchase callback
+[PASS] Hosted checkout completion remains server-authoritative
+[PASS] Google Play verification remains server-authoritative
+[PASS] Wallet consumption occurs only after server verification
+[PASS] VIP acknowledgement occurs only after server verification
+[PASS] Economy UI does not locally grant coins/VIP entitlement
+[PASS] Economy is visual card/grid based rather than raw key-value dump
+[PASS] VC-ANDROID-PH11-R02 economy/payment regression: 14/14 PASS
+
+===== ph09_r08_gradle_properties_authority.py :: PASS =====
+[PASS] 22 frozen PH08 product/build keys preserved
+[PASS] 1 PH09-R08 controlled Gradle tooling key preserved
+[PASS] org.gradle.tooling.parallel=true is explicit for Gradle 9.5 / current Android Studio sync compatibility
+[PASS] extra org.gradle.* and systemProp.* workstation/runtime properties are non-source authority
+[PASS] unknown VOICECLOUD_/android./kotlin./kapt./ksp. keys remain fail-closed
+[PASS] gradle.properties effective authority satisfied: 23 required keys
+
+===== ph09_r08_compile_risk_regression.py :: PASS =====
+[PASS] settings module declares Android Compose Hilt dependencies
+[PASS] Retrofit wildcard body maps are annotated
+[PASS] repository Any envelope parsers are null-safe
+[PASS] repository map helpers use explicit empty generic maps
+[PASS] Settings ViewModel StateFlow and event channel are lifecycle-safe
+[PASS] appearance viewmodel exposes stable StateFlow
+[PASS] root collects appearance with lifecycle
+[PASS] settings screens avoid experimental FlowRow dependency
+[PASS] settings screens use supported Material3 page top bar
+[PASS] settings screens import list items helper
+[PASS] context report route encodes dynamic values
+[PASS] context report route decodes arguments
+[PASS] all PH09 navigation destinations are composable
+[PASS] public profile callback signature and callsite agree
+[PASS] live room callback signature and callsite agree
+[PASS] report enums are exhaustive and type-safe
+[PASS] HTML CMS rendering is converted to plain Compose text
+[PASS] email and phone fields use keyboard options
+[PASS] Gradle tooling parallelism is explicit for current Gradle/Studio compatibility
+[PASS] no obvious Kotlin merge/conflict markers
+[PASS] device instrumentation no longer hard-codes debug application id
+[PASS] device instrumentation resolves AGP output metadata
+[PASS] device instrumentation resolves and reuses foreground Android user
+[PASS] known Kotlin 2.3 annotation-target warnings are explicit
+[PASS] PowerShell parser authority runs before Gradle compilation
+[PASS] FCM override deprecation uses the exact compiler diagnostic suppression
+[PASS] VC-ANDROID-PH09-R08 compile-risk regression: 26/26 PASS
+
+===== ph09_r08_device_closure_regression.py :: PASS =====
+[PASS] device gate derives Debug app identity from AGP output metadata
+[PASS] device gate derives Debug androidTest APK from AGP output metadata
+[PASS] device gate does not hard-code VoiceCloud debug target package
+[PASS] device gate resolves foreground Android user
+[PASS] foreground Android user must parse as a non-negative integer
+[PASS] app and test APK installs explicitly target the foreground user
+[PASS] app package is verified enabled for the same Android user
+[PASS] test package is verified enabled for the same Android user
+[PASS] runner is discovered dynamically from installed instrumentation
+[PASS] runner target must equal AGP-derived app applicationId
+[PASS] runner package is cross-checked with test metadata when available
+[PASS] instrumentation executes for the explicit foreground Android user
+[PASS] device gate identifies itself as Gate 7
+[PASS] stale Gate 6 instrumentation label is removed
+[PASS] target-package-not-found is a first-class rejected failure
+[PASS] instrumentation failure diagnostics include app/test package state
+[PASS] device gate still requires at least one executed test
+[PASS] no healthy device remains a distinct nonfatal code 2
+[PASS] wired/wireless candidate health and minimum API checks remain
+[PASS] APK path comes from output metadata rather than fixed filenames
+[PASS] device PowerShell interpolation braces UserId before colon
+[PASS] device PowerShell interpolation braces currentUser before colon
+[PASS] device process capture drains redirected output asynchronously
+[PASS] VC-ANDROID-PH09-R08 device/instrumentation closure regression: 23/23 PASS
+
+===== ph07_r03_adb_daemon_regression.py :: PASS =====
+[PASS] adb devices uses captured process helper
+[PASS] normal adb stderr is informational
+[PASS] direct PowerShell adb devices invocation removed
+[PASS] no-device exit remains nonfatal code 2
+VC-ANDROID-PH07-R03 adb daemon regression: 4/4 PASS
+

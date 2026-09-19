@@ -1,0 +1,45 @@
+VC-ANDROID-PH13-R14 DIFF MANIFEST
+Parent tree: VC-ANDROID-PH13-R13
+
+MODIFIED CHANGELOG.md
+MODIFIED README.md
+MODIFIED app/src/androidTest/java/app/voicecloud/android/VoiceCloudFoundationInstrumentedTest.kt
+MODIFIED core/designsystem/build.gradle.kts
+MODIFIED core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudFeedback.kt
+MODIFIED core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPageTopBar.kt
+MODIFIED core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudPremium.kt
+MODIFIED core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudVisuals.kt
+MODIFIED core/designsystem/src/main/java/app/voicecloud/core/designsystem/theme/VoiceCloudTheme.kt
+MODIFIED feature/auth/src/main/java/app/voicecloud/feature/auth/ui/AuthScreens.kt
+MODIFIED feature/bootstrap/src/main/java/app/voicecloud/feature/bootstrap/BootstrapRoute.kt
+MODIFIED feature/creator/src/main/java/app/voicecloud/feature/creator/ui/CreatorScreens.kt
+MODIFIED feature/discovery/src/main/java/app/voicecloud/feature/discovery/ui/DiscoveryScreens.kt
+MODIFIED feature/economy/src/main/java/app/voicecloud/feature/economy/ui/EconomyScreens.kt
+MODIFIED feature/engagement/src/main/java/app/voicecloud/feature/engagement/ui/EngagementScreens.kt
+MODIFIED feature/hosting/src/main/java/app/voicecloud/feature/hosting/ui/HostingScreens.kt
+MODIFIED feature/live/src/main/java/app/voicecloud/feature/live/ui/LiveRoomScreens.kt
+MODIFIED feature/profile/src/main/java/app/voicecloud/feature/profile/ui/ProfileScreens.kt
+MODIFIED feature/settings/src/main/java/app/voicecloud/feature/settings/ui/SettingsScreens.kt
+
+ADDED    VC-ANDROID-PH13-R14-REVISION.txt
+ADDED    contracts/VC-ANDROID-PH13-R14-PH13-R13-PARENT-PRODUCT-CANONICAL.sha256
+ADDED    contracts/VC-ANDROID-PH13-R14-SOURCE-MANIFEST.sha256
+ADDED    core/designsystem/src/main/java/app/voicecloud/core/designsystem/component/VoiceCloudMedia.kt
+ADDED    docs/VC-ANDROID-PH13-R14-AUTOMATED-EVIDENCE.md
+ADDED    docs/VC-ANDROID-PH13-R14-IMPLEMENTATION-REPORT.md
+ADDED    docs/VC-ANDROID-PH13-R14-MANUAL-DEVICE-QA.md
+ADDED    docs/VC-ANDROID-PH13-R14-SCREEN-COVERAGE.md
+ADDED    scripts/VC-ANDROID-PH13-R14-ACCEPTANCE.cmd
+ADDED    scripts/VC-ANDROID-PH13-R14-ISOLATED-BUILD.ps1
+ADDED    scripts/VC-ANDROID-PH13-R14-SOURCE-DIAGNOSTIC.ps1
+ADDED    scripts/ph13_r14_acceptance_wiring_regression.py
+ADDED    scripts/ph13_r14_delivery_integrity.py
+ADDED    scripts/ph13_r14_kotlin_compile_risk_regression.py
+ADDED    scripts/ph13_r14_product_preservation_regression.py
+ADDED    scripts/ph13_r14_source_hygiene.py
+ADDED    scripts/ph13_r14_visual_device_regression.py
+ADDED    scripts/ph13_r14_workstation_artifact_regression.py
+
+Modified: 19
+Added: 18
+Deleted: 0

@@ -1,0 +1,21 @@
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+acc=(ROOT/'scripts/VC-ANDROID-PH13-R11-ACCEPTANCE.cmd').read_text(encoding='utf-8')
+diag=(ROOT/'scripts/VC-ANDROID-PH13-R11-SOURCE-DIAGNOSTIC.ps1').read_text(encoding='utf-8')
+closure=(ROOT/'scripts/VC-ANDROID-PH13-R11-DEVICE-CLOSURE.ps1').read_text(encoding='utf-8')
+checks=[]
+def ck(label,cond): checks.append(bool(cond)); print(('[PASS] ' if cond else '[FAIL] ')+label)
+ck('R11 source diagnostic wired','VC-ANDROID-PH13-R11-SOURCE-DIAGNOSTIC.ps1' in acc)
+ck('R11 device closure wired','VC-ANDROID-PH13-R11-DEVICE-CLOSURE.ps1' in acc)
+ck('R11 delivery integrity wired','ph13_r11_delivery_integrity.py' in acc)
+ck('R11 product preservation regression wired','ph13_r11_product_preservation_regression.py' in diag)
+ck('R11 device closure regression wired','ph13_r11_device_closure_regression.py' in diag)
+ck('R09 full UI compile-risk authority retained','ph13_r09_full_ui_compile_risk_regression.py' in diag)
+ck('R11 does not rerun full compile/test/lint/assembly chain',all(x not in acc for x in ['compileDebugKotlin','compileStagingKotlin','compileReleaseKotlin','lintDebug','lintStaging','lintRelease','assembleRelease']))
+ck('R11 device preflight is explicit before build fallback','[DEVICE PREFLIGHT]' in closure)
+ck('R11 no-device is represented separately','VC_DEVICE_PENDING' in acc and '[DEVICE-PENDING]' in acc)
+ck('R11 genuine device failure remains fail-closed','R11 physical-device closure encountered a real device/instrumentation failure' in acc and 'exit /b 1' in acc)
+ck('R11 pending device does not invalidate build-proven host acceptance','host acceptance completed successfully' in acc and '[PENDING] Physical-device instrumentation remains pending' in acc)
+ck('R11 final full-device success path retained','R09 build-proven Gates 1-6 + R11 resilient physical-device closure' in acc)
+if not all(checks): raise SystemExit(1)
+print(f'[PASS] VC-ANDROID-PH13-R11 acceptance wiring: {len(checks)}/{len(checks)} PASS')

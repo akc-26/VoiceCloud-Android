@@ -1,0 +1,6 @@
+VoiceCloud Android revision: VC-ANDROID-PH13-R01
+Parent package: VoiceCloud-Android-VC-ANDROID-PH12-R01
+Parent Git ancestry: PH11-R02 @ fad14e236a780cbe14a74a4676a3ad94237d9bbe
+Scope: Creator Analytics, Wallet, Earnings, Gifts, Payouts, Notifications and Host Verification closure.
+Authority override: Android MUST NOT expose creator stream credentials, RTMP URLs, provider secrets, or credential regeneration even though web Creator Studio exposes them.
+Build acceptance: workstation Gradle/device acceptance remains required before Git freeze.
