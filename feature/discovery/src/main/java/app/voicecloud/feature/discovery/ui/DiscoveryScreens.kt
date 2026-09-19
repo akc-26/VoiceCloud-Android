@@ -223,31 +223,6 @@ private fun adaptivePagePadding(): PaddingValues {
 }
 
 @Composable
-private fun RowScope.HomeShortcut(label: String, iconRes: Int, onClick: () -> Unit) {
-    ElevatedCard(
-        modifier = Modifier.weight(1f).heightIn(min = 64.dp).clickable(onClick = onClick),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-        ) {
-            Surface(shape = RoundedCornerShape(12.dp), color = ConsumerColors.SapphireSoft) {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    tint = ConsumerColors.SapphireDeep,
-                    modifier = Modifier.padding(7.dp).size(20.dp),
-                )
-            }
-            Text(voiceCloudTitleCase(label), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
-        }
-    }
-}
-
-@Composable
 private fun StatusBlock(state: DiscoveryUiState, onRetry: (() -> Unit)? = null) {
     VoiceCloudToastEffect(state.error, state.notice)
     if (state.loading) Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
@@ -318,10 +293,10 @@ private fun EmptyBlock(title: String, body: String) {
 }
 
 @Composable
-private fun androidx.compose.foundation.layout.RowScope.HomeShortcut(label: String, icon: Int, onClick: () -> Unit) {
+private fun RowScope.HomeShortcut(label: String, iconRes: Int, onClick: () -> Unit) {
     VoiceCloudApprovedCard(Modifier.weight(1f).height(64.dp), onClick = onClick, contentPadding = 12.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Icon(painterResource(icon), contentDescription = null, tint = ConsumerColors.Sapphire, modifier = Modifier.size(22.dp))
+            Icon(painterResource(iconRes), contentDescription = null, tint = ConsumerColors.Sapphire, modifier = Modifier.size(22.dp))
             Text(label, style = MaterialTheme.typography.labelLarge, color = ConsumerColors.Text, maxLines = 1)
         }
     }
